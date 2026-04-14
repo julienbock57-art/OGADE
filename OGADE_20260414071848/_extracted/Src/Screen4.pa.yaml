@@ -1,0 +1,2463 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen4:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Form5:
+          Control: Form@2.4.4
+          Layout: Vertical
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            DataSource: ='Gestion des maquettes'
+            Height: =653
+            Width: =1306
+            X: =40
+            Y: =40
+          Children:
+            - Titre_DataCard3:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Title"
+                  Default: =ThisItem.Référence
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Titre)
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Titre)
+                  Required: =true
+                  Update: =DataCardValue30.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =0
+                Children:
+                  - DataCardKey39:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue30:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey39.Y + DataCardKey39.Height + 4
+                  - ErrorMessage39:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue30.Y + DataCardValue30.Height
+                  - StarVisible39:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey39.Y
+                  - Label31:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        X: =40
+                        Y: =40
+            - Matière_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxMultiSelectEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Mati_x00e8_re"
+                  Default: =ThisItem.Matière
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Matière)
+                  Required: =false
+                  Update: =DataCardValue31.SelectedItems
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =0
+                Children:
+                  - DataCardKey40:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue31:
+                      Control: Classic/ComboBox@2.4.0
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        ChevronBackground: =RGBA(56, 96, 178, 1)
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayFields: =["Value"]
+                        DisplayMode: =Parent.DisplayMode
+                        Font: =Font.'Open Sans'
+                        Height: =32
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =Choices([@'Gestion des maquettes'].Matière)
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["Value"]
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =10.5
+                        Tooltip: =Parent.DisplayName
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey40.Y + DataCardKey40.Height + 4
+                  - ErrorMessage40:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue31.Y + DataCardValue31.Height
+                  - StarVisible40:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey40.Y
+            - Longueur maquette_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Longueurmaquette"
+                  Default: =ThisItem.'Longueur maquette'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Longueur maquette')
+                  Required: =false
+                  Update: =Value(DataCardValue33.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =0
+                Children:
+                  - DataCardKey41:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue33:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey41.Y + DataCardKey41.Height + 4
+                  - ErrorMessage41:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue33.Y + DataCardValue33.Height
+                  - StarVisible41:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey41.Y
+            - Largeur maquette _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Largeurmaquette"
+                  Default: =ThisItem.'Largeur maquette '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Largeur maquette ')
+                  Required: =false
+                  Update: =Value(DataCardValue39.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =1
+                Children:
+                  - DataCardKey42:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue39:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey42.Y + DataCardKey42.Height + 4
+                  - ErrorMessage42:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue39.Y + DataCardValue39.Height
+                  - StarVisible42:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey42.Y
+            - Hauteur maquette_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Hauteurmaquette"
+                  Default: =ThisItem.'Hauteur maquette'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Hauteur maquette')
+                  Required: =false
+                  Update: =Value(DataCardValue40.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =1
+                Children:
+                  - DataCardKey43:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue40:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey43.Y + DataCardKey43.Height + 4
+                  - ErrorMessage43:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue40.Y + DataCardValue40.Height
+                  - StarVisible43:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey43.Y
+            - DN maquette _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="DNmaquette"
+                  Default: =ThisItem.'DN maquette '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'DN maquette ')
+                  Required: =false
+                  Update: =Value(DataCardValue41.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =1
+                Children:
+                  - DataCardKey45:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue41:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey45.Y + DataCardKey45.Height + 4
+                  - ErrorMessage45:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue41.Y + DataCardValue41.Height
+                  - StarVisible45:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey45.Y
+            - Epaisseur paroi maquette _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Epaisseurparoimaquette"
+                  Default: =ThisItem.'Epaisseur paroi maquette '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Epaisseur paroi maquette ')
+                  Required: =false
+                  Update: =Value(DataCardValue42.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =2
+                Children:
+                  - DataCardKey51:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue42:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey51.Y + DataCardKey51.Height + 4
+                  - ErrorMessage46:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue42.Y + DataCardValue42.Height
+                  - StarVisible51:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey51.Y
+            - Longueur défaut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Longueurd_x00e9_faut"
+                  Default: =ThisItem.'Longueur défaut'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Longueur défaut')
+                  Required: =false
+                  Update: =Value(DataCardValue43.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =2
+                Children:
+                  - DataCardKey52:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue43:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey52.Y + DataCardKey52.Height + 4
+                  - ErrorMessage51:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue43.Y + DataCardValue43.Height
+                  - StarVisible52:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey52.Y
+            - Largeur défaut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Largeurd_x00e9_faut"
+                  Default: =ThisItem.'Largeur défaut'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Largeur défaut')
+                  Required: =false
+                  Update: =Value(DataCardValue44.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =2
+                Children:
+                  - DataCardKey53:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue44:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey53.Y + DataCardKey53.Height + 4
+                  - ErrorMessage52:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue44.Y + DataCardValue44.Height
+                  - StarVisible53:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey53.Y
+            - Profondeur défaut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Profondeurd_x00e9_faut"
+                  Default: =ThisItem.'Profondeur défaut'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Profondeur défaut')
+                  Required: =false
+                  Update: =Value(DataCardValue46.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =3
+                Children:
+                  - DataCardKey57:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue46:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey57.Y + DataCardKey57.Height + 4
+                  - ErrorMessage53:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue46.Y + DataCardValue46.Height
+                  - StarVisible57:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey57.Y
+            - Diamètre défaut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Diam_x00e8_tred_x00e9_faut"
+                  Default: =ThisItem.'Diamètre défaut'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Diamètre défaut')
+                  Required: =false
+                  Update: =Value(DataCardValue51.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =3
+                Children:
+                  - DataCardKey58:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue51:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey58.Y + DataCardKey58.Height + 4
+                  - ErrorMessage57:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue51.Y + DataCardValue51.Height
+                  - StarVisible58:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey58.Y
+            - Type de défaut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Typeded_x00e9_faut"
+                  Default: =ThisItem.'Type de défaut'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Type de défaut')
+                  Required: =false
+                  Update: =DataCardValue52.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =3
+                Children:
+                  - DataCardKey59:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue52:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Type de défaut')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey59.Y + DataCardKey59.Height + 4
+                  - ErrorMessage58:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue52.Y + DataCardValue52.Height
+                  - StarVisible59:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey59.Y
+            - Localisation_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Localisation"
+                  Default: =ThisItem.Localisation
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Localisation)
+                  Required: =false
+                  Update: =DataCardValue53.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =4
+                Children:
+                  - DataCardKey60:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue53:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Localisation)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey60.Y + DataCardKey60.Height + 4
+                  - ErrorMessage59:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue53.Y + DataCardValue53.Height
+                  - StarVisible60:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey60.Y
+            - Historique_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Historique"
+                  Default: =ThisItem.Historique
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Historique)
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Historique)
+                  Required: =false
+                  Update: =DataCardValue57.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =4
+                Children:
+                  - DataCardKey61:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue57:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey61.Y + DataCardKey61.Height + 4
+                  - ErrorMessage60:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue57.Y + DataCardValue57.Height
+                  - StarVisible61:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey61.Y
+            - 'Localisation : Entreprise_DataCard1':
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Localisation_x003a_Entreprise"
+                  Default: |-
+                    =ThisItem.'Localisation : Entreprise'
+                  DisplayName: |-
+                    =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Localisation : Entreprise')
+                  Required: =false
+                  Update: =DataCardValue58.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =4
+                Children:
+                  - DataCardKey63:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue58:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: |-
+                          =Choices([@'Gestion des maquettes'].'Localisation : Entreprise')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey63.Y + DataCardKey63.Height + 4
+                  - ErrorMessage61:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue58.Y + DataCardValue58.Height
+                  - StarVisible63:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey63.Y
+            - Description_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Description"
+                  Default: =ThisItem.Description
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Description)
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Description)
+                  Required: =false
+                  Update: =DataCardValue59.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =5
+                Children:
+                  - DataCardKey64:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue59:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey64.Y + DataCardKey64.Height + 4
+                  - ErrorMessage63:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue59.Y + DataCardValue59.Height
+                  - StarVisible64:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey64.Y
+            - Composant_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Composant"
+                  Default: =ThisItem.Composant
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Composant)
+                  Required: =false
+                  Update: =DataCardValue64.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =5
+                Children:
+                  - DataCardKey65:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue64:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Composant)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey65.Y + DataCardKey65.Height + 4
+                  - ErrorMessage64:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue64.Y + DataCardValue64.Height
+                  - StarVisible65:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey65.Y
+            - Pièces_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Pi_x00e8_ces"
+                  Default: =ThisItem.Pièces
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Pièces)
+                  Required: =false
+                  Update: =DataCardValue65.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =5
+                Children:
+                  - DataCardKey67:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue65:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Pièces)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey67.Y + DataCardKey67.Height + 4
+                  - ErrorMessage66:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue65.Y + DataCardValue65.Height
+                  - StarVisible67:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey67.Y
+            - Catégorie_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Cat_x00e9_gorie"
+                  Default: =ThisItem.Catégorie
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Catégorie)
+                  Required: =false
+                  Update: =DataCardValue66.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =6
+                Children:
+                  - DataCardKey75:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue66:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Catégorie)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey75.Y + DataCardKey75.Height + 4
+                  - ErrorMessage74:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue66.Y + DataCardValue66.Height
+                  - StarVisible75:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey75.Y
+            - Emprunteur _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Emprunteur"
+                  Default: =ThisItem.'Emprunteur '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Emprunteur ')
+                  Required: =false
+                  Update: =DataCardValue67.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =6
+                Children:
+                  - DataCardKey76:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue67:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Emprunteur ')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey76.Y + DataCardKey76.Height + 4
+                  - ErrorMessage75:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue67.Y + DataCardValue67.Height
+                  - StarVisible76:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey76.Y
+            - Vie de la maquette_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Viedelamaquette"
+                  Default: =ThisItem.'Vie de la maquette'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Vie de la maquette')
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, 'Vie de la maquette')
+                  Required: =false
+                  Update: =DataCardValue68.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =6
+                Children:
+                  - DataCardKey77:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue68:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey77.Y + DataCardKey77.Height + 4
+                  - ErrorMessage76:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue68.Y + DataCardValue68.Height
+                  - StarVisible77:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey77.Y
+            - Type de contrôle_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Typedecontr_x00f4_le"
+                  Default: =ThisItem.'Type de contrôle'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Type de contrôle')
+                  Required: =false
+                  Update: =DataCardValue69.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =7
+                Children:
+                  - DataCardKey78:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue69:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Type de contrôle')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey78.Y + DataCardKey78.Height + 4
+                  - ErrorMessage77:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue69.Y + DataCardValue69.Height
+                  - StarVisible78:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey78.Y
+            - Forme de la maquette_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Formedelamaquette"
+                  Default: =ThisItem.'Forme de la maquette'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Forme de la maquette')
+                  Required: =false
+                  Update: =DataCardValue70.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =7
+                Children:
+                  - DataCardKey79:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue70:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Forme de la maquette')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey79.Y + DataCardKey79.Height + 4
+                  - ErrorMessage78:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue70.Y + DataCardValue70.Height
+                  - StarVisible79:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey79.Y
+            - Lien ECM_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: UrlEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="LienECM"
+                  Default: =ThisItem.'Lien ECM'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Lien ECM')
+                  Required: =false
+                  Update: =DataCardValue71.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =7
+                Children:
+                  - DataCardKey80:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue71:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ='TextInputCanvas.Mode'.SingleLine
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey80.Y + DataCardKey80.Height + 4
+                  - ErrorMessage79:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue71.Y + DataCardValue71.Height
+                  - StarVisible80:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey80.Y
+            - Description des défauts _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Descriptiondesd_x00e9_fauts"
+                  Default: =ThisItem.'Description des défauts '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Description des défauts ')
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, 'Description des défauts ')
+                  Required: =false
+                  Update: =DataCardValue72.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =8
+                Children:
+                  - DataCardKey81:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue72:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey81.Y + DataCardKey81.Height + 4
+                  - ErrorMessage80:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue72.Y + DataCardValue72.Height
+                  - StarVisible81:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey81.Y
+            - Date d'emprunt_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: DateEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Datedemprunt"
+                  Default: =ThisItem.'Date d''emprunt'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Date d''emprunt')
+                  Required: =false
+                  Update: =DataCardValue73.SelectedDate
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =8
+                Children:
+                  - DataCardKey82:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue73:
+                      Control: DatePicker@0.0.46
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DisplayMode: =Parent.DisplayMode
+                        SelectedDate: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey82.Y + DataCardKey82.Height + 4
+                  - ErrorMessage81:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue73.Y + DataCardValue73.Height
+                  - StarVisible82:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey82.Y
+            - Date de retour estimée _DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: DateEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Datederetourestim_x00e9_e"
+                  Default: =ThisItem.'Date de retour estimée '
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Date de retour estimée ')
+                  Required: =false
+                  Update: =DataCardValue74.SelectedDate
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =8
+                Children:
+                  - DataCardKey83:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue74:
+                      Control: DatePicker@0.0.46
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DisplayMode: =Parent.DisplayMode
+                        SelectedDate: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey83.Y + DataCardKey83.Height + 4
+                  - ErrorMessage82:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue74.Y + DataCardValue74.Height
+                  - StarVisible83:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey83.Y
+            - En transit_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Entransit"
+                  Default: =ThisItem.'En transit'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'En transit')
+                  Required: =false
+                  Update: =DataCardValue75.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =9
+                Children:
+                  - DataCardKey84:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue75:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'En transit')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey84.Y + DataCardKey84.Height + 4
+                  - ErrorMessage83:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue75.Y + DataCardValue75.Height
+                  - StarVisible84:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey84.Y
+            - Statut_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Statut"
+                  Default: =ThisItem.Statut
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Statut)
+                  Required: =false
+                  Update: =DataCardValue76.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =9
+                Children:
+                  - DataCardKey85:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue76:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Statut)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey85.Y + DataCardKey85.Height + 4
+                  - ErrorMessage84:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue76.Y + DataCardValue76.Height
+                  - StarVisible85:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey85.Y
+            - Emprunteur Entreprise_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="EmprunteurEntreprise"
+                  Default: =ThisItem.'Emprunteur Entreprise'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Emprunteur Entreprise')
+                  Required: =false
+                  Update: =DataCardValue77.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =9
+                Children:
+                  - DataCardKey86:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue77:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Emprunteur Entreprise')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey86.Y + DataCardKey86.Height + 4
+                  - ErrorMessage85:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue77.Y + DataCardValue77.Height
+                  - StarVisible86:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey86.Y
+            - Type d'assemblage_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Typedassemblage"
+                  Default: =ThisItem.'Type d''assemblage'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Type d''assemblage')
+                  Required: =false
+                  Update: =DataCardValue78.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =10
+                Children:
+                  - DataCardKey87:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue78:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Type d''assemblage')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey87.Y + DataCardKey87.Height + 4
+                  - ErrorMessage86:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue78.Y + DataCardValue78.Height
+                  - StarVisible87:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey87.Y
+            - Informations certifiées_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ToggleEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Informationscertifi_x00e9_es"
+                  Default: =ThisItem.'Informations certifiées'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Informations certifiées')
+                  Required: =false
+                  Update: =DataCardValue79.Checked
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =10
+                Children:
+                  - DataCardKey88:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue79:
+                      Control: Toggle@1.1.5
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Checked: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Height: =32
+                        Label: =""
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey88.Y + DataCardKey88.Height + 4
+                  - ErrorMessage87:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue79.Y + DataCardValue79.Height
+                  - StarVisible88:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey88.Y
+            - Procédures_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Proc_x00e9_dures"
+                  Default: =ThisItem.Procédures
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Procédures)
+                  Required: =false
+                  Update: =DataCardValue80.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =10
+                Children:
+                  - DataCardKey89:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue80:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].Procédures)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey89.Y + DataCardKey89.Height + 4
+                  - ErrorMessage88:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue80.Y + DataCardValue80.Height
+                  - StarVisible89:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey89.Y
+            - N° de FIEC_DataCard3:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="N_x00b0_deFIEC"
+                  Default: =ThisItem.'N° de FIEC'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'N° de FIEC')
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, 'N° de FIEC')
+                  Required: =false
+                  Update: =DataCardValue81.Value
+                  Width: =870
+                  WidthFit: =true
+                  X: =0
+                  Y: =11
+                Children:
+                  - DataCardKey90:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue81:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey90.Y + DataCardKey90.Height + 4
+                  - ErrorMessage89:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue81.Y + DataCardValue81.Height
+                  - StarVisible90:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey90.Y
+            - Type de maquette_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: ComboBoxEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Typedemaquette"
+                  Default: =ThisItem.'Type de maquette'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Type de maquette')
+                  Required: =false
+                  Update: =DataCardValue82.Selected
+                  Width: =870
+                  WidthFit: =true
+                  X: =1
+                  Y: =11
+                Children:
+                  - DataCardKey91:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue82:
+                      Control: DropDown@0.0.45
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        DefaultSelectedItems: =Parent.Default
+                        DisplayMode: =Parent.DisplayMode
+                        Items: =Choices([@'Gestion des maquettes'].'Type de maquette')
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey91.Y + DataCardKey91.Height + 4
+                  - ErrorMessage90:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue82.Y + DataCardValue82.Height
+                  - StarVisible91:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey91.Y
+            - Référence unique_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: NumberEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="R_x00e9_f_x00e9_renceunique"
+                  Default: =ThisItem.'Référence unique'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Référence unique')
+                  Required: =false
+                  Update: =Value(DataCardValue83.Value)
+                  Width: =870
+                  WidthFit: =true
+                  X: =2
+                  Y: =11
+                Children:
+                  - DataCardKey92:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue83:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey92.Y + DataCardKey92.Height + 4
+                  - ErrorMessage91:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue83.Y + DataCardValue83.Height
+                  - StarVisible92:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey92.Y
+            - Photo maquette envoie_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: LargePicture
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Plan"
+                  Default: =ThisItem.'Photo maquette envoi'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Photo maquette envoi')
+                  Required: =false
+                  Update: =Image19.Image
+                  Width: =435
+                  X: =0
+                  Y: =12
+                Children:
+                  - DataCardKey93:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =34
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 60
+                        Wrap: =false
+                        X: =30
+                        Y: =10
+                  - Image19:
+                      Control: Image@2.2.3
+                      MetadataKey: FieldValue
+                      Properties:
+                        BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                        DisplayMode: =Parent.DisplayMode
+                        Height: =AddPicture5.Height
+                        Image: =If(IsBlank(AddPicture5.Media), Parent.Default, AddPicture5.Media)
+                        Tooltip: =Parent.DisplayName
+                        Width: =AddPicture5.Width
+                        X: =AddPicture5.X
+                        Y: =AddPicture5.Y
+                  - AddPicture5:
+                      Control: AddMedia@2.2.1
+                      MetadataKey: AddPicture
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =200
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =DataCardKey93.Y + DataCardKey93.Height + 5
+                  - ErrorMessage92:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =10
+                        Size: =12
+                        Text: =Parent.Error
+                        Visible: =Parent.DisplayMode=DisplayMode.Edit
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =Image19.Y + Image19.Height
+                  - StarVisible93:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =DataCardKey93.Height
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Wrap: =false
+                        Y: =DataCardKey93.Y
+            - Photo maquette récéption_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: LargePicture
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Photomaquetten_x002b_1"
+                  Default: =ThisItem.'Photo maquette réception'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Photo maquette réception')
+                  Required: =false
+                  Update: =Image21.Image
+                  Width: =435
+                  X: =1
+                  Y: =12
+                Children:
+                  - DataCardKey94:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =34
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 60
+                        Wrap: =false
+                        X: =30
+                        Y: =10
+                  - Image21:
+                      Control: Image@2.2.3
+                      MetadataKey: FieldValue
+                      Properties:
+                        BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                        DisplayMode: =Parent.DisplayMode
+                        Height: =AddPicture6.Height
+                        Image: =If(IsBlank(AddPicture6.Media), Parent.Default, AddPicture6.Media)
+                        Tooltip: =Parent.DisplayName
+                        Width: =AddPicture6.Width
+                        X: =AddPicture6.X
+                        Y: =AddPicture6.Y
+                  - AddPicture6:
+                      Control: AddMedia@2.2.1
+                      MetadataKey: AddPicture
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =200
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =DataCardKey94.Y + DataCardKey94.Height + 5
+                  - ErrorMessage93:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =10
+                        Size: =12
+                        Text: =Parent.Error
+                        Visible: =Parent.DisplayMode=DisplayMode.Edit
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =Image21.Y + Image21.Height
+                  - StarVisible94:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =DataCardKey94.Height
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Wrap: =false
+                        Y: =DataCardKey94.Y
+            - Lien ECM RFF_DataCard2:
+                Control: TypedDataCard@1.0.7
+                Variant: UrlEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="LienECMRFF"
+                  Default: =ThisItem.'Lien ECM RFF'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Lien ECM RFF')
+                  Required: =false
+                  Update: =DataCardValue84.Value
+                  Width: =1305
+                  WidthFit: =true
+                  X: =2
+                  Y: =12
+                Children:
+                  - DataCardKey95:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue84:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ='TextInputCanvas.Mode'.SingleLine
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey95.Y + DataCardKey95.Height + 4
+                  - ErrorMessage94:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue84.Y + DataCardValue84.Height
+                  - StarVisible95:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =20
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey95.Y
+            - Commentaires_DataCard1:
+                Control: TypedDataCard@1.0.7
+                Variant: TextualEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="Commentaires"
+                  Default: =ThisItem.Commentaires
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Commentaires)
+                  MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Commentaires)
+                  Required: =false
+                  Update: =DataCardValue85.Value
+                  Width: =1306
+                  WidthFit: =true
+                  X: =0
+                  Y: =13
+                Children:
+                  - DataCardKey96:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldName
+                      Properties:
+                        Height: =22
+                        Text: =Parent.DisplayName
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =10
+                  - DataCardValue85:
+                      Control: TextInput@0.0.54
+                      MetadataKey: FieldValue
+                      Properties:
+                        AccessibleLabel: =Parent.DisplayName
+                        Align: =Align.Left
+                        DisplayMode: =Parent.DisplayMode
+                        Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                        Required: =Parent.Required
+                        Value: =Parent.Default
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardKey96.Y + DataCardKey96.Height + 4
+                  - ErrorMessage95:
+                      Control: Text@0.0.51
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        Height: =30
+                        Text: =Parent.Error
+                        Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =Parent.Width - 48
+                        X: =24
+                        Y: =DataCardValue85.Y + DataCardValue85.Height
+                  - StarVisible96:
+                      Control: Text@0.0.51
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Height: =30
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Y: =DataCardKey96.Y
+            - Pièces jointes_DataCard3:
+                Control: TypedDataCard@1.0.7
+                Variant: ClassicAttachmentsEdit
+                IsLocked: true
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataField: ="{Attachments}"
+                  Default: =ThisItem.'Pièces jointes'
+                  DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Pièces jointes')
+                  Required: =false
+                  Update: =DataCardValue86.Attachments
+                  Width: =435
+                  X: =1
+                  Y: =13
+                Children:
+                  - DataCardKey97:
+                      Control: Label@2.5.1
+                      MetadataKey: FieldName
+                      Properties:
+                        AutoHeight: =true
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =34
+                        Text: =Parent.DisplayName
+                        Width: =Parent.Width - 60
+                        Wrap: =false
+                        X: =30
+                        Y: =10
+                  - DataCardValue86:
+                      Control: Attachments@2.3.0
+                      MetadataKey: FieldValue
+                      Properties:
+                        BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                        DisplayMode: =Parent.DisplayMode
+                        Font: =Font.'Open Sans'
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        ItemColor: =RGBA(255, 255, 255, 1)
+                        ItemFill: =RGBA(56, 96, 178, 1)
+                        ItemHoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =Parent.Default
+                        PaddingBottom: =5
+                        PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                        PaddingRight: =5
+                        PaddingTop: =5
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        Tooltip: =Parent.DisplayName
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =DataCardKey97.Y + DataCardKey97.Height + 5
+                  - ErrorMessage96:
+                      Control: Label@2.5.1
+                      MetadataKey: ErrorMessage
+                      Properties:
+                        AutoHeight: =true
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(168, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =10
+                        Live: =Live.Assertive
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =14
+                        Text: =Parent.Error
+                        Visible: =Parent.DisplayMode=DisplayMode.Edit
+                        Width: =Parent.Width - 60
+                        X: =30
+                        Y: =DataCardValue86.Y + DataCardValue86.Height
+                  - StarVisible97:
+                      Control: Label@2.5.1
+                      MetadataKey: FieldRequired
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =DataCardKey97.Height
+                        Text: ="*"
+                        Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                        Width: =30
+                        Wrap: =false
+                        Y: =DataCardKey97.Y

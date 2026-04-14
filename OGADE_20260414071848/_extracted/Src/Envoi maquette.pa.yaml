@@ -1,0 +1,3000 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Envoi maquette:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container19_6:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =74
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =1327
+            X: =19
+            Y: =13
+          Children:
+            - Rectangle6_15:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =74
+                  Width: =130
+            - RectQuickActionBar3_14:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Height: =74
+                  Width: =1197
+                  X: =130
+            - LblAppName3_9:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 0, 0, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =74
+                  Size: =18
+                  Text: |-
+                    ="Envoi de la maquette : " & Gallery8.Selected.Référence
+                  Width: =1327
+            - Image4_10:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =42
+                  Image: ='badge-facebook'
+                  Visible: =If (Gallery8.Selected.'Informations certifiées' = true , true, false)
+                  Width: =33
+                  X: =408
+                  Y: =16
+            - Icon35_6:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =74
+                  HoverColor: =ColorFade(Self.Color, 10%)
+                  Icon: =Icon.Home
+                  OnSelect: =Navigate('Home Page')
+                  PaddingBottom: =15
+                  PaddingTop: =15
+                  TabIndex: =0
+                  Tooltip: ="Retour à l'accueil"
+                  Width: =130
+      - Barre_Bas_Boutons_3:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =83
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            Width: =1310
+            X: =33
+            Y: =670
+          Children:
+            - Container7_96:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =51
+                  Y: =8
+                Children:
+                  - Icon19_112:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =Icon.DetailList
+                        OnSelect: =Navigate(Screen8)
+                        Width: =48
+                        X: =42
+                  - Label23_160:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Liste maquette"
+                        Width: =136
+                        Y: =45
+            - Container7_97:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =257
+                  Y: =8
+                Children:
+                  - Icon19_113:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =If((Gallery8.Selected.Statut.Value = "Disponible" Or Gallery8.Selected.Statut.Value = "En cours de fabrication") Or Gallery8.Selected.'En transit'.Value = "Envoi en attente"  , DisplayMode.Disabled , DisplayMode.Edit)
+                        Height: =45
+                        Icon: = Icon.Send
+                        OnSelect: |-
+                          =If(Gallery8.Selected.'En transit'.Value = "OUI", Navigate('Reception maquette');
+                          EditForm(Form1);
+
+                          Set(Varadresse,Blank());
+                          Set(VaradresseEntreprise,Blank())
+                          , 
+
+                          Navigate('Envoi maquette');NewForm('FormulaireDemandeD''envoiMaquetteSextant');
+                          NewForm('FormulaireDemandeD''envoiMaquetteHorsSextant');
+                          EditForm(Form1_1);
+                          )
+                        Rotation: =If(Gallery8.Selected.'En transit'.Value = "OUI", 180, 0)
+                        Width: =48
+                        X: =46
+                  - Label23_161:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: =If(Gallery8.Selected.'En transit'.Value = "OUI", "Réception","Envoi")
+                        Width: =136
+                        Y: =45
+                  - InfoButtonCanvas2_9:
+                      Control: InfoButton@0.0.33
+                      Properties:
+                        Content: ="L'envoi de la maquette est impossible lorsque celle-ci n'a pas été réservée au préalable, qu'elle est en cours de fabrication ou qu'une demande d'envoi est en attente. Veuillez vérifier son état actuel et apporter les modifications nécessaires pour procéder à l'envoi."
+                        Height: =23
+                        Visible: =If((Gallery8.Selected.Statut.Value = "Disponible" Or Gallery8.Selected.Statut.Value = "En cours de fabrication") And Gallery8.Selected.'En transit'.Value = "NON" , true , false)
+                        X: =94
+            - Container7_98:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =464
+                  Y: =8
+                Children:
+                  - Icon19_115:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =
+                        OnSelect: |-
+                          =EditForm(Form3_1);
+                          Clear(SelectionOptionEntreprise);
+                          Set(VariablePrêtmatériel, If (Gallery5.Selected.Entreprise.Value = "EDF" , "Prêt du matériel à un fournisseur", "Retour matériel"));
+                          Navigate(Screen14_3)
+                        Width: =48
+                        X: =46
+                  - Label23_162:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =10
+                        Text: =If (Gallery8.Selected.Statut.Value = "Disponible",  "Réservation", "Retour réservation")
+                        Width: =136
+                        Y: =45
+                  - Icon19_114:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =If(Gallery8.Selected.Statut.Value = "Sortie d'usine" Or Gallery8.Selected.Statut.Value = "En cours de fabrication" , DisplayMode.Disabled , DisplayMode.Edit)
+                        Height: =45
+                        Icon: =If (Gallery5.Selected.Entreprise.Value = "EDF" , Icon.Export, Icon.Export)
+                        OnSelect: "=If (\n    Gallery8.Selected.Statut.Value = \"Disponible\",\n    Navigate(ScreenEmpruntMaquette);\n    EditForm(Form4_2),\n\n    Navigate('Retour emprunt');\n    EditForm(Form4_1)\n    \n)"
+                        Rotation: =If (Gallery8.Selected.Statut.Value = "Disponible",  0, 180)
+                        Width: =48
+                        X: =44
+            - Container7_101:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =1140
+                  Y: =8
+                Children:
+                  - Icon19_118:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =Icon.AddLibrary
+                        OnSelect: |+
+                          =Navigate(Screen5);
+                          Set(VaradresseEntreprise2,Blank());
+                          //Set(Varadresse2;Blank());;
+                          Set(varTypeAssemblage,Blank());
+                          //Set(varmatière;Blank());;
+                          Set(Varnewmaquette,1);
+                          Set(VarDescriptionDéfaut,0);
+                          NewForm(Form2);
+                          Clear(DéfautValeursTab1);
+                          ClearCollect(SelectionOptionmatière  ,Choices([@'Gestion des maquettes'].Matière) );
+                          ClearCollect(SelectionOptionProcédure  , Choices([@'Gestion des maquettes'].Procédures));
+                          Set(DescriptionJSON1,"[]")
+                        Width: =48
+                        X: =46
+                  - Label23_165:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Ajout maquette"
+                        Width: =136
+                        Y: =45
+            - Container7_99:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =690
+                  Y: =8
+                Children:
+                  - Icon19_116:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =Icon.Information
+                        OnSelect: |-
+                          =Navigate(Informations_Maquette);
+                          Set(Varmodificationmaquette , DisplayMode.Disabled);
+                          Set(VarvaliderModification , false)
+                        Width: =48
+                        X: =46
+                  - Label23_163:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Informations "
+                        Width: =136
+                        Y: =45
+            - Container7_100:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =917
+                  Y: =8
+                Children:
+                  - Label23_164:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =If(User().Email = Gallery5.Selected.'Responsable '.Email,RGBA(0, 0, 0, 1),RGBA(215, 223, 240, 100))
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Modification"
+                        Width: =136
+                        Y: =45
+                  - Icon19_117:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(215, 223, 240, 1)
+                        DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).'Référent maquette',DisplayMode.Edit , DisplayMode.Disabled)
+                        Height: =44
+                        Icon: =Icon.Edit
+                        OnSelect: |-
+                          =EditForm(Form2);
+                          Navigate(Screen5);
+                          Set(DescriptionJSON1,Gallery8.Selected.'Description des défauts ');
+                          Set(VaradresseEntreprise2,Blank());
+                          //Set(Varadresse2;Blank());;
+                          Set(varTypeAssemblage,Blank());
+                          //Set(varmatière;Blank());;
+                          Set(Varnewmaquette,0);
+                          Clear(DéfautValeursTab1);
+                          ClearCollect(SelectionOptionmatière  ,Choices([@'Gestion des maquettes'].Matière) );
+                          ClearCollect(SelectionOptionProcédure  ,Choices([@'Gestion des maquettes'].Procédures));
+                          ForAll(Gallery3.AllItems, Collect(DéfautValeursTab1, {Hauteur : Hauteur.Text, Longueur : Longueur.Text, Largeur : Largeur.Text , Profondeur : Profondeur.Text , Diamètre : Diamètre.Text, Numéro : Numéro_3.Value, Type : Type.Selected.Value }));
+                        Width: =56
+                        X: =40
+                        Y: =1
+                  - InfoButtonCanvas1_16:
+                      Control: InfoButton@0.0.33
+                      Properties:
+                        Content: ="Modification possible uniquement par les personnes identifiées «référent maquettes» "
+                        Height: =23
+                        Width: =23
+                        X: =96
+                        Y: =1
+      - Container24:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =548
+            Width: =1324
+            X: =19
+            Y: =104
+          Children:
+            - Formulaire localisation actuelle de la maquette:
+                Control: Form@2.4.4
+                Layout: Vertical
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataSource: ='Gestion des maquettes'
+                  DefaultMode: =FormMode.View
+                  Height: =191
+                  Item: =Gallery8.Selected
+                  Width: =1311
+                  Y: =17
+                Children:
+                  - DataCard35:
+                      Control: TypedDataCard@1.0.7
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =39
+                        Width: =1311
+                        X: =0
+                        Y: =0
+                      Children:
+                        - Container25:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =32
+                              Width: =1270
+                              X: =16
+                            Children:
+                              - TextCanvas5:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Size: =18
+                                    Text: ="Localisation actuelle de la maquette"
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =1036
+                                    X: =4
+                  - Localisation_DataCard3:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation"
+                        Default: =ThisItem.Localisation
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Localisation)
+                        Required: =false
+                        Update: =DataCardValue144.Selected
+                        Width: =437
+                        X: =0
+                        Y: =1
+                      Children:
+                        - DataCardKey158:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue144:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Gestion des maquettes'].Localisation)
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey158.Y + DataCardKey158.Height + 4
+                        - ErrorMessage155:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue144.Y + DataCardValue144.Height
+                        - StarVisible156:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey158.Y
+                  - 'Localisation : Entreprise_DataCard3':
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      IsLocked: true
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation_x003a_Entreprise"
+                        Default: |-
+                          =ThisItem.'Localisation : Entreprise'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Localisation : Entreprise')
+                        Required: =false
+                        Update: =DataCardValue145.Selected
+                        Width: =437
+                        X: =1
+                        Y: =1
+                      Children:
+                        - DataCardKey160:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue145:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: |-
+                                =Choices([@'Gestion des maquettes'].'Localisation : Entreprise')
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey160.Y + DataCardKey160.Height + 4
+                        - ErrorMessage157:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue145.Y + DataCardValue145.Height
+                        - StarVisible158:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey160.Y
+                  - Localisation_Rayonnage_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      IsLocked: true
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation_Rayonnage"
+                        Default: =ThisItem.Localisation_Rayonnage
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Localisation_Rayonnage)
+                        MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Localisation_Rayonnage)
+                        Required: =false
+                        Update: =DataCardValue146.Value
+                        Width: =437
+                        X: =2
+                        Y: =1
+                      Children:
+                        - DataCardKey181:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue146:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey181.Y + DataCardKey181.Height + 4
+                        - ErrorMessage158:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue146.Y + DataCardValue146.Height
+                        - StarVisible159:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey181.Y
+                  - Localisation_Salle_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation_Salle"
+                        Default: =ThisItem.Localisation_Salle
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Localisation_Salle)
+                        MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Localisation_Salle)
+                        Required: =false
+                        Update: =DataCardValue147.Value
+                        Width: =437
+                        X: =0
+                        Y: =2
+                      Children:
+                        - DataCardKey182:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: ="Localisation_Salle / Bâtiment"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue147:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey182.Y + DataCardKey182.Height + 4
+                        - ErrorMessage159:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue147.Y + DataCardValue147.Height
+                        - StarVisible160:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey182.Y
+                  - Compléments localisation_DataCard5:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      IsLocked: true
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Compl_x00e9_mentslocalisation"
+                        Default: =ThisItem.'Compléments localisation'
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Compléments localisation')
+                        MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, 'Compléments localisation')
+                        Required: =false
+                        Update: =DataCardValue165.Value
+                        Width: =437
+                        X: =1
+                        Y: =2
+                      Children:
+                        - DataCardKey183:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue165:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey183.Y + DataCardKey183.Height + 4
+                        - ErrorMessage179:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue165.Y + DataCardValue165.Height
+                        - StarVisible180:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey183.Y
+            - FormulaireDemandeD'envoiMaquetteHorsSextant:
+                Control: Form@2.4.4
+                Layout: Vertical
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataSource: ='Gestion des maquettes'
+                  Height: =338
+                  Item: =Gallery8.Selected
+                  NumberOfColumns: =12
+                  Visible: =false
+                  Width: =1324
+                  Y: =210
+                Children:
+                  - DataCard36:
+                      Control: TypedDataCard@1.0.7
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =43
+                        Width: =1320
+                        X: =0
+                        Y: =0
+                      Children:
+                        - Container25_2:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =32
+                              Width: =1270
+                              X: =15
+                              Y: =5
+                            Children:
+                              - TextCanvas5_2:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Size: =18
+                                    Text: ="Envoi de la maquette"
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =1036
+                                    X: =5
+                  - Localisation_DataCard4:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation"
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Localisation)
+                        Required: =true
+                        Update: "=If(IsBlank(LocalisationAdresseEntreprise.Selected)  ,If(IsBlank(LocalisationAdresseEntreprise.SearchText), Blank() , {Value : LocalisationAdresseEntreprise.SearchText}) , LocalisationAdresseEntreprise.Selected) "
+                        Width: =550
+                        X: =0
+                        Y: =1
+                      Children:
+                        - DataCardKey185:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - ErrorMessage181:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =LocalisationAdresseEntreprise.Y + LocalisationAdresseEntreprise.Height
+                        - StarVisible182:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey185.Y
+                        - Conteneur localisation_4:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =32
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey185.Y + DataCardKey185.Height + 4
+                            Children:
+                              - LocalisationAdresseEntreprise:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    ChevronBackground: =RGBA(0, 0, 0, 0)
+                                    ChevronFill: =RGBA(122, 138, 143, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DisplayFields: =["Value"]
+                                    Fill: =RGBA(245, 245, 245, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion des maquettes'].Localisation)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(122, 138, 143, 1)
+                                    Size: =11
+                                    Width: =Parent.Width
+                  - 'Localisation : Entreprise_DataCard4':
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Localisation_x003a_Entreprise"
+                        DisplayName: |-
+                          =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Localisation : Entreprise')
+                        Required: =true
+                        Update: "=If(IsBlank(EntrepriseDestinationEnvoi.Selected)  ,If(IsBlank(EntrepriseDestinationEnvoi.SearchText), Blank() , {Value : EntrepriseDestinationEnvoi.SearchText}) , EntrepriseDestinationEnvoi.Selected) "
+                        Width: =330
+                        X: =5
+                        Y: =1
+                      Children:
+                        - DataCardKey198:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - ErrorMessage194:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =EntrepriseDestinationEnvoi.Y + EntrepriseDestinationEnvoi.Height
+                        - StarVisible195:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey198.Y
+                        - Conteneur localisation_Entreprise_6:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =32
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey198.Y + DataCardKey198.Height + 4
+                            Children:
+                              - EntrepriseDestinationEnvoi:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    ChevronBackground: =RGBA(0, 0, 0, 0)
+                                    ChevronFill: =RGBA(122, 138, 143, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DisplayFields: =["Value"]
+                                    Fill: =RGBA(245, 245, 245, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: |-
+                                      =Choices([@'Gestion des maquettes'].'Localisation : Entreprise')
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(122, 138, 143, 1)
+                                    Size: =11
+                                    Width: =Parent.Width
+                  - Compléments localisation_DataCard6:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Compl_x00e9_mentslocalisation"
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Compléments localisation')
+                        Height: =93
+                        MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, 'Compléments localisation')
+                        Required: =true
+                        Update: =DataCardValue183.Value
+                        Width: =660
+                        X: =0
+                        Y: =2
+                      Children:
+                        - DataCardKey201:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue183:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =51
+                              Mode: ='TextInputCanvas.Mode'.Multiline
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey201.Y + DataCardKey201.Height + 4
+                        - ErrorMessage197:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue183.Y + DataCardValue183.Height
+                        - StarVisible198:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey201.Y
+                  - DataCard13:
+                      Control: TypedDataCard@1.0.7
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =95
+                        Required: =true
+                        Width: =660
+                        X: =6
+                        Y: =2
+                      Children:
+                        - DataCardKey201_1:
+                            Control: Text@0.0.51
+                            Properties:
+                              Height: =22
+                              Text: ="Motif de l'envoi"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =20
+                              Y: =10
+                        - Motifdel'envoiDataCard:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =50
+                              Mode: ='TextInputCanvas.Mode'.Multiline
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =20
+                              Y: =DataCardKey201_1.Y + DataCardKey201_1.Height + 4
+                        - StarVisible198_1:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =20
+                              Y: =6
+                        - ErrorMessage197_1:
+                            Control: Text@0.0.51
+                            Properties:
+                              Height: =30
+                              Text: ="Motif de l'envoi est obligatoire"
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =20
+                              Y: =87
+                  - Photo maquette envoi_DataCard3:
+                      Control: TypedDataCard@1.0.7
+                      Variant: LargePicture
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Plan"
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'Photo maquette envoi')
+                        Height: =126
+                        Required: =true
+                        Update: =Image26.Image
+                        Width: =660
+                        X: =0
+                        Y: =3
+                      Children:
+                        - DataCardKey202:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =34
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =155
+                              Wrap: =false
+                              X: =30
+                              Y: =5
+                        - Image26:
+                            Control: Image@2.2.3
+                            MetadataKey: FieldValue
+                            Properties:
+                              BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =AddPicture13.Height
+                              Image: =If(IsBlank(AddPicture13.Media), Parent.Default, AddPicture13.Media)
+                              Tooltip: =Parent.DisplayName
+                              Width: =AddPicture13.Width
+                              X: =AddPicture13.X
+                              Y: =AddPicture13.Y
+                        - AddPicture13:
+                            Control: AddMedia@2.2.1
+                            MetadataKey: AddPicture
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =102
+                              Width: =409
+                              X: =185
+                              Y: =5
+                        - ErrorMessage198:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =18
+                              Size: =12
+                              Text: =Parent.Error
+                              Visible: =Parent.DisplayMode=DisplayMode.Edit
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =Image26.Y + Image26.Height
+                        - StarVisible199:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =DataCardKey202.Height
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Wrap: =false
+                              Y: =DataCardKey202.Y
+                  - DataCard39:
+                      Control: TypedDataCard@1.0.7
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =102
+                        Width: =440
+                        X: =6
+                        Y: =3
+                      Children:
+                        - ButtonCanvas4_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              BasePaletteColor: =RGBA(8, 222, 8, 1)
+                              Height: =38
+                              Icon: ="Send"
+                              IconStyle: ='ButtonCanvas.IconStyle'.Filled
+                              OnSelect: |-
+                                =If('FormulaireDemandeD''envoiMaquetteHorsSextant'.Valid , 
+
+                                SubmitForm('FormulaireDemandeD''envoiMaquetteHorsSextant');
+                                Navigate (Informations_Maquette)
+
+
+                                ,
+
+                                SubmitForm('FormulaireDemandeD''envoiMaquetteHorsSextant'))
+                              Text: ="Valider l'envoi de la maquette"
+                              Width: =288
+                              X: =30
+                              Y: =35
+                  - Historique_DataCard11:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Historique"
+                        Default: =ThisItem.Historique
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,Historique)
+                        MaxLength: =DataSourceInfo([@'Gestion des maquettes'], DataSourceInfo.MaxLength, Historique)
+                        Required: =false
+                        Update: |-
+                          ="• Le " & Today() &", la maquette a été envoyée à "& EntrepriseDestinationEnvoi.Selected.Value & ", à " &LocalisationAdresseEntreprise.Selected.Value &". Personne ayant réalisé l'envoi : " &User().FullName & ". Motif : " & 'Motifdel''envoiDataCard'.Value &"<br><br>" & DataCardValue178.Value
+                        Visible: =false
+                        Width: =330
+                        X: =0
+                        Y: =4
+                      Children:
+                        - DataCardKey184:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue178:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey184.Y + DataCardKey184.Height + 4
+                        - ErrorMessage180:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue178.Y + DataCardValue178.Height
+                        - StarVisible181:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey184.Y
+                  - En transit_DataCard3:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Entransit"
+                        Default: =ThisItem.'En transit'
+                        DisplayName: =DataSourceInfo([@'Gestion des maquettes'],DataSourceInfo.DisplayName,'En transit')
+                        Required: =false
+                        Update: |-
+                          ={Value : "OUI"}
+                        Visible: =false
+                        Width: =330
+                        X: =3
+                        Y: =4
+                      Children:
+                        - DataCardKey209:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue186:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Gestion des maquettes'].'En transit')
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey209.Y + DataCardKey209.Height + 4
+                        - ErrorMessage205:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue186.Y + DataCardValue186.Height
+                        - StarVisible206:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey209.Y
+            - FormulaireDemandeD'envoiMaquetteSextant:
+                Control: Form@2.4.4
+                Layout: Vertical
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DataSource: ='Demandes d''envoi maquette'
+                  DefaultMode: =FormMode.New
+                  Height: =324
+                  NumberOfColumns: =12
+                  SnapToColumns: =false
+                  Width: =1324
+                  Y: =221
+                Children:
+                  - DataCard34:
+                      Control: TypedDataCard@1.0.7
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =46
+                        Width: =1320
+                        X: =0
+                        Y: =0
+                      Children:
+                        - Container25_1:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =32
+                              Width: =1270
+                              X: =16
+                              Y: =4
+                            Children:
+                              - TextCanvas5_1:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Size: =18
+                                    Text: ="Formulaire de demande d'envoi magasin"
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =1036
+                                    X: =4
+                  - Date d'envoi souhaitée_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: DateEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Datedenvoisouhait_x00e9_e"
+                        Default: =ThisItem.'Date de réception souhaitée'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Date de réception souhaitée')
+                        Height: =78
+                        Required: =true
+                        Update: =DataCardValue166.SelectedDate
+                        Width: =1320
+                        X: =0
+                        Y: =1
+                      Children:
+                        - DataCardKey186:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue166:
+                            Control: DatePicker@0.0.46
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DisplayMode: =Parent.DisplayMode
+                              EndDate: =Date(Year(Today())+100, 12, 31)
+                              SelectedDate: =Parent.Default
+                              StartDate: =Date(1900, 1, 1)
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey186.Y + DataCardKey186.Height + 4
+                        - ErrorMessage182:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue166.Y + DataCardValue166.Height
+                        - StarVisible183:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey186.Y
+                        - InfoButtonCanvas4:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              Content: |-
+                                ="- Envoi standard : 72 heures garantie en France 
+                                métropolitaine.
+                                - Envoi urgent : 4 heures pour prise en charge du 
+                                colis + délais de transport. La demande d'envoi 
+                                urgente sera traitée via une validation 
+                                unique du pôle logistique"
+                              Height: =28
+                              Width: =28
+                              X: =205
+                              Y: =6
+                        - ButtonCanvas4:
+                            Control: Button@0.0.45
+                            Properties:
+                              BasePaletteColor: =RGBA(8, 222, 8, 1)
+                              Height: =38
+                              Icon: ="Send"
+                              IconStyle: ='ButtonCanvas.IconStyle'.Filled
+                              OnSelect: |-
+                                =If('FormulaireDemandeD''envoiMaquetteSextant'.Valid , 
+
+                                SubmitForm('FormulaireDemandeD''envoiMaquetteSextant');
+
+                                Patch('Gestion des maquettes', Gallery8.Selected, If("sextant" in Gallery8.Selected.Localisation.Value , {'En transit': {Value : "Envoi en attente"}}, {'En transit': {Value : "Envoi en attente"},'Photo maquette envoi' : 'FormulaireDemandeD''envoiMaquetteSextant'.LastSubmit.'Photo de l''envoi'.Full }) );
+
+                                Office365Outlook.SendEmailV2("disc-dsc-demandes-maquettes@edf.fr ;" & 
+                                        Concat(
+                                            Filter(
+                                                'Agents et rôles OGADE',
+                                                'Référent logistique DQI' = true Or 'Référent maquette admin'= true
+                                            ),
+                                           Agent.Email & ";" 
+                                        ) & 'FormulaireDemandeD''envoiMaquetteSextant'.LastSubmit.'Demande urgente : Manager '.Email & "disc-dsc-dqi-mag-sextant@edf.fr" ,
+                                       "[Mail automatique] Nouvelle demande d'envoi 🚀"   &" pour la maquette : " & 'FormulaireDemandeD''envoiMaquetteSextant'.LastSubmit.Maquette.Value ,
+                                        "Bonjour à tous, <br> <br> 
+                                    Une demande d'envoi vient d'être créée par "&User().FullName & ", pour la maquette référencée « " & 'FormulaireDemandeD''envoiMaquetteSextant'.LastSubmit.Maquette.Value & " ». Afin de consulter et de VALIDER cette demande d'envoi, veuillez vous rendre sur OGADE dans l'onglet « Module logistique ». <br> <br>
+                                    Cordialement, <br> <br>
+                                    " & User().FullName)
+                                    ;
+
+                                Navigate (Informations_Maquette)
+
+
+                                ,
+
+                                SubmitForm('FormulaireDemandeD''envoiMaquetteSextant'))
+                              Text: ="Soumettre la demande d'envoi"
+                              Width: =288
+                              X: =986
+                              Y: =30
+                        - ButtonCanvas12:
+                            Control: Button@0.0.45
+                            Properties:
+                              Height: =38
+                              Icon: ="ArrowDownload"
+                              OnSelect: =Download("https://edfonline.sharepoint.com/:w:/r/sites/DISC-DSC-DQI-MAQUETTES/Documents%20partages/Formulaire%20Convention%20de%20Mise%20%C3%A0%20Disposition.doc?d=w59161d4cccdf4ce3a4320aea66f65361&csf=1&web=1&e=yywaDQ")
+                              Text: ="Télécharger la convention "
+                              Visible: |+
+                                =DataCardValue171.Selected.Value <> "EDF" && DataCardValue268.Checked = true
+                              Width: =218
+                              X: =732
+                              Y: =30
+                  - Urgence_DataCard8:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Urgence"
+                        Default: =ThisItem.Urgence
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Urgence)
+                        Required: =true
+                        Update: =DataCardValue261.Selected
+                        Width: =440
+                        X: =0
+                        Y: =2
+                      Children:
+                        - DataCardKey287:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue261:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Demandes d''envoi maquette'].Urgence)
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey287.Y + DataCardKey287.Height + 4
+                        - ErrorMessage281:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue261.Y + DataCardValue261.Height
+                        - StarVisible282:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey287.Y
+                        - InfoButtonCanvas7_2:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              BasePaletteColor: =RGBA(5, 102, 178, 1)
+                              Content: |-
+                                ="Un envoi est considéré comme urgent uniquement 
+                                si la date souhaitée de réception est fixée dans
+                                les 48 heures suivant la création de la demande.
+                                Urgence = prix de base x 15"
+                              FontColor: =RGBA(215, 58, 60, 1)
+                              Height: =28
+                              Width: =28
+                              X: =80
+                              Y: =6
+                  - Convention_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ToggleEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Convention"
+                        Default: =ThisItem.Convention
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Convention)
+                        Required: =false
+                        Update: =DataCardValue268.Checked
+                        Width: =330
+                        X: =4
+                        Y: =2
+                      Children:
+                        - DataCardKey294:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: ="Besoin d'une convention ?"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue268:
+                            Control: Toggle@1.1.5
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              Checked: =Parent.Default
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =32
+                              Label: =If(DataCardValue268.Checked , "Oui" , "Non" )
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey294.Y + DataCardKey294.Height + 4
+                        - ErrorMessage277:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue268.Y + DataCardValue268.Height
+                        - StarVisible291:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey294.Y
+                  - 'Destinataire : Entreprise_DataCard2':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Entreprise"
+                        Default: |-
+                          =ThisItem.'Destinataire : Entreprise'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Entreprise')
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Entreprise')
+                        Required: =true
+                        Update: '= If(IsBlank(DataCardValue171.Selected)  ,If(IsBlank(DataCardValue171.SearchText), Blank() , DataCardValue171.SearchText) , DataCardValue171.Selected.Value) '
+                        Width: =440
+                        X: =7
+                        Y: =2
+                      Children:
+                        - DataCardKey191:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - ErrorMessage187:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue171.Y + DataCardValue171.Height
+                        - StarVisible188:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey191.Y
+                        - Conteneur localisation_Entreprise_5:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =26
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey191.Y + DataCardKey191.Height + 4
+                            Children:
+                              - DataCardValue171:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    ChevronBackground: =RGBA(0, 0, 0, 0)
+                                    ChevronFill: =RGBA(122, 138, 143, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DisplayFields: =["Value"]
+                                    Fill: =RGBA(245, 245, 245, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion des maquettes'].'Emprunteur Entreprise')
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(122, 138, 143, 1)
+                                    Size: =11
+                                    Width: =282
+                  - 'Destinataire : Nom_DataCard2':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Nom"
+                        Default: |-
+                          =ThisItem.'Destinataire : Nom'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Nom')
+                        Height: =78
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Nom')
+                        Required: =true
+                        Update: =DataCardValue170.Value
+                        Width: =440
+                        X: =0
+                        Y: =3
+                      Children:
+                        - DataCardKey190:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue170:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey190.Y + DataCardKey190.Height + 4
+                        - ErrorMessage186:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue170.Y + DataCardValue170.Height
+                        - StarVisible187:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey190.Y
+                  - 'Destinataire : Adresse mail_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Adressemail"
+                        Default: |-
+                          =ThisItem.'Destinataire : Adresse mail'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Adresse mail')
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Adresse mail')
+                        Required: =true
+                        Update: =DataCardValue220.Value
+                        Width: =330
+                        X: =4
+                        Y: =3
+                      Children:
+                        - DataCardKey244:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue220:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey244.Y + DataCardKey244.Height + 4
+                        - ErrorMessage241:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue220.Y + DataCardValue220.Height
+                        - StarVisible242:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey244.Y
+                  - 'Destinataire : N° de téléphone_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_N_x00b0_det_x"
+                        Default: |-
+                          =ThisItem.'Destinataire : N° de téléphone'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : N° de téléphone')
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : N° de téléphone')
+                        Required: =true
+                        Update: =DataCardValue212.Value
+                        Width: =330
+                        X: =7
+                        Y: =3
+                      Children:
+                        - DataCardKey238:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue212:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey238.Y + DataCardKey238.Height + 4
+                        - ErrorMessage233:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue212.Y + DataCardValue212.Height
+                        - StarVisible234:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey238.Y
+                  - Contact_DataCard1:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Contact"
+                        Default: =ThisItem.Contact
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Contact)
+                        MaxLength: =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, Contact)
+                        Required: =false
+                        Update: =DataCardValue276.Value
+                        Width: =440
+                        X: =0
+                        Y: =4
+                      Children:
+                        - DataCardKey303:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue276:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =282
+                              X: =24
+                              Y: =DataCardKey303.Y + DataCardKey303.Height + 4
+                        - ErrorMessage298:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue276.Y + DataCardValue276.Height
+                        - StarVisible300:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey303.Y
+                        - InfoButtonCanvas6_6:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              BasePaletteColor: =RGBA(5, 102, 178, 1)
+                              Content: |-
+                                ="Indiquer la personne à contacter pour l'enlèvement 
+                                ou autre destinataire"
+                              FontColor: =RGBA(215, 58, 60, 1)
+                              Height: =28
+                              Width: =28
+                              X: =75
+                              Y: =6
+                  - 'Contact : N° de tel_DataCard4':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      IsLocked: true
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Contact_x003a_N_x00b0_detel"
+                        Default: |-
+                          =ThisItem.'Contact : N° de tel'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Contact : N° de tel')
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Contact : N° de tel')
+                        Required: =false
+                        Update: =DataCardValue282.Value
+                        Width: =330
+                        X: =4
+                        Y: =4
+                      Children:
+                        - DataCardKey309:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue282:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey309.Y + DataCardKey309.Height + 4
+                        - ErrorMessage304:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue282.Y + DataCardValue282.Height
+                        - StarVisible306:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey309.Y
+                  - 'Destinataire : Adresse_DataCard2':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Adressededestination"
+                        Default: |-
+                          =ThisItem.'Destinataire : Adresse'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Adresse')
+                        Height: =84
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Adresse')
+                        Required: =true
+                        Update: '= If(AddAdress.Checked = true , DataCardValue214.Value & " " & DataCardValue169.Value &", "& DataCardValue155.Value & " "  & DataCardValue222.Value & ", " & DataCardValue217.Selected.Value , DataCardValue172.Selected.Value) '
+                        Width: =1210
+                        X: =0
+                        Y: =5
+                      Children:
+                        - DataCardKey192:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - ErrorMessage188:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue172.Y + DataCardValue172.Height
+                        - StarVisible189:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey192.Y
+                        - Conteneur localisation_3:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =30
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =1020
+                              X: =24
+                              Y: =DataCardKey192.Y + DataCardKey192.Height + 4
+                            Children:
+                              - DataCardValue172:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    ChevronBackground: =RGBA(0, 0, 0, 0)
+                                    ChevronFill: =RGBA(122, 138, 143, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: |-
+                                      =If(AddAdress.Checked = true , {Value : DataCardValue214.Value & " " & DataCardValue169.Value &", "& DataCardValue155.Value & " "  & DataCardValue222.Value & ", " & DataCardValue217.Selected.Value })
+                                    DisplayFields: =[""]
+                                    DisplayMode: =If(AddAdress.Checked = true , DisplayMode.View , DisplayMode.Edit)
+                                    Fill: =RGBA(245, 245, 245, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =30
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    IsSearchable: =false
+                                    Items: |-
+                                      =Distinct(Filter('Demandes d''envoi maquette', Not IsBlank('Destinataire : Code postal')), 'Destinataire : Adresse')
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
+                                    SearchFields: =[""]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(122, 138, 143, 1)
+                                    Size: =11
+                                    Width: =818
+                              - AddAdress:
+                                  Control: CheckBox@0.0.30
+                                  Properties:
+                                    Label: ="Ajouter une adresse ? "
+                                    Width: =202
+                                    X: =818
+                  - 'Destinataire : N° de voie_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_N_x00b0_devoi"
+                        Default: |-
+                          =ThisItem.'Destinataire : N° de voie'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : N° de voie')
+                        Height: =79
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : N° de voie')
+                        Required: =AddAdress.Checked
+                        Update: |-
+                          =If(AddAdress.Checked = true , DataCardValue214.Value , LookUp('Demandes d''envoi maquette' , 'Destinataire : Adresse' = DataCardValue172.Selected.Value).'Destinataire : N° de voie')
+                        Visible: =AddAdress.Checked
+                        Width: =220
+                        X: =0
+                        Y: =6
+                      Children:
+                        - DataCardKey240:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue214:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey240.Y + DataCardKey240.Height + 4
+                        - ErrorMessage235:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue214.Y + DataCardValue214.Height
+                        - StarVisible236:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey240.Y
+                  - 'Destinataire : Nom de la voie_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Nomdelavoie"
+                        Default: |-
+                          =ThisItem.'Destinataire : Nom de la voie'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Nom de la voie')
+                        Height: =69
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Nom de la voie')
+                        Required: =AddAdress.Checked
+                        Update: |-
+                          =If(AddAdress.Checked = true , DataCardValue169.Value , LookUp('Demandes d''envoi maquette' , 'Destinataire : Adresse' = DataCardValue172.Selected.Value).'Destinataire : Nom de la voie')
+                        Visible: =AddAdress.Checked
+                        Width: =440
+                        X: =1
+                        Y: =6
+                      Children:
+                        - DataCardKey189:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue169:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey189.Y + DataCardKey189.Height + 4
+                        - ErrorMessage185:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue169.Y + DataCardValue169.Height
+                        - StarVisible186:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey189.Y
+                  - 'Destinataire : Ville_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Ville"
+                        Default: |-
+                          =ThisItem.'Destinataire : Ville'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Ville')
+                        Height: =63
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Ville')
+                        Required: =AddAdress.Checked
+                        Update: |-
+                          =
+                          If(AddAdress.Checked = true , DataCardValue222.Value, LookUp('Demandes d''envoi maquette' , 'Destinataire : Adresse' = DataCardValue172.Selected.Value).'Destinataire : Ville')
+                        Visible: =AddAdress.Checked
+                        Width: =220
+                        X: =2
+                        Y: =6
+                      Children:
+                        - DataCardKey245:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue222:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey245.Y + DataCardKey245.Height + 4
+                        - ErrorMessage242:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue222.Y + DataCardValue222.Height
+                        - StarVisible243:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey245.Y
+                  - 'Destinataire : Code postal_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Codepostal"
+                        Default: |-
+                          =ThisItem.'Destinataire : Code postal'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Code postal')
+                        Height: =65
+                        MaxLength: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Destinataire : Code postal')
+                        Required: =AddAdress.Checked
+                        Update: |-
+                          =If(AddAdress.Checked = true , DataCardValue155.Value , LookUp('Demandes d''envoi maquette' , 'Destinataire : Adresse' = DataCardValue172.Selected.Value).'Destinataire : Code postal')
+                        Visible: =AddAdress.Checked
+                        Width: =220
+                        X: =3
+                        Y: =6
+                      Children:
+                        - DataCardKey170:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue155:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey170.Y + DataCardKey170.Height + 4
+                        - ErrorMessage168:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue155.Y + DataCardValue155.Height
+                        - StarVisible169:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey170.Y
+                  - Justification pas de convention_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Justificationpasdeconvention"
+                        Default: =ThisItem.'Justification pas de convention'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Justificationpasdeconvention)
+                        Height: =107
+                        MaxLength: =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, Justificationpasdeconvention)
+                        Required: =DataCardValue268.Checked = false
+                        Update: =DataCardValue285.Value
+                        Visible: =DataCardValue268.Checked = false
+                        Width: =586
+                        X: =4
+                        Y: =6
+                      Children:
+                        - DataCardKey313:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue285:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =62
+                              Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: |+
+                                =612
+                              X: =24
+                              Y: =DataCardKey313.Y + DataCardKey313.Height + 4
+                        - ErrorMessage307:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue285.Y + DataCardValue285.Height
+                        - StarVisible309:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey313.Y
+                  - 'Destinataire : Pays_DataCard1':
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Destinataire_x003a_Pays"
+                        Default: |-
+                          =ThisItem.'Destinataire : Pays'
+                        DisplayName: |-
+                          =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Destinataire : Pays')
+                        Height: =348
+                        Required: =AddAdress.Checked
+                        Update: |-
+                          =
+                          If(AddAdress.Checked = true , DataCardValue217.Selected , LookUp('Demandes d''envoi maquette' , 'Destinataire : Adresse' = DataCardValue172.Selected.Value).'Destinataire : Pays')
+                        Visible: =AddAdress.Checked
+                        Width: =330
+                        X: =11
+                        Y: =7
+                      Children:
+                        - DataCardKey242:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue217:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: |-
+                                =Choices([@'Demandes d''envoi maquette'].'Destinataire : Pays')
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey242.Y + DataCardKey242.Height + 4
+                        - ErrorMessage237:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue217.Y + DataCardValue217.Height
+                        - StarVisible238:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey242.Y
+                  - Motif de l'envoi_DataCard1:
+                      Control: TypedDataCard@1.0.7
+                      Variant: TextualEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Motifdelenvoi"
+                        Default: =ThisItem.'Motif de l''envoi'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Motif de l''envoi')
+                        Height: =359
+                        MaxLength: =DataSourceInfo([@'Demandes d''envoi maquette'], DataSourceInfo.MaxLength, 'Motif de l''envoi')
+                        Required: =true
+                        Update: =DataCardValue173.Value
+                        Width: =880
+                        X: =12
+                        Y: =7
+                      Children:
+                        - DataCardKey193:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: ="Commentaire :"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue173:
+                            Control: TextInput@0.0.54
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =62
+                              Mode: ='TextInputCanvas.Mode'.Multiline
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Value: =Parent.Default
+                              Width: =612
+                              X: =24
+                              Y: =DataCardKey193.Y + DataCardKey193.Height + 4
+                        - ErrorMessage189:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue173.Y + DataCardValue173.Height
+                        - StarVisible190:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =10
+                  - Photo de l'envoi_DataCard1:
+                      Control: TypedDataCard@1.0.7
+                      Variant: LargePicture
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Photodelenvoi"
+                        Default: =ThisItem.'Photo de l''envoi'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Photo de l''envoi')
+                        Required: |-
+                          =If(
+                              "sextant" in Gallery8.Selected.Localisation.Value || 
+                              "ampère" in Gallery8.Selected.Localisation.Value || 
+                              "saint denis" in Gallery8.Selected.Localisation.Value, 
+                              false, 
+                              true
+                          )
+                        Update: =Image25.Image
+                        Visible: =If("sextant" in Gallery8.Selected.Localisation.Value , false , true)
+                        Width: =440
+                        X: =1
+                        Y: =8
+                      Children:
+                        - DataCardKey199:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =34
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 60
+                              Wrap: =false
+                              X: =30
+                              Y: =10
+                        - Image25:
+                            Control: Image@2.2.3
+                            MetadataKey: FieldValue
+                            Properties:
+                              BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =AddPicture11.Height
+                              Image: =If(IsBlank(AddPicture11.Media), Parent.Default, AddPicture11.Media)
+                              Tooltip: =Parent.DisplayName
+                              Width: =AddPicture11.Width
+                              X: =AddPicture11.X
+                              Y: =AddPicture11.Y
+                        - AddPicture11:
+                            Control: AddMedia@2.2.1
+                            MetadataKey: AddPicture
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =90
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =DataCardKey199.Y + DataCardKey199.Height + 5
+                        - ErrorMessage195:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =10
+                              Size: =12
+                              Text: =Parent.Error
+                              Visible: =Parent.DisplayMode=DisplayMode.Edit
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =Image25.Y + Image25.Height
+                        - StarVisible196:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =DataCardKey199.Height
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Wrap: =false
+                              Y: =DataCardKey199.Y
+                  - Pièces jointes_DataCard7:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ClassicAttachmentsEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="{Attachments}"
+                        Default: =ThisItem.'Pièces jointes'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Pièces jointes')
+                        Height: =176
+                        Required: =DataCardValue268.Checked = true
+                        Update: =DataCardValue262.Attachments
+                        Visible: =DataCardValue268.Checked = true
+                        Width: =550
+                        X: =2
+                        Y: =8
+                      Children:
+                        - DataCardKey288:
+                            Control: Label@2.5.1
+                            MetadataKey: FieldName
+                            Properties:
+                              AutoHeight: =true
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =34
+                              Text: ="Convention à joindre"
+                              Width: =Parent.Width - 60
+                              Wrap: =false
+                              X: =30
+                              Y: =10
+                        - DataCardValue262:
+                            Control: Attachments@2.3.0
+                            MetadataKey: FieldValue
+                            Properties:
+                              BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                              DisplayMode: =Parent.DisplayMode
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              ItemColor: =RGBA(255, 255, 255, 1)
+                              ItemFill: =RGBA(56, 96, 178, 1)
+                              ItemHoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Parent.Default
+                              PaddingBottom: =5
+                              PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                              PaddingRight: =5
+                              PaddingTop: =5
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              Tooltip: =Parent.DisplayName
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =DataCardKey288.Y + DataCardKey288.Height + 5
+                        - ErrorMessage282:
+                            Control: Label@2.5.1
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              AutoHeight: =true
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(168, 0, 0, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =10
+                              Live: =Live.Assertive
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =14
+                              Text: =Parent.Error
+                              Visible: =Parent.DisplayMode=DisplayMode.Edit
+                              Width: =Parent.Width - 60
+                              X: =30
+                              Y: =DataCardValue262.Y + DataCardValue262.Height
+                        - StarVisible283:
+                            Control: Label@2.5.1
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =DataCardKey288.Height
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Wrap: =false
+                              Y: =DataCardKey288.Y
+                  - Statut_DataCard3:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Statut"
+                        Default: =ThisItem.Statut
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Statut)
+                        Required: =false
+                        Update: |-
+                          ={Value : "Nouvelle"}
+                        Visible: =false
+                        Width: =330
+                        X: =0
+                        Y: =9
+                      Children:
+                        - DataCardKey187:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue167:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Demandes d''envoi maquette'].Statut)
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey187.Y + DataCardKey187.Height + 4
+                        - ErrorMessage183:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue167.Y + DataCardValue167.Height
+                        - StarVisible184:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey187.Y
+                  - Photo envoi effectuée ?_DataCard1:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ToggleEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Photoenvoieffectu_x00e9_e_x003f_"
+                        Default: =ThisItem.'Photo envoi effectuée ?'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Photo envoi effectuée ?')
+                        Required: =false
+                        Update: =If("sextant" in Gallery8.Selected.Localisation.Value , false , true)
+                        Visible: =false
+                        Width: =330
+                        X: =3
+                        Y: =9
+                      Children:
+                        - DataCardKey237:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue182:
+                            Control: Toggle@1.1.5
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              Checked: =Parent.Default
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =32
+                              Label: =""
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey237.Y + DataCardKey237.Height + 4
+                        - ErrorMessage232:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue182.Y + DataCardValue182.Height
+                        - StarVisible233:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =30
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey237.Y
+                  - Maquette_DataCard1:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Maquette"
+                        Default: =ThisItem.Maquette
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,Maquette)
+                        Required: =false
+                        Update: |-
+                          ={Id : Gallery8.Selected.ID}
+                        Visible: =false
+                        Width: =330
+                        X: =6
+                        Y: =9
+                      Children:
+                        - DataCardKey188:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue168:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Demandes d''envoi maquette'].Maquette)
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey188.Y + DataCardKey188.Height + 4
+                        - ErrorMessage184:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue168.Y + DataCardValue168.Height
+                        - StarVisible185:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey188.Y
+                  - Personne ayant réalisée la photo_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: ComboBoxEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Personneayantr_x00e9_alis_x00e9_0"
+                        Default: =ThisItem.'Personne ayant réalisée la photo'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Personne ayant réalisée la photo')
+                        Required: =false
+                        Update: |-
+                          =If("sextant" in Gallery8.Selected.Localisation.Value , Blank() , {Claims : "i:0#.f|membership|" & First('Utilisateursd’Office365'.SearchUserV2({searchTerm:User().Email }).value).UserPrincipalName, 
+                          Department : First('Utilisateursd’Office365'.SearchUserV2({searchTerm:User().Email }).value).Department ,
+                          DisplayName : User().FullName  ,  
+                          Email : User().Email , 
+                          JobTitle : First('Utilisateursd’Office365'.SearchUserV2({searchTerm:User().Email }).value).JobTitle })
+                        Visible: =false
+                        Width: =330
+                        X: =4
+                        Y: =10
+                      Children:
+                        - DataCardKey200:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DataCardValue181:
+                            Control: ComboBox@0.0.51
+                            MetadataKey: FieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DefaultSelectedItems: =[Parent.Default]
+                              DisplayMode: =Parent.DisplayMode
+                              Items: =Choices([@'Demandes d''envoi maquette'].'Personne ayant réalisée la photo')
+                              Required: =Parent.Required
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardKey200.Y + DataCardKey200.Height + 4
+                        - ErrorMessage196:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DataCardValue181.Y + DataCardValue181.Height
+                        - StarVisible197:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey200.Y
+                  - Date photo envoi_DataCard2:
+                      Control: TypedDataCard@1.0.7
+                      Variant: DateTimeEdit
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataField: ="Datephotoenvoi"
+                        Default: =ThisItem.'Date photo envoi'
+                        DisplayName: =DataSourceInfo([@'Demandes d''envoi maquette'],DataSourceInfo.DisplayName,'Date photo envoi')
+                        Required: =false
+                        Update: =If("sextant" in Gallery8.Selected.Localisation.Value , Blank() , Now())
+                        Visible: =false
+                        Width: =330
+                        X: =7
+                        Y: =10
+                      Children:
+                        - DataCardKey235:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldName
+                            Properties:
+                              Height: =22
+                              Text: =Parent.DisplayName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - 48
+                              Wrap: =false
+                              X: =24
+                              Y: =10
+                        - DateValue4:
+                            Control: DatePicker@0.0.46
+                            MetadataKey: DateFieldValue
+                            Properties:
+                              AccessibleLabel: =Parent.DisplayName
+                              DisplayMode: =Parent.DisplayMode
+                              SelectedDate: =Parent.Default
+                              ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                              Width: =(Parent.Width - 48) / 2
+                              X: =24
+                              Y: =DataCardKey235.Y + DataCardKey235.Height + 4
+                        - HourValue4:
+                            Control: DropDown@0.0.45
+                            MetadataKey: HourFieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Text(Hour(Parent.Default),"00")]
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =28
+                              Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"]
+                              Required: =Parent.Required
+                              Width: =DateValue4.Width / 2 - 10
+                              X: =DateValue4.X + DateValue4.Width + 10
+                              Y: =DateValue4.Y + 1
+                        - Separator14:
+                            Control: Text@0.0.51
+                            MetadataKey: HourMinuteSeparator
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =HourValue4.Height
+                              Text: =":"
+                              Width: =10
+                              X: =HourValue4.X + HourValue4.Width
+                              Y: =HourValue4.Y
+                        - MinuteValue4:
+                            Control: DropDown@0.0.45
+                            MetadataKey: MinuteFieldValue
+                            Properties:
+                              AccessibleLabel: =If(Parent.Required, Substitute("{0}. Obligatoire.", "{0}", Parent.DisplayName), Parent.DisplayName)
+                              DefaultSelectedItems: =[Text(Minute(Parent.Default),"00")]
+                              DisplayMode: =Parent.DisplayMode
+                              Height: =28
+                              Items: =["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59"]
+                              Width: =HourValue4.Width
+                              X: =HourValue4.X + HourValue4.Width + Separator14.Width
+                              Y: =HourValue4.Y + 1
+                        - ErrorMessage230:
+                            Control: Text@0.0.51
+                            MetadataKey: ErrorMessage
+                            Properties:
+                              Height: =30
+                              Text: =Parent.Error
+                              Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =Parent.Width - 48
+                              X: =24
+                              Y: =DateValue4.Y + DateValue4.Height
+                        - StarVisible231:
+                            Control: Text@0.0.51
+                            MetadataKey: FieldRequired
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Height: =20
+                              Text: ="*"
+                              Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                              Width: =30
+                              Y: =DataCardKey235.Y

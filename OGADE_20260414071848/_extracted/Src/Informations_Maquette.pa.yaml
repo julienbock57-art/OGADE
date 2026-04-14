@@ -1,0 +1,1626 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Informations_Maquette:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Canvas2:
+          Control: FluidGrid@2.3.0
+          Properties:
+            BorderThickness: =0
+            Height: =499
+            Width: =1339
+            X: =11
+            Y: =153
+          Children:
+            - DataCard2:
+                Control: DataCard@1.0.2
+                Properties:
+                  BorderColor: =RGBA(237, 237, 237, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHT
+                  Width: =1338
+                  X: =0
+                  Y: =0
+                Children:
+                  - Rectangle3:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =55
+                        OnSelect: |-
+                          =If (varCARDHEIGHT = 275, 
+                          UpdateContext({varCARDHEIGHT : 55}) & Set(Varrot1, 0) & UpdateContext({VarDescriptionMaquette : false}) ,
+                          UpdateContext({varCARDHEIGHT : 275}) & Set(Varrot1, 180) & UpdateContext({VarDescriptionMaquette : true}) )
+                        Width: =1365
+                  - Label6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: "=\"Description de la maquette : \" "
+                        Width: =419
+                        X: =19
+                        Y: =4
+                  - Label7:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Matière : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =332
+                        X: =19
+                        Y: =67
+                  - Label7_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Dimensions maquette : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =438
+                        X: =19
+                        Y: =119
+                  - Label6_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Text: "=\"Détail : \" "
+                        Visible: =VarDescriptionMaquette
+                        Width: =73
+                        X: =653
+                        Y: =61
+                  - Label7_3:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: "=\"Composant : \" "
+                        Visible: =VarDescriptionMaquette
+                        Width: =409
+                        X: =19
+                        Y: =174
+                  - Label7_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: |-
+                          ="Pièce : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =409
+                        X: =19
+                        Y: =223
+                  - Label7_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: "=\"Catégorie : \" "
+                        Visible: =VarDescriptionMaquette
+                        Width: =97
+                        X: =653
+                        Y: =223
+                  - Bas_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHT = 432, 
+                          UpdateContext({varCARDHEIGHT : 55}) & Set(Varrot1, 0) & UpdateContext({VarDescriptionMaquette : false}) ,
+                          UpdateContext({varCARDHEIGHT : 432}) & Set(Varrot1, 180) & UpdateContext({VarDescriptionMaquette : true}) )
+
+                        Rotation: =Varrot1
+                        Width: =27
+                        X: =1299
+                        Y: =7
+                  - TextInput7_2:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Concat(Gallery8.Selected.Matière, Value, ", ")
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =454
+                        X: =122
+                        Y: =69
+                  - TextInput7_3:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.Composant.Value
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =433
+                        X: =143
+                        Y: =174
+                  - TextInput7_4:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: = Gallery8.Selected.Pièces
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =475
+                        X: =101
+                        Y: =223
+                  - TextInput7_5:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.Catégorie.Value
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =495
+                        X: =766
+                        Y: =223
+                  - TextInput7_6:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: "=If(Gallery8.Selected.'Forme de la maquette'.Value = \"Parallélépipède\" Or Gallery8.Selected.'Forme de la maquette'.Value = \"Autres\",  Gallery8.Selected.'Longueur maquette' & \" x \" & Gallery8.Selected.'Largeur maquette ' & \" x \" & Gallery8.Selected.'Hauteur maquette' &\" mm\" ,\" Ø \" & Gallery8.Selected.'DN maquette '  & \" x \" & Gallery8.Selected.'Longueur maquette' & \"| Ep : \" & Gallery8.Selected.'Epaisseur paroi maquette ') "
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =37
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =343
+                        X: =233
+                        Y: =122
+                  - TextInput7_7:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.Description
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =92
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Mode: =TextMode.MultiLine
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =498
+                        X: =763
+                        Y: =69
+                  - Label7_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: |-
+                          ="Forme : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =409
+                        X: =653
+                        Y: =174
+                  - TextInput7_8:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.'Forme de la maquette'.Value
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =498
+                        X: =763
+                        Y: =174
+                  - Label7_9:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: |-
+                          ="ECM CSCT : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =168
+                        X: =19
+                        Y: =359
+                  - Label7_15:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: |-
+                          ="ECM RFF : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =153
+                        X: =659
+                        Y: =359
+                  - LinkCanvas1:
+                      Control: Link@0.0.45
+                      Properties:
+                        Align: =Align.Left
+                        Height: =59
+                        Text: =Gallery8.Selected.'Lien ECM'
+                        URL: =Gallery8.Selected.'Lien ECM'
+                        VerticalAlign: =VerticalAlign.Top
+                        Visible: =VarDescriptionMaquette
+                        Width: =531
+                        X: =122
+                        Y: =364
+                  - LinkCanvas1_1:
+                      Control: Link@0.0.45
+                      Properties:
+                        Align: =Align.Left
+                        Height: =59
+                        Text: =Gallery8.Selected.'Lien ECM RFF'
+                        URL: =Gallery8.Selected.'Lien ECM RFF'
+                        VerticalAlign: =VerticalAlign.Middle
+                        Visible: =VarDescriptionMaquette
+                        Width: =549
+                        X: =766
+                        Y: =359
+                  - Label7_24:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Poids  :  "
+                        Visible: =VarDescriptionMaquette
+                        Width: =85
+                        X: =19
+                        Y: =276
+                  - TextInput7_15:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =If(IsBlank(Gallery8.Selected.'Poids de la maquette en kg') , " ", Gallery8.Selected.'Poids de la maquette en kg' & " kg")
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =175
+                        X: =92
+                        Y: =276
+                  - Label33:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Pièces jointes : "
+                        Visible: "=If(IsBlank(First(Gallery8.Selected.'Pièces jointes').Value), false , VarDescriptionMaquette) "
+                        Width: =132
+                        X: =654
+                        Y: =271
+                  - Icon8_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(9, 33, 98, 1)
+                        Height: =44
+                        Icon: =Icon.PaperClip
+                        OnSelect: =Navigate(Screen7,ScreenTransition.Cover)
+                        Visible: "=If(IsBlank(First(Gallery8.Selected.'Pièces jointes').Value), false , VarDescriptionMaquette) "
+                        Width: =38
+                        X: =786
+                        Y: =269
+                  - Label7_21:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Dimensions colisage : "
+                        Visible: =VarDescriptionMaquette
+                        Width: =438
+                        X: =19
+                        Y: =318
+                  - TextInput7_12:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: "=Gallery8.Selected.'Colisage_Longueur (mm)' & \" x \" & Gallery8.Selected.'Colisage_Largeur (mm)' & \" x \" & Gallery8.Selected.'Colisage_Hauteur (mm)' &\" mm\" "
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =37
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =343
+                        X: =233
+                        Y: =321
+                  - Label7_28:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Poids colisage :  "
+                        Visible: =VarDescriptionMaquette
+                        Width: =137
+                        X: =653
+                        Y: =324
+                  - TextInput7_27:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =If(IsBlank(Gallery8.Selected.'Colisage_Poids (kg)') , " ", Gallery8.Selected.'Colisage_Poids (kg)' & " kg")
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarDescriptionMaquette
+                        Width: =175
+                        X: =790
+                        Y: =324
+            - DataCard3:
+                Control: DataCard@1.0.2
+                Variant: BlankCard
+                Properties:
+                  BorderColor: =RGBA(237, 237, 237, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHTdéfaut
+                  Width: =1339
+                  X: =0
+                  Y: =1
+                Children:
+                  - Rectangle3_1:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =51
+                        OnSelect: |+
+                          =If (varCARDHEIGHTdéfaut = 275, 
+                          UpdateContext({varCARDHEIGHTdéfaut : 55}) & Set(Varrot5, 0) & UpdateContext({VarDescriptiondéfaut : false}) ,
+                          UpdateContext({varCARDHEIGHTdéfaut : 275}) & Set(Varrot5, 180) & UpdateContext({VarDescriptiondéfaut : true}) )
+
+                        Width: =1365
+                        X: =-28
+                        Y: =4
+                  - Label6_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: |-
+                          ="Description des défauts : "
+                        Width: =419
+                        X: =19
+                        Y: =4
+                  - Bas_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHTdéfaut = 275, 
+                          UpdateContext({varCARDHEIGHTdéfaut : 55}) & Set(Varrot5, 0) & UpdateContext({VarDescriptiondéfaut : false}) ,
+                          UpdateContext({varCARDHEIGHTdéfaut : 275}) & Set(Varrot5, 180) & UpdateContext({VarDescriptiondéfaut : true}) )
+
+                        Rotation: =Varrot5
+                        Width: =27
+                        X: =1299
+                        Y: =7
+                  - BadgeCanvas1_3:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =
+                        Height: =41
+                        Visible: =VarDescriptiondéfaut
+                        Width: =Parent.Width - 25
+                        X: =7
+                        Y: =81
+                  - TextCanvas1_21:
+                      Control: Text@0.0.51
+                      Properties:
+                        Text: ="Type de défaut"
+                        Visible: =VarDescriptiondéfaut
+                        X: =158
+                        Y: =85
+                  - TextCanvas1_22:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Longueur"
+                        Visible: =VarDescriptiondéfaut
+                        X: =604
+                        Y: =85
+                  - TextCanvas1_23:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Largeur"
+                        Visible: =VarDescriptiondéfaut
+                        X: =736
+                        Y: =85
+                  - TextCanvas1_24:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Hauteur"
+                        Visible: =VarDescriptiondéfaut
+                        X: =873
+                        Y: =85
+                  - TextCanvas1_25:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Profondeur"
+                        Visible: =VarDescriptiondéfaut
+                        X: =1002
+                        Y: =85
+                  - TextCanvas1_26:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Diamètre"
+                        Visible: =VarDescriptiondéfaut
+                        X: =1135
+                        Y: =85
+                  - TextCanvas1_27:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Text: ="Numéro"
+                        Visible: =VarDescriptiondéfaut
+                        X: =26
+                        Y: =85
+                  - Gallery3_2:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =DisplayMode.View
+                        Height: =177
+                        Items: =Table(ParseJSON(Gallery8.Selected.'Description des défauts '))
+                        TemplateSize: =46
+                        Visible: |+
+                          =VarDescriptiondéfaut
+                        Width: =1331
+                        X: =7
+                        Y: =135
+                      Children:
+                        - Separator3_3:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =8
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - Longueur_3:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              DisplayMode: =DisplayMode.View
+                              Height: =33
+                              Value: =ThisItem.Value.Longueur
+                              Width: =108
+                              X: =596
+                        - Largeur_3:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              Height: =33
+                              Value: =ThisItem.Value.Largeur
+                              Width: =111
+                              X: =730
+                        - Hauteur_3:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              Height: =33
+                              Value: =ThisItem.Value.Hauteur
+                              Width: =110
+                              X: =861
+                        - Profondeur_3:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              Height: =33
+                              Value: =ThisItem.Value.Profondeur
+                              Width: =106
+                              X: =994
+                        - Diamètre_3:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              Height: =33
+                              Value: =ThisItem.Value.Diamètre
+                              Width: =106
+                              X: =1124
+                              Y: =1
+                        - Numéro_4:
+                            Control: TextInput@0.0.54
+                            Properties:
+                              Align: =Align.Left
+                              Value: =ThisItem.Value.Numéro
+                              Width: =106
+                              X: =16
+                        - Type_1:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              Default: =ThisItem.Value.Type
+                              DisplayMode: =DisplayMode.View
+                              Font: =Font.'Open Sans'
+                              Height: =27
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].'Type de défaut')
+                              Items.Value: =Value
+                              OnSelect: =Select(Parent)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Size: =10
+                              Width: =443
+                              X: =139
+                              Y: =5
+                        - Icon18_3:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(56, 96, 178, 1)
+                              Height: =31
+                              Icon: =Icon.Trash
+                              OnSelect: |-
+                                =RemoveIf(DéfautValeursTab1, Numéro = Numéro_4.Value);
+                                Set(DescriptionJSON1, JSON(DéfautValeursTab1))
+                              Visible: =false
+                              Width: =46
+                              X: =1244
+                              Y: =1
+            - DataCard5:
+                Control: DataCard@1.0.2
+                Variant: BlankCard
+                Properties:
+                  BorderColor: =RGBA(237, 237, 237, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHThisto
+                  Width: =1339
+                  X: =0
+                  Y: =2
+                Children:
+                  - Label7_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        AutoHeight: =true
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =153
+                        Overflow: =Overflow.Scroll
+                        Text: =If (IsBlank(Gallery8.Selected.Historique) , "Aucun déplacement dans l'historique ", Gallery8.Selected.Historique)
+                        Visible: =Varhistoriquedeplacement
+                        Width: =1266
+                        X: =20
+                        Y: =71
+                  - Rectangle3_2:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =51
+                        OnSelect: |+
+                          =If (varCARDHEIGHThisto = 120, 
+                          UpdateContext({varCARDHEIGHThisto : 55}) & Set(Varrot4, 0) & UpdateContext({Varhistoriquedeplacement : false}) ,
+                          UpdateContext({varCARDHEIGHThisto : 120}) & Set(Varrot4, 180) & UpdateContext({Varhistoriquedeplacement : true}) )
+                        Width: =1365
+                        X: =-28
+                        Y: =4
+                  - Label6_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: "=\"Historique des déplacements : \" "
+                        Width: =419
+                        X: =20
+                        Y: =4
+                  - Bas_3:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHThisto = 120, 
+                          UpdateContext({varCARDHEIGHThisto : 55}) & Set(Varrot4, 0) & UpdateContext({Varhistoriquedeplacement : false}) ,
+                          UpdateContext({varCARDHEIGHThisto : 120}) & Set(Varrot4, 180) & UpdateContext({Varhistoriquedeplacement : true}) )
+
+                        Rotation: =Varrot4
+                        Width: =27
+                        X: =1300
+                        Y: =7
+            - DataCard9:
+                Control: DataCard@1.0.2
+                Variant: BlankCard
+                Properties:
+                  BorderColor: =RGBA(237, 237, 237, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHTvie
+                  Width: =1339
+                  X: =0
+                  Y: =3
+                Children:
+                  - Rectangle3_3:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =51
+                        OnSelect: |+
+                          =If (varCARDHEIGHTvie = 150, 
+                          UpdateContext({varCARDHEIGHTvie : 55}) & Set(Varrot3, 0) & UpdateContext({VarViemaquette : false}) ,
+                          UpdateContext({varCARDHEIGHTvie : 150}) & Set(Varrot3, 180) & UpdateContext({VarViemaquette : true}) )
+                        Width: =1365
+                        X: =-28
+                        Y: =4
+                  - Label6_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: "=\"Vie de la maquette : \" "
+                        Width: =419
+                        X: =18
+                        Y: =6
+                  - Bas_4:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHTvie = 150, 
+                          UpdateContext({varCARDHEIGHTvie : 55}) & Set(Varrot3, 0) & UpdateContext({VarViemaquette : false}) ,
+                          UpdateContext({varCARDHEIGHTvie : 150}) & Set(Varrot3, 180) & UpdateContext({VarViemaquette : true}) )
+
+                        Rotation: =Varrot3
+                        Width: =27
+                        X: =1298
+                        Y: =6
+                  - Label17:
+                      Control: Label@2.5.1
+                      Properties:
+                        AutoHeight: =true
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =68
+                        Text: |-
+                          =If (
+                              IsBlank(Gallery8.Selected.'Vie de la maquette'),
+                              "Aucun test réalisé ",
+                              Gallery8.Selected.'Vie de la maquette'
+                          )
+                        Visible: =VarViemaquette
+                        Width: =1325
+                        X: =18
+                        Y: =55
+            - DataCard10:
+                Control: DataCard@1.0.2
+                Variant: BlankCard
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHTAdministrative
+                  Width: =1339
+                  X: =1
+                  Y: =4
+                Children:
+                  - Rectangle3_15:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =51
+                        OnSelect: |+
+                          =If (varCARDHEIGHTAdministrative = 275, 
+                          UpdateContext({varCARDHEIGHTAdministrative : 55}) & Set(Varrotadministrative, 0) & UpdateContext({VarAdministrativemaquette : false}) ,
+                          UpdateContext({varCARDHEIGHTAdministrative : 275}) & Set(Varrotadministrative, 180) & UpdateContext({VarAdministrativemaquette : true}) )
+
+                        Width: =1365
+                        X: =-26
+                        Y: =4
+                  - Label6_23:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: |-
+                          ="Informations administratives : "
+                        Width: =419
+                        X: =20
+                        Y: =4
+                  - Label7_16:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="N° de FIEC : "
+                        Visible: =VarAdministrativemaquette
+                        Width: =332
+                        X: =32
+                        Y: =67
+                  - Label7_17:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Référence unique : "
+                        Visible: =VarAdministrativemaquette
+                        Width: =438
+                        X: =20
+                        Y: =119
+                  - Label7_18:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: ="Type de maquette  :"
+                        Visible: =VarAdministrativemaquette
+                        Width: =409
+                        X: =20
+                        Y: =174
+                  - Bas_5:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHTAdministrative = 275, 
+                          UpdateContext({varCARDHEIGHTAdministrative : 55}) & Set(Varrotadministrative, 0) & UpdateContext({VarAdministrativemaquette : false}) ,
+                          UpdateContext({varCARDHEIGHTAdministrative : 275}) & Set(Varrotadministrative, 180) & UpdateContext({VarAdministrativemaquette : true}) )
+
+                        Rotation: =Varrotadministrative
+                        Width: =27
+                        X: =1300
+                        Y: =7
+                  - TextInput7_9:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.'N° de FIEC'
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =454
+                        X: =195
+                        Y: =69
+                  - TextInput7_10:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.'Type de maquette'.Value
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =415
+                        X: =234
+                        Y: =174
+                  - TextInput7_11:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.'Référence unique'
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =37
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =415
+                        X: =234
+                        Y: =122
+                  - Label7_25:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Référencée ASN : "
+                        Visible: =VarAdministrativemaquette
+                        Width: =168
+                        X: =690
+                        Y: =71
+                  - TextInput7_24:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Gallery8.Selected.'Référencée ASN'.Value
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =150
+                        X: =847
+                        Y: =71
+                  - Label7_26:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Durée de vie : "
+                        Visible: =VarAdministrativemaquette
+                        Width: =131
+                        X: =690
+                        Y: =123
+                  - TextInput7_25:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =If(IsBlank(Gallery8.Selected.'Durée de vie'), " "  ,If(Gallery8.Selected.'Durée de vie' = 1, Gallery8.Selected.'Durée de vie' & " an", Gallery8.Selected.'Durée de vie' &" ans"))
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =179
+                        X: =818
+                        Y: =123
+                  - Label7_27:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Valeur initiale :  "
+                        Visible: =VarAdministrativemaquette
+                        Width: =174
+                        X: =690
+                        Y: =174
+                  - TextInput7_26:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =If(IsBlank(Gallery8.Selected.'Valeur financière initiale') , " ", Gallery8.Selected.'Valeur financière initiale' & " k€")
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =172
+                        X: =825
+                        Y: =174
+                  - Label7_22:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        Text: ="Référent(s) maquette  :"
+                        Visible: =VarAdministrativemaquette
+                        Width: =409
+                        X: =20
+                        Y: =225
+                  - TextInput7_13:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =Concat(Gallery8.Selected.'Référent(s) maquette' , DisplayName & ", ")
+                        DisabledBorderColor: =RGBA(175, 191, 224, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisabledFill: =RGBA(175, 191, 224, 1)
+                        DisplayMode: =Varmodificationmaquette
+                        Font: =Font.'Open Sans'
+                        Height: =33
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Size: =12
+                        Visible: =VarAdministrativemaquette
+                        Width: =415
+                        X: =234
+                        Y: =225
+            - DataCard29:
+                Control: DataCard@1.0.2
+                Variant: BlankCard
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  BorderThickness: =2
+                  Height: =varCARDHEIGHTphoto
+                  Width: =1339
+                  X: =0
+                  Y: =5
+                Children:
+                  - Rectangle3_18:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =50
+                        OnSelect: |+
+                          =If (varCARDHEIGHTphoto = 275, 
+                          UpdateContext({varCARDHEIGHTphoto : 55}) & Set(Varrotphoto, 0) & UpdateContext({VarPhoto : false}) ,
+                          UpdateContext({varCARDHEIGHTphoto : 275}) & Set(Varrotphoto, 180) & UpdateContext({VarPhoto : true}) )
+
+                        Width: =1365
+                        X: =-26
+                        Y: =5
+                  - Label6_27:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Size: =15
+                        Text: |-
+                          ="Photos envoi et récéption : "
+                        Width: =419
+                        X: =19
+                        Y: =6
+                  - Bas_6:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: |+
+                          =39
+                        Icon: =Icon.ChevronDown
+                        OnSelect: |+
+                          =If (varCARDHEIGHTphoto = 275, 
+                          UpdateContext({varCARDHEIGHTphoto : 55}) & Set(Varrotphoto, 0) & UpdateContext({VarPhoto : false}) ,
+                          UpdateContext({varCARDHEIGHTphoto : 275}) & Set(Varrotphoto, 180) & UpdateContext({VarPhoto : true}) )
+
+                        Rotation: =Varrotphoto
+                        Width: =27
+                        X: =1300
+                        Y: =5
+                  - Image16:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =387
+                        Image: =If(IsBlank(Gallery8.Selected.'Photo maquette envoi'),'No Photo'  ,Gallery8.Selected.'Photo maquette envoi'.Full)
+                        OnSelect: =
+                        Visible: =VarPhoto
+                        Width: =566
+                        X: =64
+                        Y: =152
+                  - Image16_1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =387
+                        Image: =If(IsBlank(Gallery8.Selected.'Photo maquette réception'),'No Photo'  ,Gallery8.Selected.'Photo maquette réception'.Full)
+                        Visible: =VarPhoto
+                        Width: =566
+                        X: =734
+                        Y: =152
+                  - Label7_19:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Photo envoi : "
+                        Visible: =VarPhoto
+                        Width: =332
+                        X: =63
+                        Y: =103
+                  - Label7_20:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Photo récéption : "
+                        Visible: =VarPhoto
+                        Width: =332
+                        X: =785
+                        Y: =103
+      - Label11:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Text: |-
+              ="Statut : "
+            Width: =76
+            X: =29
+            Y: =94
+      - TextInput7:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(232, 244, 217, 1)
+            Default: '=Gallery8.Selected.Statut.Value  '
+            DisabledBorderColor: =RGBA(237, 237, 237, 1)
+            DisabledColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =If (Gallery8.Selected.Statut.Value = "Disponible", RGBA(209, 232, 178, 1), RGBA(220, 153, 153, 1))
+            DisplayMode: =DisplayMode.Disabled
+            Font: =Font.'Open Sans'
+            Height: =23
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Size: =12
+            Width: =299
+            X: =100
+            Y: =105
+      - Label11_1:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Text: |-
+              =If (Gallery8.Selected.'En transit'.Value = "OUI", "En transit vers : ","Localisation : ")
+            Width: =141
+            X: =413
+            Y: =97
+      - TextInput7_1:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Default: |-
+              =Gallery8.Selected.'Localisation : Entreprise'.Value & " | " & Gallery8.Selected.Localisation.Value
+            DisabledBorderColor: =RGBA(175, 191, 224, 1)
+            DisabledColor: =RGBA(0, 0, 0, 1)
+            DisabledFill: =RGBA(175, 191, 224, 1)
+            DisplayMode: =DisplayMode.Disabled
+            Font: =Font.'Open Sans'
+            Height: =23
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Size: =12
+            Width: =795
+            X: =554
+            Y: =105
+      - Button3_3:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(245, 136, 12, 1)
+            Font: =Font.'Open Sans'
+            Height: =44
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =Set(Varmodificationmaquette , DisplayMode.Disabled);
+              Set(VarvaliderModification , false);
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            RadiusBottomLeft: =9
+            RadiusBottomRight: =9
+            RadiusTopLeft: =9
+            RadiusTopRight: =9
+            Size: =12
+            Text: ="Valider modification"
+            Visible: =VarvaliderModification
+            Width: =203
+            X: =1021
+            Y: =13
+      - Barre_Bas_Boutons_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =83
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            Width: =1310
+            X: =33
+            Y: =670
+          Children:
+            - Container7_48:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =51
+                  Y: =8
+                Children:
+                  - Icon19_56:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =Icon.DetailList
+                        OnSelect: =Navigate(Screen8)
+                        Width: =48
+                        X: =42
+                  - Label23_101:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Liste maquette"
+                        Width: =136
+                        Y: =45
+            - Container7_49:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =257
+                  Y: =8
+                Children:
+                  - Icon19_57:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =If((Gallery8.Selected.Statut.Value = "Disponible" Or Gallery8.Selected.Statut.Value = "En cours de fabrication") Or Gallery8.Selected.'En transit'.Value = "Envoi en attente"  , DisplayMode.Disabled , If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit))
+                        Height: =45
+                        Icon: = Icon.Send
+                        OnSelect: |-
+                          =If(Gallery8.Selected.'En transit'.Value = "OUI", Navigate('Reception maquette');
+                          EditForm(Form1);
+
+                          Set(Varadresse,Blank());
+                          Set(VaradresseEntreprise,Blank())
+                          , 
+
+                          Navigate('Envoi maquette');NewForm('FormulaireDemandeD''envoiMaquetteSextant');
+                          NewForm('FormulaireDemandeD''envoiMaquetteHorsSextant');
+                          EditForm(Form1_1);
+                          )
+                        Rotation: =If(Gallery8.Selected.'En transit'.Value = "OUI", 180, 0)
+                        Width: =48
+                        X: =46
+                  - Label23_102:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: =If(Gallery8.Selected.'En transit'.Value = "OUI", "Réception","Envoi")
+                        Width: =136
+                        Y: =45
+                  - InfoButtonCanvas2_4:
+                      Control: InfoButton@0.0.33
+                      Properties:
+                        Content: ="L'envoi de la maquette est impossible lorsque celle-ci n'a pas été réservée au préalable, qu'elle est en cours de fabrication ou qu'une demande d'envoi est en attente. Veuillez vérifier son état actuel et apporter les modifications nécessaires pour procéder à l'envoi."
+                        Height: =23
+                        Visible: =If((Gallery8.Selected.Statut.Value = "Disponible" Or Gallery8.Selected.Statut.Value = "En cours de fabrication") And Gallery8.Selected.'En transit'.Value = "NON" , true , false)
+                        X: =94
+            - Container7_50:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =464
+                  Y: =8
+                Children:
+                  - Icon19_59:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =
+                        OnSelect: |-
+                          =EditForm(Form3_1);
+                          Clear(SelectionOptionEntreprise);
+                          Set(VariablePrêtmatériel, If (Gallery5.Selected.Entreprise.Value = "EDF" , "Prêt du matériel à un fournisseur", "Retour matériel"));
+                          Navigate(Screen14_3)
+                        Width: =48
+                        X: =46
+                  - Label23_103:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =10
+                        Text: =If (Gallery8.Selected.Statut.Value = "Disponible",  "Réservation", "Retour réservation")
+                        Width: =136
+                        Y: =45
+                  - Icon19_58:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =If(Gallery8.Selected.Statut.Value = "Sortie d'usine" Or Gallery8.Selected.Statut.Value = "En cours de fabrication" , DisplayMode.Disabled , If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit))
+                        Height: =45
+                        Icon: =If (Gallery5.Selected.Entreprise.Value = "EDF" , Icon.Export, Icon.Export)
+                        OnSelect: "=If (\n    Gallery8.Selected.Statut.Value = \"Disponible\",\n    Navigate(ScreenEmpruntMaquette);\n    EditForm(Form4_2),\n\n    Navigate('Retour emprunt');\n    EditForm(Form4_1)\n    \n)"
+                        Rotation: =If (Gallery8.Selected.Statut.Value = "Disponible",  0, 180)
+                        Width: =48
+                        X: =44
+            - Container7_53:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =1140
+                  Y: =8
+                Children:
+                  - Icon19_62:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit)
+                        Height: =45
+                        Icon: =Icon.AddLibrary
+                        OnSelect: |+
+                          =Navigate(Screen5);
+                          Set(VaradresseEntreprise2,Blank());
+                          //Set(Varadresse2;Blank());;
+                          Set(varTypeAssemblage,Blank());
+                          //Set(varmatière;Blank());;
+                          Set(Varnewmaquette,1);
+                          Set(VarDescriptionDéfaut,0);
+                          NewForm(Form2);
+                          Clear(DéfautValeursTab1);
+                          ClearCollect(SelectionOptionmatière  ,Choices([@'Gestion des maquettes'].Matière) );
+                          ClearCollect(SelectionOptionProcédure  , Choices([@'Gestion des maquettes'].Procédures));
+                          Set(DescriptionJSON1,"[]")
+                        Width: =48
+                        X: =46
+                  - Label23_106:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Ajout maquette"
+                        Width: =136
+                        Y: =45
+            - Container7_51:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =690
+                  Y: =8
+                Children:
+                  - Icon19_60:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =45
+                        Icon: =Icon.Information
+                        OnSelect: |-
+                          =Navigate(Informations_Maquette);
+                          Set(Varmodificationmaquette , DisplayMode.Disabled);
+                          Set(VarvaliderModification , false)
+                        Width: =48
+                        X: =46
+                  - Label23_104:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Informations "
+                        Width: =136
+                        Y: =45
+            - Container7_52:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Height: =65
+                  RadiusBottomLeft: =30
+                  RadiusBottomRight: =30
+                  RadiusTopLeft: =30
+                  RadiusTopRight: =30
+                  Width: =136
+                  X: =917
+                  Y: =8
+                Children:
+                  - Label23_105:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =If(User().Email = Gallery5.Selected.'Responsable '.Email,RGBA(0, 0, 0, 1),RGBA(215, 223, 240, 100))
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: ="Modification"
+                        Width: =136
+                        Y: =45
+                  - Icon19_61:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(215, 223, 240, 1)
+                        DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).'Référent maquette',DisplayMode.Edit , DisplayMode.Disabled)
+                        Height: =44
+                        Icon: =Icon.Edit
+                        OnSelect: |-
+                          =EditForm(Form2);
+                          Navigate(Screen5);
+                          Set(DescriptionJSON1,Gallery8.Selected.'Description des défauts ');
+                          Set(VaradresseEntreprise2,Blank());
+                          //Set(Varadresse2;Blank());;
+                          Set(varTypeAssemblage,Blank());
+                          //Set(varmatière;Blank());;
+                          Set(Varnewmaquette,0);
+                          Clear(DéfautValeursTab1);
+                          ClearCollect(SelectionOptionmatière  ,Choices([@'Gestion des maquettes'].Matière) );
+                          ClearCollect(SelectionOptionProcédure  ,Choices([@'Gestion des maquettes'].Procédures));
+                          ForAll(Gallery3.AllItems, Collect(DéfautValeursTab1, {Hauteur : Hauteur.Text, Longueur : Longueur.Text, Largeur : Largeur.Text , Profondeur : Profondeur.Text , Diamètre : Diamètre.Text, Numéro : Numéro_3.Value, Type : Type.Selected.Value }));
+                        Width: =56
+                        X: =40
+                        Y: =1
+                  - InfoButtonCanvas1_8:
+                      Control: InfoButton@0.0.33
+                      Properties:
+                        Content: |-
+                          ="Modification possible uniquement par les 
+                          personnes identifiées «référent maquettes» "
+                        Height: =25
+                        Width: =25
+                        X: =100
+      - Container19:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =74
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =1327
+            X: =19
+            Y: =13
+          Children:
+            - RectQuickActionBar3:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Height: =74
+                  Width: =1327
+            - LblAppName3:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 0, 0, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =64
+                  Size: =18
+                  Text: |-
+                    ="Informations maquette : " & Gallery8.Selected.Référence
+                  Width: =947
+                  X: =208
+                  Y: =5
+            - Image4_1:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =42
+                  Image: ='badge-facebook'
+                  Visible: =If (Gallery8.Selected.'Informations certifiées' = true , true, false)
+                  Width: =33
+                  X: =408
+                  Y: =16
+            - Rectangle6_1:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =74
+                  Width: =130
+            - Icon35_3:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =74
+                  HoverColor: =ColorFade(Self.Color, 10%)
+                  Icon: =Icon.Home
+                  OnSelect: =Navigate('Home Page')
+                  PaddingBottom: =15
+                  PaddingTop: =15
+                  TabIndex: =0
+                  Tooltip: ="Retour à l'accueil"
+                  Width: =130
+      - InfoButtonCanvas3:
+          Control: InfoButton@0.0.33
+          Properties:
+            Content: ="Retour prévu le " & Gallery8.Selected.'Date de retour estimée '
+            Width: =23
+            X: =11
+            Y: =98

@@ -1,0 +1,2609 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen14:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container6:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(241, 244, 249, 0.45)
+            Height: =768
+            Width: =1366
+          Children:
+            - Container5_2:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =69
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =1310
+                  X: =26
+                  Y: =11
+                Children:
+                  - Rectangle14:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =69
+                        Width: =128
+                  - RectQuickActionBar2_2:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =69
+                        Width: =1182
+                        X: =128
+                  - Label19_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =53
+                        Size: =25
+                        Text: ="Gestion du matériel END"
+                        Width: =454
+                        X: =428
+                        Y: =8
+                  - Icon28:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =53
+                        Icon: =Icon.ShoppingCart
+                        OnSelect: =If(PanierVisible = true , Set(PanierVisible,false), Set(PanierVisible,true))
+                        Width: =48
+                        X: =1238
+                        Y: =11
+                  - BadgeCanvas1:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =CountRows(PanierTransfert)
+                        X: =1265
+                  - Toggle1:
+                      Control: Toggle@1.1.5
+                      Properties:
+                        BasePaletteColor: =RGBA(247, 116, 38, 1)
+                        Font: =Font.'Open Sans'
+                        FontColor: =RGBA(255, 255, 255, 1)
+                        FontSize: =18
+                        Height: =36
+                        Label: =If(Toggle1.Checked = true ,  "Vision matériel" , "Vision lot/chaîne")
+                        LabelPosition: ='Toggle.LabelPosition'.Before
+                        Width: =232
+                        X: =904
+                        Y: =11
+                  - Icon35_8:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(214, 221, 224, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =69
+                        HoverColor: =ColorFade(Self.Color, 10%)
+                        Icon: =Icon.Home
+                        OnSelect: =Navigate('Home Page')
+                        PaddingBottom: =15
+                        PaddingTop: =15
+                        TabIndex: =0
+                        Tooltip: ="Retour à l'accueil"
+                        Width: =128
+            - Container5_3:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =83
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =1310
+                  X: =26
+                  Y: =674
+                Children:
+                  - Container7:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =51
+                        Y: =8
+                      Children:
+                        - Icon19_12:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =Icon.DetailList
+                              OnSelect: =Navigate(Screen14)
+                              Width: =48
+                              X: =42
+                        - Label23_12:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Tableau matériel"
+                              Width: =136
+                              Y: =41
+                  - Container7_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =257
+                        Y: =8
+                      Children:
+                        - Icon19_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: |-
+                                =If(
+                                    Toggle1.Checked = true,
+                                    DisplayMode.Disabled,
+                                    If(
+                                        First(
+                                            Filter(
+                                                'Agents et rôles OGADE',
+                                                User().Email = Agent.Email
+                                            )
+                                        ).Magasinier,
+                                        DisplayMode.Disabled,
+                                        If(
+                                            Gallery5.Selected.'En transit '.Value = "En attente" Or Gallery5.Selected.'En prêt'.Value = "Non",
+                                            DisplayMode.Disabled,
+                                            DisplayMode.Edit
+                                        )
+                                    )
+                                )
+                              Height: =45
+                              Icon: = Icon.Send
+                              OnSelect: |-
+                                =Set(
+                                    Variabledéplacementmatériel,
+                                    If (
+                                        Gallery5.Selected.'En transit '.Value = "Oui",
+                                        "Réception du matériel",
+                                        "Envoi du matériel"
+                                    )
+                                );
+                                If (
+                                    Gallery5.Selected.'En transit '.Value = "Oui",
+                                    EditForm(Form3_4),
+                                    NewForm('FormulaireDemandeD''envoiMatériel')
+                                );
+                                Navigate(Screen14_4)
+                              Rotation: =If (Gallery5.Selected.'En transit '.Value = "Oui" , 180,0)
+                              Width: =48
+                              X: =46
+                        - Label23_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =If (Gallery5.Selected.'En transit '.Value = "Oui" , "Réception","Envoi")
+                              Width: =136
+                              Y: =45
+                  - Container7_2:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =464
+                        Y: =8
+                      Children:
+                        - Label23_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =10
+                              Text: =If (Gallery5.Selected.'En prêt'.Value <> "Oui"  ,"Réservation","Retour réservation")
+                              Width: =136
+                              Y: =40
+                        - Icon19_5:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =If(Toggle1.Checked = true,DisplayMode.Disabled,If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit))
+                              Height: =45
+                              Icon: =If (Gallery5.Selected.'En transit '.Value <> "Oui" , Icon.Export, Icon.Export)
+                              OnSelect: |-
+                                =EditForm(Form3_1);
+                                Clear(SelectionOptionEntreprise);
+                                Set(VariablePrêtmatériel, If (Gallery5.Selected.'En prêt'.Value <> "Oui"  ,  "Prêt matériel","Retour matériel"));
+                                Navigate(Screen14_3)
+                              Rotation: =If (Gallery5.Selected.'En prêt'.Value <> "Oui"  , 0, 180)
+                              Width: =48
+                              X: =44
+                  - Container7_3:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =1140
+                        Y: =8
+                      Children:
+                        - Icon19_3:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit)
+                              Height: =45
+                              Icon: =Icon.AddLibrary
+                              OnSelect: |-
+                                =If(Toggle1.Checked = true,
+
+                                Set(VarModifouajout2,"Nouvel élément" );
+                                NewForm(Form3_9);
+                                Navigate(Screen14_7),
+
+                                NewForm(Form3);
+                                Set(VarModifouajout,"Nouvel élément");
+                                Navigate(Screen14_2))
+                              Width: =48
+                              X: =46
+                        - Label23_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =If(Toggle1.Checked = true,"Ajout chaîne","Ajout matériel")
+                              Width: =136
+                              Y: =45
+                  - Container7_4:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =690
+                        Y: =8
+                      Children:
+                        - Icon19_4:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =If(Toggle1.Checked = true,DisplayMode.Disabled,DisplayMode.Edit)
+                              Height: =45
+                              Icon: =Icon.Information
+                              OnSelect: |-
+                                =Set(Itemtablist3_1 , ["Infos", "Pièces jointes", "Photos du matériel", "Etat et complétude du matériel","Historique" , "QR code"]) ;
+                                Navigate(Screen14_1)
+                              Width: =48
+                              X: =46
+                        - Label23_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Informations"
+                              Width: =136
+                              Y: =45
+                  - Container7_5:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =917
+                        Y: =8
+                      Children:
+                        - Label23_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =If(User().Email = Gallery5.Selected.'Responsable '.Email,RGBA(0, 0, 0, 1),RGBA(215, 223, 240, 100))
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Modification"
+                              Width: =136
+                              Y: =45
+                        - Icon19:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(215, 223, 240, 1)
+                              DisplayMode: "=If(\n    Toggle1.Checked = true,\n    DisplayMode.Edit,\n    If(\n        User().Email = Gallery5.Selected.'Responsable '.Email Or User().Email = Gallery5.Selected.'Créé par'.Email Or Not IsEmpty(\n            Filter(\n                'Agents et rôles',\n                'Nom de l''agent'.Email = User().Email,\n                'OGADE_Responsable matériel' = true,\n                Périmètre_OGADE_Matériel.Value = Gallery5.Selected.'Propriétaire du matériel'.Value\n            )\n        ) Or Not IsEmpty(\n            Filter(\n                'Agents et rôles',\n                'Nom de l''agent'.Email = User().Email,\n                OGADE_Matériels_Admin = true\n                \n            )\n        ),\n        DisplayMode.Edit,\n        DisplayMode.Disabled\n    )\n)"
+                              Height: =44
+                              Icon: =Icon.Edit
+                              OnSelect: |-
+                                =If(Toggle1.Checked = true,
+                                Set(VarModifouajout2,"Modification" );
+                                EditForm(Form3_9);
+                                Navigate(Screen14_7),
+                                EditForm(Form3);
+                                Set(VarModifouajout,"Modification" );
+                                Navigate(Screen14_2))
+                              Width: =56
+                              X: =40
+                              Y: =1
+                        - InfoButtonCanvas1:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              Content: |-
+                                ="Modification possible uniquement par la 
+                                personne responsable du matériel"
+                              Height: =24
+                              Width: =24
+                              X: =100
+            - TextInput1_1:
+                Control: Classic/TextInput@2.3.2
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Default: "=If(\r\n   Not (IsBlank(Last(BarcodeReader1.Barcodes).Value)),\r\n   If (Last(BarcodeReader1.Barcodes).Value = \"1231412\", \"\",Last(BarcodeReader1.Barcodes).Value),\"\"\r\n   \r\n)"
+                  Font: =Font.'Open Sans'
+                  Height: =29
+                  HintText: ="Barre de recherche"
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  PaddingRight: =4.5
+                  PaddingTop: =4.5
+                  Size: =11.7
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =1101
+                  X: =38
+                  Y: =93
+            - Icon3_2:
+                Control: Classic/Icon@2.5.0
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =31
+                  Icon: =Icon.Cancel
+                  OnSelect: |-
+                    =
+                    Reset(TextInput1_1)
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =38
+                  X: =1056
+                  Y: =93
+            - Bas_7:
+                Control: Classic/Icon@2.5.0
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 0, 0, 1)
+                  Height: =36
+                  Icon: =Icon.ChevronDown
+                  OnSelect: |-
+                    =If (varPopUpfiltre = true, 
+                    UpdateContext({varPopUpfiltre : false}) & Set(Varrot, 0),
+                    UpdateContext({varPopUpfiltre : true}) & Set(Varrot, 180) )
+                  Rotation: =Varrot
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =31
+                  X: =1094
+                  Y: =88
+            - Container8:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =508
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =1310
+                  X: =26
+                  Y: =145
+                Children:
+                  - Gallery5:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =423
+                        Items: "=If(ComboBox3_1.Selected.Value = \"Oui\" ,Filter ('Gestion matériel END',\r\nIsBlank(DropdownCanvas3.Selected) || DropdownCanvas3.Selected.Value = Site.Value,\r\nIsBlank(DropdownCanvas4_1.Selected) || DropdownCanvas4_1.Selected.Value = Entreprise.Value,\r\nIsBlank(DropdownCanvas4.Selected) || DropdownCanvas4.Selected.Value = Groupe.Value,\r\nIsBlank(DropdownCanvas4_3.Selected) || DropdownCanvas4_3.Selected.Value = 'En transit '.Value,\r\nIsBlank(DropdownCanvas4_2.Selected) || DropdownCanvas4_2.Selected.Value = 'Type de matériel'.Value,\r\nIsBlank(DropdownCanvas4_4.Selected) || DropdownCanvas4_4.Selected.Value = 'Etat du matériel'.Value, \r\n\r\nIsBlank(DropdownCanvas4_8.Selected) || DropdownCanvas4_8.Selected.Value = 'Motif du prêt'.Value, \r\nIsBlank(DropdownCanvas4_7.Selected) || DropdownCanvas4_7.Selected.Value = 'Propriétaire du matériel'.Value, \r\n\r\nIsBlank(ComboBox2.Selected) || ComboBox2.Selected.Email= 'Responsable '.Email,\r\nIsBlank(DatePickerCanvas1.SelectedDate) || DatePickerCanvas1.SelectedDate <= 'Date d''échéance',\r\nIsBlank(DatePickerCanvas1_1.SelectedDate) || DatePickerCanvas1_1.SelectedDate >= 'Date d''échéance',\r\nIsBlank(DatePickerCanvas1_2.SelectedDate) || DatePickerCanvas1_2.SelectedDate <= 'Date de retour prêt',\r\nIsBlank(DatePickerCanvas1_3.SelectedDate) || DatePickerCanvas1_3.SelectedDate >= 'Date de retour prêt',\r\n\r\nIsBlank(TextInput1_1.Text) || TextInput1_1.Text = Titre,\r\nIsBlank(ComboBox3.SelectedItems) || ComboBox3.Selected.Référence = 'Lots/Chaînes Matériels END '.Value,\r\n\r\nIsBlank(DropdownCanvas4_5.Selected) || DropdownCanvas4_5.Selected.Value = 'Type END'.Value ,\r\nIsBlank(DropdownCanvas4_6.Selected) || DropdownCanvas4_6.Selected.Value = 'En prêt'.Value,\r\nIsBlank(ComboBox3_1.Selected) || 'Information vérifiée ?' = true\r\n\r\n//IsBlank(Filtre_matériel_PJ.Selected) ||  If(Filtre_matériel_PJ.Selected.Value = \"Oui\" ; 'Comporte des pièces jointes' = true;  'Comporte des pièces jointes' = false) ;\r\n//IsBlank(Filtre_matériel_FIEC.Selected) || If(Filtre_matériel_FIEC.Selected.Value = \"Oui\" ; IsBlank('N° de FIEC') = false;  IsBlank('N° de FIEC') = true)  \r\n\r\n) , \r\nFilter ('Gestion matériel END',\r\nIsBlank(DropdownCanvas3.Selected) || DropdownCanvas3.Selected.Value = Site.Value,\r\nIsBlank(DropdownCanvas4_1.Selected) || DropdownCanvas4_1.Selected.Value = Entreprise.Value,\r\nIsBlank(DropdownCanvas4.Selected) || DropdownCanvas4.Selected.Value = Groupe.Value,\r\nIsBlank(DropdownCanvas4_3.Selected) || DropdownCanvas4_3.Selected.Value = 'En transit '.Value,\r\nIsBlank(DropdownCanvas4_2.Selected) || DropdownCanvas4_2.Selected.Value = 'Type de matériel'.Value,\r\nIsBlank(DropdownCanvas4_4.Selected) || DropdownCanvas4_4.Selected.Value = 'Etat du matériel'.Value, \r\n\r\nIsBlank(DropdownCanvas4_8.Selected) || DropdownCanvas4_8.Selected.Value = 'Motif du prêt'.Value, \r\nIsBlank(DropdownCanvas4_7.Selected) || DropdownCanvas4_7.Selected.Value = 'Propriétaire du matériel'.Value, \r\n\r\nIsBlank(ComboBox2.Selected) || ComboBox2.Selected.Email = 'Responsable '.Email,\r\nIsBlank(DatePickerCanvas1.SelectedDate) || DatePickerCanvas1.SelectedDate <= 'Date d''échéance',\r\nIsBlank(DatePickerCanvas1_1.SelectedDate) || DatePickerCanvas1_1.SelectedDate >= 'Date d''échéance',\r\nIsBlank(DatePickerCanvas1_2.SelectedDate) || DatePickerCanvas1_2.SelectedDate <= 'Date de retour prêt',\r\nIsBlank(DatePickerCanvas1_3.SelectedDate) || DatePickerCanvas1_3.SelectedDate >= 'Date de retour prêt',\r\n\r\nIsBlank(TextInput1_1.Text) || TextInput1_1.Text = Titre,\r\nIsBlank(ComboBox3.SelectedItems) || ComboBox3.Selected.Référence = 'Lots/Chaînes Matériels END '.Value,\r\n\r\n\r\nIsBlank(DropdownCanvas4_9.Selected) || DropdownCanvas4_9.Selected.Value = 'Type de traducteur',\r\nIsBlank(DropdownCanvas4_10.Selected) || DropdownCanvas4_10.Selected.Value = 'Produits chimiques',\r\n\r\n\r\nIsBlank(DropdownCanvas4_5.Selected) || DropdownCanvas4_5.Selected.Value = 'Type END'.Value ,\r\nIsBlank(DropdownCanvas4_6.Selected) || DropdownCanvas4_6.Selected.Value = 'En prêt'.Value,\r\nIsBlank(ComboBox3_1.Selected) || 'Information vérifiée ?' = false\r\n//IsBlank(Filtre_matériel_FIEC.Selected) || If(Filtre_matériel_FIEC.Selected.Value = \"Oui\" ; IsBlank('N° de FIEC') = false;  IsBlank('N° de FIEC') = true)  \r\n\r\n))\r\n\r\n  \r\n"
+                        TemplateSize: =119
+                        Width: =1307
+                        Y: =56
+                      Children:
+                        - Rectangle15:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Height: =
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - Container10:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =If(ThisItem.IsSelected,2,0)
+                              Fill: =RGBA(241, 244, 249, 0.41)
+                              Height: =93
+                              RadiusBottomLeft: =25
+                              RadiusBottomRight: =25
+                              RadiusTopLeft: =25
+                              RadiusTopRight: =25
+                              Width: =1282
+                              X: =4
+                              Y: =14
+                            Children:
+                              - Title3_1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =77
+                                    OnSelect: =
+                                    Overflow: =Overflow.Scroll
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |-
+                                      ="ID : " & ThisItem.Titre &"
+                                      " & ThisItem.'Type de matériel'.Value & "
+                                      " & ThisItem.'Fournisseur du matériel'.Value & "
+                                      " & If (IsBlank(ThisItem.'Lots/Chaînes Matériels END ') , Char(10), "",ThisItem.'Lots/Chaînes Matériels END '.Value &"/"& ThisItem.'Lots/Chaînes Matériels END : Titre'.Value)
+                                    Width: =135
+                                    X: =52
+                                    Y: =6
+                              - Title3_3:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =55
+                                    OnSelect: =
+                                    Overflow: =Overflow.Scroll
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |+
+                                      =If(ThisItem.'En transit '.Value = "Oui", "En transit vers : ", "Localisation : " ) & "
+                                      " & 
+                                      ThisItem.Groupe.Value & " / " & ThisItem.Site.Value & 
+                                      If(
+                                          !IsBlank(ThisItem.'Compléments localisation'), Char(10) & " / " & ThisItem.'Compléments localisation',"") & "
+                                          " & "En prêt : " & ThisItem.'En prêt'.Value
+                                    VerticalAlign: =VerticalAlign.Top
+                                    Width: =172
+                                    X: =335
+                                    Y: =34
+                              - Title3_7:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =If(ThisItem.'Matériel soumis à vérification périodique ?'.Value = "Non" , RGBA(50, 49, 48, 100) ,If (ThisItem.'Date d''échéance' <= Today() ,RGBA(235, 23,23, 100)    ,   If (ThisItem.'Date d''échéance' -30 <= Today(),    RGBA(245, 166, 7, 1),RGBA(50, 49, 48, 100) )))
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =52
+                                    OnSelect: =
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |-
+                                      =If(ThisItem.'Matériel soumis à vérification périodique ?'.Value = "Non" , "Non soumis à vérification périodique", "Date fin de validité : " & ThisItem.'Date d''échéance')
+                                    Width: =167
+                                    X: =505
+                                    Y: =28
+                              - BadgeCanvas2:
+                                  Control: Badge@0.0.24
+                                  Properties:
+                                    Content: =ThisItem.'Responsable '.DisplayName
+                                    Height: =50
+                                    Width: =210
+                                    X: =681
+                                    Y: =18
+                              - Icon23:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =22
+                                    Icon: =Icon.Cars
+                                    Visible: "=If(ThisItem.'En transit '.Value = \"Oui\" , true, false) "
+                                    Width: =29
+                                    X: =408
+                                    Y: =6
+                              - Icon23_1:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =22
+                                    Icon: =Icon.Waypoint
+                                    Visible: "=If(ThisItem.'En transit '.Value = \"Oui\" , false, true) "
+                                    Width: =29
+                                    X: =407
+                                    Y: =6
+                              - Rectangle17:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    DisplayMode: =DisplayMode.View
+                                    Fill: =If (ThisItem.'En prêt'.Value = "Oui" Or  ThisItem.'En transit '.Value = "Oui" Or ThisItem.'En transit '.Value = "En attente" Or  ThisItem.'Date d''échéance' <= Today()     Or ThisItem.'Etat du matériel'.Value = "HS"  , RGBA(222, 16, 16, 1)  ,RGBA(141, 198, 63, 100))
+                                    Width: =34
+                                    X: =1250
+                              - Title3_4:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =80
+                                    OnSelect: =
+                                    Overflow: =Overflow.Scroll
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |-
+                                      =ThisItem.Entreprise.Value & "
+                                      " & If(ThisItem.'En prêt'.Value <>"Oui" , "", "Motif prêt : " &
+                                      ThisItem.'Motif du prêt'.Value & 
+                                      "
+                                      Date de retour : 
+                                      " & ThisItem.'Date de retour prêt')
+                                    Tooltip: =
+                                    Width: =163
+                                    X: =907
+                                    Y: =9
+                              - Title3_5:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =52
+                                    OnSelect: =
+                                    Overflow: =Overflow.Scroll
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |-
+                                      ="Etat : "&ThisItem.'Etat du matériel'.Value & "
+                                      " & "Complétude :  " & ThisItem.Complétude.Value
+                                    Width: =163
+                                    X: =1078
+                                    Y: =41
+                              - Icon22:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: |+
+                                      =If (ThisItem.Complétude.Value = "Complet" And ThisItem.'Etat du matériel'.Value = "Correct" , RGBA(141, 198, 63, 100) , If ( ThisItem.'Etat du matériel'.Value = "HS" , RGBA(235, 23,23, 100), RGBA(245, 166, 7, 1) ))
+                                    Height: =25
+                                    Icon: =If (ThisItem.Complétude.Value = "Complet" And ThisItem.'Etat du matériel'.Value = "Correct" , Icon.EmojiSmile , If ( ThisItem.'Etat du matériel'.Value = "HS" , Icon.EmojiSad, Icon.EmojiNeutral ))
+                                    Width: =22
+                                    X: =1149
+                                    Y: =9
+                              - Icon24:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =If (ThisItem.'Date d''échéance' <= Today() ,RGBA(235, 23,23, 100)    ,   If (ThisItem.'Date d''échéance' -30 <= Today(),    RGBA(245, 166, 7, 1),RGBA(50, 49, 48, 100) ))
+                                    Height: =25
+                                    Icon: =Icon.Warning
+                                    Visible: =If (ThisItem.'Date d''échéance' <= Today() ,true   ,   If (ThisItem.'Date d''échéance' -15 <= Today(),   true,false ))
+                                    Width: =35
+                                    X: =562
+                                    Y: =6
+                              - Icon29:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    DisabledColor: =RGBA(9, 33, 98, 0.24)
+                                    DisplayMode: =If(ThisItem.'En transit '.Value <> "Non" Or ThisItem.'En prêt'.Value = "Non" , DisplayMode.Edit, DisplayMode.Edit)
+                                    Height: =38
+                                    Icon: =Icon.Add
+                                    OnSelect: |-
+                                      =If (CountRows(
+                                         Filter(
+                                            PanierTransfert,
+                                            Titre=ThisItem.Titre
+                                         )
+                                      )>0 , false , Collect(PanierTransfert, ThisItem) )
+                                    Visible: |-
+                                      =If (CountRows(
+                                         Filter(
+                                            PanierTransfert,
+                                            Titre = ThisItem.Titre
+                                         )
+                                      )>0 , false , true )
+                                    Width: =44
+                                    X: =8
+                                    Y: =28
+                              - Image4_7:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =29
+                                    Image: ='badge-facebook'
+                                    Visible: =If (ThisItem.'Information vérifiée ?' = true , true, false)
+                                    Width: =21
+                                    X: =1221
+                                    Y: =6
+                              - Title3_6:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =77
+                                    OnSelect: =
+                                    Overflow: =Overflow.Scroll
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =10
+                                    Text: |+
+                                      =If(
+                                          !IsBlank(ThisItem.Modèle),
+                                      Char(10) & "Modèle : "
+                                       & ThisItem.Modèle,""
+                                      ) &
+                                      If(
+                                          !IsBlank(ThisItem.'Type de traducteur'),
+                                          Char(10) & "Type de traducteur : " & ThisItem.'Type de traducteur',
+                                          ""
+                                      )
+
+                                    Width: =146
+                                    X: =187
+                                    Y: =6
+                              - Icon34:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =30
+                                    Icon: =Icon.PaperClip
+                                    OnSelect: |+
+                                      =Set(varTabHeader, "Pièces jointes");
+                                      Set(Itemtablist3_1, ["Infos"]);
+                                      Set(Itemtablist3_1 , ["Infos", "Pièces jointes", "Photos du matériel", "Etat et complétude du matériel","Historique" , "QR code"]) ;
+                                      Navigate(Screen14_1, ScreenTransition.None);
+                                    Width: =30
+                                    X: =1250
+                                    Y: =29
+                  - Container9:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =56
+                        Width: =1338
+                      Children:
+                        - Container12:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =32
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =311
+                              X: =15
+                              Y: =9
+                            Children:
+                              - Label25:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: ="Matériel "
+                                    Width: =303
+                                    X: =8
+                        - Container12_1:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =30
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =160
+                              X: =342
+                              Y: =9
+                            Children:
+                              - Label25_1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =30
+                                    Text: ="Localisation"
+                                    Width: =159
+                        - Container12_2:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =30
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =151
+                              X: =522
+                              Y: =9
+                            Children:
+                              - Label25_2:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =29
+                                    Text: ="Validité"
+                                    Width: =149
+                        - Container12_3:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =30
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =206
+                              X: =687
+                              Y: =9
+                            Children:
+                              - Label25_3:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =30
+                                    Text: ="Responsable"
+                                    Width: =206
+                        - Container12_4:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =30
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =157
+                              X: =910
+                              Y: =9
+                            Children:
+                              - Label25_4:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =29
+                                    Text: ="Entreprise"
+                                    Width: =154
+                                    X: =3
+                        - Container12_5:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =28
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =211
+                              X: =1083
+                              Y: =11
+                            Children:
+                              - Label25_5:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =28
+                                    Size: =12
+                                    Text: ="Etat/Complétude/Vérif"
+                                    Width: =199
+                                    X: =5
+            - Container8_1:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =508
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =If(Toggle1.Checked = true, true,false)
+                  Width: =1295
+                  X: =26
+                  Y: =145
+                Children:
+                  - Gallery5_5:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =423
+                        Items: |
+                          ='Lots/Chaînes Matériels END'
+                        TemplateSize: =199
+                        Width: =1292
+                        Y: =56
+                      Children:
+                        - Rectangle15_1:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Height: =
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - Container10_1:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderThickness: =If(ThisItem.IsSelected,2,0)
+                              Fill: =RGBA(241, 244, 249, 0.41)
+                              Height: =163
+                              RadiusBottomLeft: =25
+                              RadiusBottomRight: =25
+                              RadiusTopLeft: =25
+                              RadiusTopRight: =25
+                              Width: =1282
+                              X: =4
+                              Y: =14
+                            Children:
+                              - Label34:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =41
+                                    Text: =ThisItem.Référence
+                                    Width: =189
+                                    X: =35
+                                    Y: =42
+                              - Label34_1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =41
+                                    Text: =ThisItem.Titre
+                                    Width: =203
+                                    X: =35
+                                    Y: =83
+                              - Gallery13:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =153
+                                    Items: =Filter('Gestion matériel END','Lots/Chaînes Matériels END '.Value = ThisItem.Référence)
+                                    TemplateSize: =51
+                                    Width: =1036
+                                    X: =236
+                                    Y: =8
+                                  Children:
+                                    - Separator11:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =8
+                                          OnSelect: =Select(Parent)
+                                          Width: =Parent.TemplateWidth
+                                          Y: =Parent.TemplateHeight - Self.Height
+                                    - Container10_2:
+                                        Control: GroupContainer@1.4.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          BorderThickness: =If(ThisItem.IsSelected,2,0)
+                                          Fill: =RGBA(241, 244, 249, 0.41)
+                                          Height: =47
+                                          RadiusBottomLeft: =25
+                                          RadiusBottomRight: =25
+                                          RadiusTopLeft: =25
+                                          RadiusTopRight: =25
+                                          Width: =1036
+                                        Children:
+                                          - Title3_2:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                BorderColor: =RGBA(0, 0, 0, 1)
+                                                Color: =RGBA(50, 49, 48, 1)
+                                                Font: =Font.'Open Sans'
+                                                FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                                Height: =39
+                                                OnSelect: =
+                                                Overflow: =Overflow.Scroll
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: "=\"ID : \" & ThisItem.Titre &\"\r\n\" &ThisItem.'Type de matériel'.Value & \"\r\n\" & ThisItem.'Fournisseur du matériel'.Value "
+                                                Width: =215
+                                                X: =29
+                                                Y: =7
+                                          - Title3_8:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                BorderColor: =RGBA(0, 0, 0, 1)
+                                                Color: =If (ThisItem.'Date d''échéance' <= Today() ,RGBA(235, 23,23, 100)    ,   If (ThisItem.'Date d''échéance' -15 <= Today(),    RGBA(245, 166, 7, 1),RGBA(50, 49, 48, 100) ))
+                                                Font: =Font.'Open Sans'
+                                                FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                                Height: =46
+                                                OnSelect: =
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: |-
+                                                  ="Date fin de validité : " & ThisItem.'Date d''échéance'
+                                                Width: =167
+                                                X: =260
+                                          - BadgeCanvas2_1:
+                                              Control: Badge@0.0.24
+                                              Properties:
+                                                Content: =ThisItem.'Responsable '.DisplayName
+                                                FontSize: =8
+                                                Height: =40
+                                                Width: =210
+                                                X: =443
+                                                Y: =3
+                                          - Rectangle17_1:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 18, 107, 1)
+                                                DisplayMode: =DisplayMode.View
+                                                Fill: =If (ThisItem.Entreprise.Value <> "EDF" Or  ThisItem.'En transit '.Value = "Oui" Or   ThisItem.'Date d''échéance' <= Today()     Or ThisItem.'Etat du matériel'.Value = "HS"  , RGBA(222, 16, 16, 1)  ,RGBA(141, 198, 63, 100))
+                                                Height: =93
+                                                Width: =32
+                                                X: =1250
+                                          - Title3_9:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                BorderColor: =RGBA(0, 0, 0, 1)
+                                                Color: =RGBA(50, 49, 48, 1)
+                                                Font: =Font.'Open Sans'
+                                                FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                                Height: =55
+                                                OnSelect: =
+                                                Overflow: =Overflow.Scroll
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: |-
+                                                  =ThisItem.Entreprise.Value & "
+                                                  " & If (ThisItem.Entreprise.Value ="EDF" , "", "Date de retour : 
+                                                  " & ThisItem.'Date de retour prêt')
+                                                Width: =163
+                                                X: =669
+                                                Y: =4
+                                          - Icon22_1:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 18, 107, 1)
+                                                Color: |+
+                                                  =If (ThisItem.Complétude.Value = "Complet" And ThisItem.'Etat du matériel'.Value = "Correct" , RGBA(141, 198, 63, 100) , If ( ThisItem.'Etat du matériel'.Value = "HS" , RGBA(235, 23,23, 100), RGBA(245, 166, 7, 1) ))
+                                                Height: =25
+                                                Icon: =If (ThisItem.Complétude.Value = "Complet" And ThisItem.'Etat du matériel'.Value = "Correct" , Icon.EmojiSmile , If ( ThisItem.'Etat du matériel'.Value = "HS" , Icon.EmojiSad, Icon.EmojiNeutral ))
+                                                Width: =22
+                                                X: =1149
+                                                Y: =9
+                                          - Icon29_1:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 18, 107, 1)
+                                                Color: =RGBA(0, 18, 107, 1)
+                                                DisabledColor: =RGBA(9, 33, 98, 0.24)
+                                                DisplayMode: =If(ThisItem.'En transit '.Value = "Oui" , DisplayMode.Disabled, DisplayMode.Edit)
+                                                Height: =30
+                                                Icon: =Icon.Add
+                                                OnSelect: |-
+                                                  =If (CountRows(
+                                                     Filter(
+                                                        PanierTransfert,
+                                                        Titre=ThisItem.Titre
+                                                     )
+                                                  )>0 , false , Collect(PanierTransfert, ThisItem) )
+                                                Visible: |-
+                                                  =If (CountRows(
+                                                     Filter(
+                                                        PanierTransfert,
+                                                        Titre=ThisItem.Titre
+                                                     )
+                                                  )>0 , false , true )
+                                                Width: =36
+                                                X: =17
+                                                Y: =7
+                                          - Title3_10:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                BorderColor: =RGBA(0, 0, 0, 1)
+                                                Color: =RGBA(50, 49, 48, 1)
+                                                Font: =Font.'Open Sans'
+                                                FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                                Height: =52
+                                                OnSelect: =
+                                                Overflow: =Overflow.Scroll
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =8
+                                                Text: |-
+                                                  ="Etat : "&ThisItem.'Etat du matériel'.Value & "
+                                                  " & "Complétude :  " & ThisItem.Complétude.Value
+                                                Width: =163
+                                                X: =842
+                                                Y: =10
+                              - Icon27:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =49
+                                    Icon: =Icon.Add
+                                    OnSelect: |+
+                                      =Collect(PanierTransfert,Filter('Gestion matériel END','Lots/Chaînes Matériels END '.Value = ThisItem.Référence));
+
+                                    Width: =46
+                                    X: =4
+                                    Y: =60
+                  - Container9_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =56
+                        Width: =1295
+                      Children:
+                        - Container12_6:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =32
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =227
+                              X: =15
+                              Y: =9
+                            Children:
+                              - Label25_6:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: ="Référence lot/Chaîne "
+                                    Width: =208
+                                    X: =8
+                        - Container12_7:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =32
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =220
+                              X: =258
+                              Y: =9
+                            Children:
+                              - Label25_7:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: ="Nom des materiels"
+                                    Width: =208
+                                    X: =5
+                        - Container12_8:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =32
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =169
+                              X: =499
+                              Y: =9
+                            Children:
+                              - Label25_8:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: ="Etalonnage"
+                                    Width: =151
+                                    X: =10
+                        - Container12_9:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =30
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =206
+                              X: =687
+                              Y: =9
+                            Children:
+                              - Label25_9:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =30
+                                    Text: ="Responsable"
+                                    Width: =206
+                        - Container12_10:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =28
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =157
+                              X: =910
+                              Y: =11
+                            Children:
+                              - Label25_10:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =28
+                                    Text: ="Entreprise"
+                                    Width: =140
+                                    X: =10
+                        - Container12_11:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(215, 223, 240, 0.57)
+                              Height: =28
+                              RadiusBottomLeft: =15
+                              RadiusBottomRight: =15
+                              RadiusTopLeft: =15
+                              RadiusTopRight: =15
+                              Width: =169
+                              X: =1083
+                              Y: =11
+                            Children:
+                              - Label25_11:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =28
+                                    Text: ="Etat/Complétude"
+                                    Width: =157
+                                    X: =5
+            - Icon18_4:
+                Control: Classic/Icon@2.5.0
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =48
+                  Icon: =Icon.Sync
+                  OnSelect: =Refresh('Gestion matériel END')
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =30
+                  X: =1203
+                  Y: =82
+            - Icon10_8:
+                Control: Classic/Icon@2.5.0
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =41
+                  Icon: =Icon.FilterFlat
+                  OnSelect: |-
+                    =Reset( DropdownCanvas3);
+                    Reset( DropdownCanvas4_4);
+                    Reset( DropdownCanvas4);
+                    Reset( DropdownCanvas4_2);
+                    Reset( DropdownCanvas4_3);
+                    Reset( DropdownCanvas4_1);
+                    Reset(DatePickerCanvas1);
+                    Reset(DatePickerCanvas1_1);
+                    Reset(ComboBox2); 
+                    Reset(ComboBox3);
+                    Reset(ComboBox3_1);
+                    Reset( DropdownCanvas4_7);
+                    Reset( DropdownCanvas4_8);
+                    Reset( DropdownCanvas4_5);
+
+                    Reset( DropdownCanvas4_6);
+
+                    Reset( DatePickerCanvas1_2);
+                    Reset(DatePickerCanvas1_3);
+
+                    Reset( DatePickerCanvas1_1);
+                    Reset(DatePickerCanvas1);
+                    Reset(Filtre_matériel_FIEC);
+                    Reset(Filtre_matériel_PJ);
+
+
+                    Reset(DropdownCanvas4_9);
+                    Reset(DropdownCanvas4_10)
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =31
+                  X: =1155
+                  Y: =86
+            - Icon26:
+                Control: Classic/Icon@2.5.0
+                Group: Searchbar
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =37
+                  Icon: =Icon.HorizontalLine
+                  OnSelect: |-
+                    =Reset( DropdownCanvas3);
+                    Reset( DropdownCanvas4_4);
+                    Reset( DropdownCanvas4);
+                    Reset( DropdownCanvas4_2);
+                    Reset( DropdownCanvas4_3);
+                    Reset( DropdownCanvas4_1);
+                    Reset(DatePickerCanvas1);
+                    Reset(DatePickerCanvas1_1);
+                    Reset(ComboBox2); 
+                    Reset(ComboBox3);
+                    Reset(ComboBox3_1);
+                    Reset( DropdownCanvas4_7);
+                    Reset( DropdownCanvas4_8);
+                    Reset( DropdownCanvas4_5);
+
+                    Reset( DropdownCanvas4_6);
+
+                    Reset( DatePickerCanvas1_2);
+                    Reset(DatePickerCanvas1_3);
+
+                    Reset( DatePickerCanvas1_1);
+                    Reset(DatePickerCanvas1);
+                    Reset(Filtre_matériel_FIEC);
+                    Reset(Filtre_matériel_PJ);
+
+
+                    Reset(DropdownCanvas4_9);
+                    Reset(DropdownCanvas4_10)
+                  Rotation: =45
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =31
+                  X: =1155
+                  Y: =84
+            - BarcodeReader1:
+                Control: BarcodeReader@1.0.25
+                Group: Searchbar
+                Properties:
+                  FontSize: =10
+                  Height: =44
+                  OnScan: =Reset(TextInput1_1)
+                  Text: ="Scan QR CODE"
+                  Visible: =If(Toggle1.Checked = true, false,true)
+                  Width: =85
+                  X: =1251
+                  Y: =90
+            - Container15:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semibold
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =333
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =PanierVisible
+                  Width: =789
+                  X: =530
+                  Y: =80
+                Children:
+                  - Button2:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: =RGBA(54, 176, 75, 1)
+                        Font: =Font.'Open Sans'
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Navigate(Screen_EnvoiMultiple_MatérielsEND);
+                          Set(PanierVisible,false);
+                          NewForm('FormulaireDemandeD''envoiMatériel_1')
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Transfert site"
+                        Visible: =If(CountRows(PanierTransfert) = 0 , false , true)
+                        Width: =150
+                        X: =121
+                        Y: =280
+                  - Button2_1:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: =RGBA(255, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Clear(PanierTransfert);
+                          Set(PanierVisible,false)
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Vider"
+                        Visible: =If(CountRows(PanierTransfert) = 0 , false , true)
+                        Width: =92
+                        X: =13
+                        Y: =280
+                  - Gallery9:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =265
+                        Items: =PanierTransfert
+                        TemplateSize: =64
+                        Visible: =If(CountRows(PanierTransfert) = 0 , false , true)
+                        Width: =779
+                      Children:
+                        - Title5:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =25
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.Titre
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =221
+                              X: =14
+                              Y: =6
+                        - Separator7:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =8
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - Title5_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =23
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.'Type de matériel'.Value
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =221
+                              X: =14
+                              Y: =31
+                        - Icon30:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =39
+                              Icon: =Icon.Cancel
+                              OnSelect: =Remove(PanierTransfert,ThisItem)
+                              Width: =48
+                              X: =715
+                              Y: =15
+                        - Title5_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =58
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: |-
+                                ="Localisation : 
+                                "& ThisItem.Groupe.Value & " / " & ThisItem.Site.Value
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =372
+                              X: =262
+                              Y: =6
+                  - Button2_5:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Fill: =RGBA(54, 176, 75, 1)
+                        Font: =Font.'Open Sans'
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Navigate(Screen14_6);
+                          EditForm(Form3_7);
+                          Set(PanierVisible,false)
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Transfert étalonnage"
+                        Visible: =If(CountRows(PanierTransfert) = 0 , false , true)
+                        Width: =215
+                        X: =295
+                        Y: =280
+                  - Icon31:
+                      Control: Classic/Icon@2.5.0
+                      Group: Group5
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =190
+                        Icon: =Icon.ShoppingCart
+                        Visible: =If(CountRows(PanierTransfert) = 0 , true , false)
+                        Width: =310
+                        X: =121
+                        Y: =35
+                  - Icon32:
+                      Control: Classic/Icon@2.5.0
+                      Group: Group5
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =192
+                        Icon: =Icon.Cancel
+                        Visible: =If(CountRows(PanierTransfert) = 0 , true , false)
+                        Width: =278
+                        X: =153
+                        Y: =18
+                  - Label21:
+                      Control: Label@2.5.1
+                      Group: Group5
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Size: =19
+                        Text: ="Panier vide"
+                        Visible: =If(CountRows(PanierTransfert) = 0 , true , false)
+                        Width: =200
+                        X: =192
+                        Y: =225
+                  - Button2_6:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: =RGBA(54, 176, 75, 1)
+                        Font: =Font.'Open Sans'
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |+
+                          =Navigate('Screen_Réservation EDF');
+                          EditForm(Form3_11);
+                          Set(PanierVisible,false);
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Réservation EDF"
+                        Visible: =If(CountRows(PanierTransfert) = 0 , false , true)
+                        Width: =221
+                        X: =534
+                        Y: =280
+      - Filtres_1:
+          Control: FluidGrid@2.3.0
+          Properties:
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =381
+            Visible: =If(Toggle1.Checked = true, false,varPopUpfiltre)
+            Width: =1098
+            X: =42
+            Y: =126
+          Children:
+            - DataCard5_2:
+                Control: DataCard@1.0.2
+                Properties:
+                  BorderColor: =RGBA(237, 237, 237, 1)
+                  BorderThickness: =2
+                  Height: =617
+                  Width: =1097
+                  X: =0
+                  Y: =0
+                Children:
+                  - Label1_42:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="Site"
+                        Width: =154
+                        X: =51
+                        Y: =45
+                  - Icon6_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Location
+                        Width: =32
+                        X: =14
+                        Y: =44
+                  - Label1_48:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="Groupe"
+                        Width: =140
+                        X: =51
+                        Y: =101
+                  - Label3_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Filtres : "
+                        Underline: =true
+                        Width: =1044
+                        Y: =5
+                  - DropdownCanvas3:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =["BELLEVILLE", "BLAYAIS", "BUGEY", "CATTENOM", "CHINON" ,"CHOOZ" , "CIVAUX", "CRUAS", "DAMPIERRE", "FLAMENVILLE", "GOLFECH" , "GRAVELINES" ,"NOGENT-SUR-SEINE" ,"PALUEL", "PENLY", "ST-ALBAN", "ST-LAURENT", "TRICASTIN"]
+                        X: =173
+                        Y: =54
+                  - DropdownCanvas4:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].Groupe)
+                        X: =173
+                        Y: =106
+                  - Icon6_3:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Waypoint
+                        Width: =32
+                        X: =14
+                        Y: =96
+                  - Label1_49:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="Entreprise"
+                        Width: =140
+                        X: =581
+                        Y: =51
+                  - DropdownCanvas4_1:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].Entreprise)
+                        X: =703
+                        Y: =56
+                  - Icon6_4:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.OfficeBuilding
+                        Width: =32
+                        X: =544
+                        Y: =46
+                  - Label1_50:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Type : "
+                        Width: =140
+                        X: =51
+                        Y: =153
+                  - DropdownCanvas4_2:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].'Type de matériel')
+                        X: =173
+                        Y: =158
+                  - Icon6_5:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Items
+                        Width: =32
+                        X: =14
+                        Y: =148
+                  - Label1_51:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="En transit : "
+                        Width: =140
+                        X: =581
+                        Y: =98
+                  - DropdownCanvas4_3:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].'En transit ')
+                        X: =703
+                        Y: =103
+                  - Icon6_6:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Cars
+                        Width: =32
+                        X: =544
+                        Y: =93
+                  - Label1_52:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =43
+                        Text: |-
+                          ="Fin de validité étalonnage entre le : "
+                        Width: =295
+                        Y: =350
+                  - DatePickerCanvas1:
+                      Control: DatePicker@0.0.46
+                      Properties:
+                        Placeholder: ="Sélectionner une date"
+                        X: =308
+                        Y: =355
+                  - DatePickerCanvas1_1:
+                      Control: DatePicker@0.0.46
+                      Properties:
+                        Placeholder: ="Sélectionner une date"
+                        X: =724
+                        Y: =355
+                  - Label1_53:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =44
+                        Text: |-
+                          ="Et le : "
+                        X: =628
+                        Y: =349
+                  - Label1_54:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Responsable : "
+                        Width: =140
+                        X: =42
+                        Y: =472
+                  - Icon6_7:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Person
+                        Width: =32
+                        X: =11
+                        Y: =470
+                  - Label1_55:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Etat : "
+                        Width: =140
+                        X: =581
+                        Y: =148
+                  - DropdownCanvas4_4:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].'Etat du matériel')
+                        X: =703
+                        Y: =153
+                  - Icon6_8:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Information
+                        Width: =32
+                        X: =544
+                        Y: =148
+                  - Container14:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =34
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Width: =372
+                        X: =166
+                        Y: =472
+                      Children:
+                        - ComboBox2:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DisplayName","Email"]
+                              Font: =Font.'Open Sans'
+                              Height: =34
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: |+
+                                =Choices([@'Gestion matériel END'].'Responsable ')
+                              OnChange: =Set(Searchtermenom2,ComboBox2.SearchText)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Claims"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =374
+                  - Icon10_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |+
+                          =Reset( DropdownCanvas3)
+                        Width: =24
+                        X: =495
+                        Y: =52
+                  - Icon10_3:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4)
+                        Width: =24
+                        X: =495
+                        Y: =103
+                  - Icon10_4:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |+
+                          =
+                          Reset( DropdownCanvas4_2);
+                        Width: =24
+                        X: =493
+                        Y: =155
+                  - Icon10_5:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_1)
+                        Width: =24
+                        X: =1033
+                        Y: =57
+                  - Icon10_6:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_3)
+                        Width: =24
+                        X: =1033
+                        Y: =102
+                  - Icon10_7:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_4)
+                        Width: =24
+                        X: =1030
+                        Y: =150
+                  - Label1_56:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Lot/Chaîne : "
+                        Width: =140
+                        X: =595
+                        Y: =472
+                  - Icon6_9:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =35
+                        Icon: =Icon.Ribbon
+                        Width: =32
+                        X: =564
+                        Y: =472
+                  - Container14_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =33
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Width: =370
+                        X: =701
+                        Y: =472
+                      Children:
+                        - ComboBox3:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["R_x00e9_f_x00e9_rence","Title"]
+                              Font: =Font.'Open Sans'
+                              Height: =35
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: ='Lots/Chaînes Matériels END'
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["R_x00e9_f_x00e9_rence"]
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =372
+                  - Image4_8:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Image: ='badge-facebook'
+                        Visible: =If (Gallery5.Selected.'Information vérifiée ?' = true , true, false)
+                        Width: =33
+                        X: =11
+                        Y: =514
+                  - Label1_57:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="Infos validées"
+                        Width: =140
+                        X: =43
+                        Y: =520
+                  - Container14_2:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =33
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Width: =372
+                        X: =166
+                        Y: =521
+                      Children:
+                        - ComboBox3_1:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["R_x00e9_f_x00e9_rence","Title"]
+                              Font: =Font.'Open Sans'
+                              Height: =35
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =["Oui","Non"]
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =374
+                  - Label1_58:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =43
+                        Text: |-
+                          ="Date de retour estimée : "
+                        Width: =295
+                        X: =8
+                        Y: =404
+                  - DatePickerCanvas1_2:
+                      Control: DatePicker@0.0.46
+                      Properties:
+                        Placeholder: ="Sélectionner une date"
+                        X: =311
+                        Y: =409
+                  - DatePickerCanvas1_3:
+                      Control: DatePicker@0.0.46
+                      Properties:
+                        Placeholder: ="Sélectionner une date"
+                        X: =727
+                        Y: =409
+                  - Label1_59:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =44
+                        Text: |-
+                          ="Et le : "
+                        X: =631
+                        Y: =403
+                  - Icon10_9:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DatePickerCanvas1_1);
+                          Reset(DatePickerCanvas1)
+                        Width: =24
+                        X: =1044
+                        Y: =354
+                  - Icon10_10:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DatePickerCanvas1_2);
+                          Reset(DatePickerCanvas1_3)
+                        Width: =24
+                        X: =1044
+                        Y: =403
+                  - Label1_60:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Type d'END: "
+                        Width: =140
+                        X: =51
+                        Y: =208
+                  - DropdownCanvas4_5:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Appearance: ='DropdownCanvas.Appearance'.FilledDarker
+                        Items: =Choices([@'Gestion matériel END'].'Type END')
+                        X: =173
+                        Y: =213
+                  - Icon6_10:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Manufacture
+                        Width: =32
+                        X: =14
+                        Y: =203
+                  - Label1_61:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="En prêt : "
+                        Width: =140
+                        X: =581
+                        Y: =203
+                  - DropdownCanvas4_6:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =["Oui","Non"]
+                        X: =703
+                        Y: =208
+                  - Icon6_11:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Airplane
+                        Width: =32
+                        X: =544
+                        Y: =203
+                  - Icon10_11:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |+
+                          =
+                          Reset( DropdownCanvas4_5);
+                        Width: =24
+                        X: =493
+                        Y: =210
+                  - Icon10_12:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_6)
+                        Width: =24
+                        X: =1030
+                        Y: =205
+                  - Image4_9:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Image: ='badge-facebook'
+                        Width: =33
+                        X: =11
+                        Y: =517
+                  - Label1_62:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Propriétaire : "
+                        Width: =140
+                        X: =51
+                        Y: =259
+                  - DropdownCanvas4_7:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Appearance: ='DropdownCanvas.Appearance'.FilledDarker
+                        Items: =Choices([@'Gestion matériel END'].'Propriétaire du matériel')
+                        X: =173
+                        Y: =264
+                  - Icon6_12:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.Tag
+                        Width: =32
+                        X: =14
+                        Y: =254
+                  - Label1_63:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Motif du prêt : "
+                        Width: =140
+                        X: =581
+                        Y: =254
+                  - DropdownCanvas4_8:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: =Choices([@'Gestion matériel END'].'Motif du prêt')
+                        X: =703
+                        Y: =259
+                  - Icon6_13:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.DockRight
+                        Width: =32
+                        X: =544
+                        Y: =254
+                  - Icon10_13:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |+
+                          =
+                          Reset( DropdownCanvas4_7);
+                        Width: =24
+                        X: =493
+                        Y: =261
+                  - Icon10_14:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_8)
+                        Width: =24
+                        X: =1030
+                        Y: =256
+                  - Label1_64:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="Pièces jointes ? "
+                        Visible: =false
+                        Width: =154
+                        X: =599
+                        Y: =521
+                  - Icon6_14:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.PaperClip
+                        Visible: =false
+                        Width: =32
+                        X: =564
+                        Y: =519
+                  - Container14_3:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =35
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Visible: =false
+                        Width: =336
+                        X: =735
+                        Y: =521
+                      Children:
+                        - Filtre_matériel_PJ:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["R_x00e9_f_x00e9_rence","Title"]
+                              Font: =Font.'Open Sans'
+                              Height: =35
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =["Oui","Non"]
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =335
+                  - Label1_65:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: ="N° FIEC renseigné ? "
+                        Visible: =false
+                        Width: =175
+                        X: =33
+                        Y: =572
+                  - Icon6_15:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =38
+                        Icon: =Icon.Money
+                        Visible: =false
+                        Width: =25
+                        X: =8
+                        Y: =572
+                  - Container14_4:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =35
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        Visible: =false
+                        Width: =336
+                        X: =202
+                        Y: =572
+                      Children:
+                        - Filtre_matériel_FIEC:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["R_x00e9_f_x00e9_rence","Title"]
+                              Font: =Font.'Open Sans'
+                              Height: =35
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =["Oui","Non"]
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =335
+                  - Label1_66:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Traducteur : "
+                        Width: =140
+                        X: =52
+                        Y: =309
+                  - DropdownCanvas4_9:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Appearance: ='DropdownCanvas.Appearance'.FilledDarker
+                        Items: =Distinct('Gestion matériel END' , 'Type de traducteur')
+                        X: =174
+                        Y: =314
+                      Children:
+                        - Value2:
+                            Control: DropDownDataField@1.5.0
+                            Variant: textualColumn
+                            IsLocked: true
+                            Properties:
+                              FieldDisplayName: ="Value"
+                              FieldName: ="Value"
+                              FieldType: ="s"
+                              Order: =1
+                  - Icon6_16:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.ToolsWrench
+                        Width: =32
+                        X: =15
+                        Y: =304
+                  - Label1_67:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =42
+                        Text: |-
+                          ="Produits chimiques : "
+                        Width: =140
+                        X: =582
+                        Y: =304
+                  - DropdownCanvas4_10:
+                      Control: DropDown@0.0.45
+                      Properties:
+                        Items: |-
+                          =[{Texte : "Oui" , Value : true}, {Texte : "Non" , Value : false}]
+                        X: =704
+                        Y: =309
+                      Children:
+                        - Texte1:
+                            Control: DropDownDataField@1.5.0
+                            Variant: textualColumn
+                            IsLocked: true
+                            Properties:
+                              FieldDisplayName: ="Texte"
+                              FieldName: ="Texte"
+                              FieldType: ="s"
+                              Order: =1
+                  - Icon6_17:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Icon: =Icon.LightningBolt
+                        Width: =32
+                        X: =545
+                        Y: =304
+                  - Icon10_15:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |+
+                          =
+                          Reset( DropdownCanvas4_9);
+                        Width: =24
+                        X: =494
+                        Y: =311
+                  - Icon10_16:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =34
+                        Icon: =Icon.Erase
+                        OnSelect: |-
+                          =
+                          Reset( DropdownCanvas4_10)
+                        Width: =24
+                        X: =1031
+                        Y: =306
+                  - ButtonCanvas21_1:
+                      Control: Button@0.0.45
+                      Properties:
+                        Appearance: ='ButtonCanvas.Appearance'.Primary
+                        BasePaletteColor: =RGBA(156, 220, 79, 1)
+                        BorderColor: =RGBA(13, 50, 61, 1)
+                        BorderStyle: =BorderStyle.Solid
+                        FontSize: =18
+                        Height: =40
+                        Icon: ="Search"
+                        IconStyle: ='ButtonCanvas.IconStyle'.Outline
+                        OnSelect: =Launch("https://app.powerbi.com/groups/me/reports/ad3f74ee-b3ce-44a6-aa64-59a2c96e5602/ReportSection53b815a3005d8c028d0c?ctid=e242425b-70fc-44dc-9ddf-c21e304e6c80&experience=power-bi")
+                        Text: ="Cliquer sur le bouton pour accéder à la Recherche avancée"
+                        Width: =763
+                        X: =215
+                        Y: =2
+                  - Image39_1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =40
+                        Image: ='PBI-removebg-preview_1'
+                        Width: =50
+                        X: =841

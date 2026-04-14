@@ -1,0 +1,106 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen11:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container2FunnelScreen_1:
+          Control: GroupContainer@1.4.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Height: =600
+            LayoutDirection: =LayoutDirection.Vertical
+            PaddingBottom: =10
+            PaddingLeft: =40
+            PaddingRight: =40
+            PaddingTop: =20
+            Width: =477
+            Y: =40
+          Children:
+            - TextCanvas5_11:
+                Control: Text@0.0.51
+                Properties:
+                  Height: =40
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  Size: =22
+                  Text: ="Brand New Employees"
+                  Weight: ='TextCanvas.Weight'.Semibold
+                  Width: '=Parent.Width - 50   '
+            - TextCanvas6_1:
+                Control: Text@0.0.51
+                Properties:
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  Text: =CountRows(galNewHires_1.AllItems) &" last entires"
+            - galNewHires_1:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Items: =Table({Name:"Charlotte Anderson",JobTitle:"HR Specialist", Start:Today(),Image:SampleImage},{Name:"Bridget Hernandez",JobTitle:"CRM Manager", Start:Today(),Image:SampleImage}, {Name:"Abe Hires",JobTitle:"Sales Rep", Start:Today(),Image:SampleImage},{Name:"Jonathan Peters",JobTitle:"Marketing Support", Start:Today(),Image:SampleImage})
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  TemplateSize: =300
+                  WrapCount: =2
+                Children:
+                  - Container7_132:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semilight
+                        Height: =244
+                        Width: =Parent.TemplateWidth - 20
+                        X: =9
+                        Y: =9
+                      Children:
+                        - Image6_1:
+                            Control: Image@2.2.3
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =60
+                              Image: =ThisItem.Image
+                              OnSelect: =
+                              RadiusBottomLeft: =60
+                              RadiusBottomRight: =60
+                              RadiusTopLeft: =60
+                              RadiusTopRight: =60
+                              Width: =60
+                              X: =(Parent.Width - Self.Width) / 2
+                              Y: =19
+                        - TextCanvas7_3:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              FontColor: =App.Theme.Colors.Darker20
+                              Size: =18
+                              Text: =ThisItem.Name
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width
+                              Y: =92
+                        - TextCanvas7_4:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Size: =16
+                              Text: =ThisItem.JobTitle
+                              Width: =Parent.Width
+                              Y: =133
+                        - TextCanvas7_5:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              FontColor: =App.Theme.Colors.Lighter10
+                              Size: =12
+                              Text: ="STARTED ON "& Text(ThisItem.Start,"dd mmm")
+                              Width: =Parent.Width/2
+                              X: =(Parent.Width - Self.Width) / 2
+                              Y: =180

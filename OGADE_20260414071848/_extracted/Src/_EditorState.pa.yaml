@@ -1,0 +1,59 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+EditorState:
+  ScreensOrder:
+    - Menu principal_OLD
+    - Screen2
+    - Screen7
+    - Screen8
+    - Informations_Maquette
+    - Nouvelle maquette
+    - Screen10
+    - ScreenEmpruntMaquette
+    - Envoi maquette
+    - Reception maquette
+    - Retour emprunt
+    - Retour emprunt_OLD
+    - Envoi maquette_Old
+    - Reception maquette_OLD
+    - Opératinréunssie
+    - Opératinréunssie2
+    - EchecOpération
+    - Screen5
+    - Screen6
+    - Screen1
+    - Screen3
+    - Screen13
+    - Screen14
+    - Screen14_1
+    - Screen14_2
+    - Screen14_7
+    - Screen14_3
+    - Screen14_4
+    - Screen14_5
+    - Screen_EnvoiMultiple_MatérielsEND
+    - Screen_Réservation EDF
+    - Screen14_6
+    - Screen4
+    - Screen12
+    - Home Page
+    - Menu magasin
+    - Screen9
+    - Screen_Envoi_Mutualisé
+    - Screen_Envoi_Mutualisé_matériels_ajout
+    - Screen_Envoi_Mutualisé_maquettes_ajout
+    - Pièces jointes_demande d'envoi maquettes
+    - Pièces jointes_demande d'envoi mutualisé
+    - Validation maquettes_multiple
+    - Screen_RéceptionMultiple
+    - Screen_RéceptionMultiple_Détails
+    - Screen11
+    - Screen15
+  ComponentDefinitionsOrder:
+    - Component1

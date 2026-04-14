@@ -1,0 +1,1493 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen14_1:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |+
+        =Set(varTabHeader, "Pièces jointes");
+    Children:
+      - Container6_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(241, 244, 249, 0.45)
+            Height: =768
+            Width: =1366
+          Children:
+            - Container5_4:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =69
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =Not Screen14_1.Printing
+                  Width: =1310
+                  X: =26
+                  Y: =11
+                Children:
+                  - Rectangle14_1:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =69
+                        Width: =128
+                  - RectQuickActionBar2_3:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =69
+                        Width: =1182
+                        X: =128
+                  - Label19_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =46
+                        Size: =25
+                        Text: ="Gestion du matériel END"
+                        Width: =658
+                        X: =510
+                        Y: =11
+                  - Icon35_11:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(214, 221, 224, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =69
+                        HoverColor: =ColorFade(Self.Color, 10%)
+                        Icon: =Icon.Home
+                        OnSelect: =Navigate('Home Page')
+                        PaddingBottom: =15
+                        PaddingTop: =15
+                        TabIndex: =0
+                        Tooltip: ="Retour à l'accueil"
+                        Width: =130
+            - TabList3_1:
+                Control: TabList@2.2.31
+                Properties:
+                  Alignment: ='TabList.Alignment'.Horizontal
+                  DefaultSelectedItems: "={Value : \"Pièces jointes\"}\r\n\r\n    \r\n    "
+                  Height: =79
+                  Items: =Itemtablist3_1
+                  Size: ='TabList.Size'.Medium
+                  Visible: =Not Screen14_1.Printing
+                  Width: =1187
+                  X: =26
+                  Y: =107
+                Children:
+                  - Titre3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Titre"
+                        FieldName: ="Title"
+                        FieldType: ="s"
+                        Order: =8
+                  - Validité (an)3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Validité (an)"
+                        FieldName: ="Validit_x00e9__x0028_an_x0029_"
+                        FieldType: ="n"
+                        Order: =9
+                  - Responsable 3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Responsable "
+                        FieldName: ="Responsabledelamaquette"
+                        FieldType: ="E"
+                        Order: =10
+                  - Complétude3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Complétude"
+                        FieldName: ="Compl_x00e9_tude"
+                        FieldType: ="E"
+                        Order: =11
+                  - Etat du matériel3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Etat du matériel"
+                        FieldName: ="Etatdumat_x00e9_riel"
+                        FieldType: ="E"
+                        Order: =12
+                  - Commentaire état matériel3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Commentaire état matériel"
+                        FieldName: ="Commentaire_x00e9_tatmat_x00e9_r"
+                        FieldType: ="s"
+                        Order: =13
+                  - Commentaires complétude3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Commentaires complétude"
+                        FieldName: ="Commentairescompl_x00e9_tude"
+                        FieldType: ="s"
+                        Order: =13
+                  - N° de FIEC3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="N° de FIEC"
+                        FieldName: ="N_x00b0_deFIEC"
+                        FieldType: ="s"
+                        Order: =14
+                  - Fournisseur du matériel3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Fournisseur du matériel"
+                        FieldName: ="Fournisseurdumat_x00e9_riel"
+                        FieldType: ="E"
+                        Order: =15
+                  - Photo Envoie3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Photo Envoie"
+                        FieldName: ="PhotoEnvoie"
+                        FieldType: ="I"
+                        Order: =16
+                  - Photo Réception3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Photo Réception"
+                        FieldName: ="PhotoR_x00e9_ception"
+                        FieldType: ="I"
+                        Order: =17
+                  - Pièces jointes3_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Pièces jointes"
+                        FieldName: ="{Attachments}"
+                        FieldType: ="r*"
+                        Order: =18
+                  - Value1_1:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Value"
+                        FieldName: ="Value"
+                        FieldType: ="s"
+                        Order: =2
+            - Container5:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =477
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =If(TabList3_1.Selected.Value = "Infos", true , false)
+                  Width: =1310
+                  X: =26
+                  Y: =170
+                Children:
+                  - Container11:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =41
+                        Width: =381
+                        X: =46
+                        Y: =60
+                      Children:
+                        - Label27:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =25
+                              Text: |-
+                                ="ID : " & Gallery5.Selected.Titre
+                              Width: =361
+                              X: =12
+                              Y: =8
+                  - Container11_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =470
+                        Y: =59
+                      Children:
+                        - Label27_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="N° de FIEC : " & Gallery5.Selected.'N° de FIEC'
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_2:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =46
+                        Y: =125
+                      Children:
+                        - Label27_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Size: =11
+                              Text: |-
+                                ="Type de matériel : " & Gallery5.Selected.'Type de matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_3:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =470
+                        Y: =125
+                      Children:
+                        - Container11_4:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =42
+                              Width: =381
+                            Children:
+                              - Label27_4:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =26
+                                    Text: |-
+                                      ="Fournisseur : " & Gallery5.Selected.'Fournisseur du matériel'.Value
+                                    Width: =359
+                                    X: =12
+                                    Y: =8
+                  - Container11_5:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =890
+                        Y: =125
+                      Children:
+                        - Label27_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Etat du matériel : " & Gallery5.Selected.'Etat du matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_6:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =317
+                        Y: =355
+                      Children:
+                        - Label27_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Groupe : " & Gallery5.Selected.Groupe.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_7:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =741
+                        Y: =355
+                      Children:
+                        - Label27_7:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Site : " & Gallery5.Selected.Site.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_8:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =46
+                        Y: =418
+                      Children:
+                        - Label27_8:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Entreprise : " & Gallery5.Selected.Entreprise.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Label26:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =32
+                        Text: |-
+                          ="Localisation du matériel : "
+                        Width: =302
+                        X: =46
+                        Y: =310
+                  - Container11_9:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =890
+                        Y: =60
+                      Children:
+                        - Label27_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Pôle propriétaire : " &  Gallery5.Selected.'Propriétaire du matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Label26_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =32
+                        Text: |-
+                          ="Informations générales : "
+                        Width: =302
+                        X: =46
+                        Y: =12
+                  - Container11_12:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =46
+                        Width: =221
+                        X: =46
+                        Y: =353
+                      Children:
+                        - Label27_11:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =32
+                              Text: |-
+                                =If (Gallery5.Selected.'En transit '.Value="Oui" , "En transit vers : " , "Au magasin de : ")
+                              Width: =168
+                              X: =57
+                              Y: =6
+                        - Icon20:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledBorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =34
+                              Icon: =Icon.Home
+                              Visible: =If(Gallery5.Selected.'En transit '.Value = "Oui" , false, true)
+                              Width: =48
+                              X: =9
+                              Y: =4
+                        - Icon20_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =34
+                              Icon: =Icon.Cars
+                              Visible: =If(Gallery5.Selected.'En transit '.Value = "Oui" , true, false)
+                              Width: =48
+                              X: =9
+                              Y: =4
+                  - Container11_16:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Visible: =If (Gallery5.Selected.Entreprise.Value <> "EDF" , true,false)
+                        Width: =381
+                        X: =470
+                        Y: =418
+                      Children:
+                        - Label27_10:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Motif prêt : " & Gallery5.Selected.'Motif du prêt'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_18:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =46
+                        Y: =186
+                      Children:
+                        - Label27_12:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Référence lot/chaîne : " & Gallery5.Selected.'Lots/Chaînes Matériels END '.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                  - Container11_19:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =470
+                        Y: =249
+                      Children:
+                        - Label27_18:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Fournisseur : " & Gallery5.Selected.'Fournisseur du matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                        - Container11_20:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =42
+                              Width: =381
+                            Children:
+                              - Label27_17:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: |-
+                                      ="Nom du lot/chaîne : " & Gallery5.Selected.'Lots/Chaînes Matériels END : Titre'.Value
+                                    Width: =190
+                                    X: =12
+                                    Y: =8
+                              - Container11_25:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =42
+                                    Width: =381
+                                  Children:
+                                    - Label27_24:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          Font: =Font.'Open Sans'
+                                          Height: =37
+                                          Text: |-
+                                            ="Nom du lot/chaîne : " & Gallery5.Selected.'Lots/Chaînes Matériels END : Titre'.Value
+                                          Width: =184
+                  - Image4_6:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Image: ='badge-facebook'
+                        Visible: =If (Gallery5.Selected.'Information vérifiée ?' = true , true, false)
+                        Width: =33
+                        X: =5
+                        Y: =7
+                  - Container11_21:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =654
+                        X: =468
+                        Y: =419
+                      Children:
+                        - Label27_19:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =30
+                              Text: |-
+                                ="Prêt : " & Gallery5.Selected.'En prêt'.Value  & If( Gallery5.Selected.'En prêt'.Value ="Oui" , " | Motif : " & Gallery5.Selected.'Motif du prêt'.Value & " | Date de retour : "&  Gallery5.Selected.'Date de retour prêt')
+                              Width: =642
+                              X: =12
+                              Y: =8
+                  - Container11_22:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =42
+                        Width: =381
+                        X: =890
+                        Y: =186
+                      Children:
+                        - Label27_21:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Fournisseur : " & Gallery5.Selected.'Fournisseur du matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                        - Container11_23:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =42
+                              Width: =381
+                            Children:
+                              - Label27_20:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =26
+                                    Text: |-
+                                      ="Type d'END : " & Gallery5.Selected.'Type END'.Value
+                                    Width: =359
+                                    X: =12
+                                    Y: =8
+                  - Container11_24:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =38
+                        Width: =381
+                        X: =46
+                        Y: =248
+                      Children:
+                        - Container11_26:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =38
+                              Width: =381
+                            Children:
+                              - Label27_27:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =36
+                                    Text: |-
+                                      ="Responsable : " & Gallery5.Selected.'Responsable '.DisplayName
+                                    Width: =369
+                                    X: =12
+                  - Container11_27:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =79
+                        Width: =381
+                        X: =890
+                        Y: =248
+                      Children:
+                        - Label27_26:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =26
+                              Text: |-
+                                ="Fournisseur : " & Gallery5.Selected.'Fournisseur du matériel'.Value
+                              Width: =359
+                              X: =12
+                              Y: =8
+                        - Container11_28:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =79
+                              Width: =381
+                            Children:
+                              - Label27_23:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Overflow: =Overflow.Scroll
+                                    Text: |-
+                                      ="Commentaires : " & Gallery5.Selected.Commentaires
+                                    Width: =373
+                                    X: =8
+                                    Y: =4
+                              - Container11_29:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =79
+                                    Width: =381
+                                  Children:
+                                    - Label27_25:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          Font: =Font.'Open Sans'
+                                          Height: =76
+                                          Overflow: =Overflow.Scroll
+                                          Text: |-
+                                            ="Commentaires : " & Gallery5.Selected.Commentaires
+                                          Width: =381
+                  - Container11_30:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =41
+                        Width: =381
+                        X: =470
+                        Y: =187
+                      Children:
+                        - Label27_29:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Modèle : " & Gallery5.Selected.Modèle
+                              Width: =381
+                        - Container11_31:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =0
+                              Width: =287
+                              Y: =40
+                            Children:
+                              - Label27_22:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =23
+                                    Text: |-
+                                      ="Nom du lot/chaîne : " & Gallery5.Selected.'Lots/Chaînes Matériels END : Titre'.Value
+                                    Width: =275
+                                    X: =12
+                                    Y: =8
+                              - Container11_32:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =22
+                                    Width: =287
+                                    Y: =20
+                                  Children:
+                                    - Label27_28:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          Font: =Font.'Open Sans'
+                                          Height: =18
+                                          Text: |-
+                                            ="Nom du lot/chaîne : " & Gallery5.Selected.'Lots/Chaînes Matériels END : Titre'.Value
+                                          Width: =296
+                                          Y: =24
+            - Container5_1:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =477
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =If(TabList3_1.Selected.Value = "Pièces jointes", true , false)
+                  Width: =1310
+                  X: =26
+                  Y: =170
+                Children:
+                  - Container11_15:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =447
+                        Width: =1283
+                        X: =14
+                        Y: =18
+                      Children:
+                        - Gallery6:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(241, 244, 249, 0.26)
+                              Height: =419
+                              Items: =Gallery5.Selected.'Pièces jointes'
+                              Width: =527
+                              X: =36
+                              Y: =12
+                            Children:
+                              - Image9:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =64
+                                    Image: "=If(\r\n\r\n    // Word icon\r\n    EndsWith(ThisItem.AbsoluteUri, \"doc\"),\r\n\r\n    \"data:image/svg+xml;utf8, %3Csvg%20%20viewBox%3D%270%200%202048%202048%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20d%3D%27M2048%20475v1445q0%2027-10%2050t-27%2040-41%2028-50%2010H640q-27%200-50-10t-40-27-28-41-10-50v-256H115q-24%200-44-9t-37-25-25-36-9-45V627q0-24%209-44t25-37%2036-25%2045-9h397V128q0-27%2010-50t27-40%2041-28%2050-10h933q26%200%2049%209t42%2028l347%20347q18%2018%2027%2041t10%2050zm-384-256v165h165l-165-165zM320%201424h161q2-8%209-43t18-83%2021-103%2022-101%2016-76%208-31l7%2030q7%2030%2017%2077t23%20100%2023%20103%2019%2084%2010%2043h160l148-672H834l-80%20438-100-438H502l-96%20440-86-440H170l150%20672zm320%20496h1280V512h-256q-27%200-50-10t-40-27-28-41-10-50V128H640v384h397q24%200%2044%209t37%2025%2025%2036%209%2045v922q0%2024-9%2044t-25%2037-36%2025-45%209H640v256zm640-1024V768h512v128h-512zm0%20256v-128h512v128h-512zm0%20256v-128h512v128h-512z%27%20fill%3D%27%230078d4%27%3E%3C%2Fpath%3E%3C%2Fsvg%3E\",\r\n\r\n    // Word icon\r\n    EndsWith(ThisItem.AbsoluteUri, \"docx\"),\r\n\r\n    \"data:image/svg+xml;utf8, %3Csvg%20%20viewBox%3D%270%200%202048%202048%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20d%3D%27M2048%20475v1445q0%2027-10%2050t-27%2040-41%2028-50%2010H640q-27%200-50-10t-40-27-28-41-10-50v-256H115q-24%200-44-9t-37-25-25-36-9-45V627q0-24%209-44t25-37%2036-25%2045-9h397V128q0-27%2010-50t27-40%2041-28%2050-10h933q26%200%2049%209t42%2028l347%20347q18%2018%2027%2041t10%2050zm-384-256v165h165l-165-165zM320%201424h161q2-8%209-43t18-83%2021-103%2022-101%2016-76%208-31l7%2030q7%2030%2017%2077t23%20100%2023%20103%2019%2084%2010%2043h160l148-672H834l-80%20438-100-438H502l-96%20440-86-440H170l150%20672zm320%20496h1280V512h-256q-27%200-50-10t-40-27-28-41-10-50V128H640v384h397q24%200%2044%209t37%2025%2025%2036%209%2045v922q0%2024-9%2044t-25%2037-36%2025-45%209H640v256zm640-1024V768h512v128h-512zm0%20256v-128h512v128h-512zm0%20256v-128h512v128h-512z%27%20fill%3D%27%230078d4%27%3E%3C%2Fpath%3E%3C%2Fsvg%3E\",\r\n    \r\n    // pdf icon\r\n    EndsWith(ThisItem.AbsoluteUri, \"pdf\"),\r\n    \"data:image/svg+xml;utf8, %3Csvg%20%20viewBox%3D%270%200%202048%202048%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20d%3D%27M1243%200l549%20549v1499H128V0h1115zm37%20219v293h293l-293-293zM256%201920h1408V640h-512V128H256v1792zm256-896V896h896v128H512zm0%20256v-128h896v128H512zm0%20256v-128h896v128H512z%27%20fill%3D%27%237a7574%27%3E%3C%2Fpath%3E%3C%2Fsvg%3E\"\r\n   \r\n)"
+                                    OnSelect: =Select(Parent)
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Width: =69
+                                    X: =19
+                                    Y: =15
+                              - Title3:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                                    Height: =25
+                                    OnSelect: =Select(Parent)
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =ThisItem.DisplayName
+                                    VerticalAlign: =VerticalAlign.Top
+                                    Width: =346
+                                    X: =105
+                                    Y: =35
+                              - Separator6:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =8
+                                    OnSelect: =Select(Parent)
+                                    Width: =Parent.TemplateWidth
+                                    Y: =Parent.TemplateHeight - Self.Height
+                              - Rectangle16:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Fill: =RGBA(0, 18, 107, 1)
+                                    Height: =Parent.TemplateHeight - Separator6.Height
+                                    OnSelect: =Select(Parent)
+                                    Visible: =ThisItem.IsSelected
+                                    Width: =4
+                              - Icon21:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =30
+                                    Icon: =Icon.Download
+                                    OnSelect: =Launch(ThisItem.AbsoluteUri)
+                                    Width: =45
+                                    X: =477
+                                    Y: =30
+            - Container5_6:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =477
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =If(TabList3_1.Selected.Value = "Etat et complétude du matériel", true , false)
+                  Width: =1310
+                  X: =26
+                  Y: =170
+                Children:
+                  - Container11_10:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =436
+                        Width: =1263
+                        X: =26
+                        Y: =18
+                      Children:
+                        - Container11_14:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =184
+                              Width: =1201
+                              X: =18
+                              Y: =23
+                            Children:
+                              - Label27_14:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =36
+                                    Overflow: =Overflow.Scroll
+                                    Text: |-
+                                      ="Etat du materiel : " & Gallery5.Selected.'Etat du matériel'.Value
+                                    Width: =505
+                                    X: =12
+                                    Y: =8
+                              - Label27_15:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =104
+                                    Overflow: =Overflow.Scroll
+                                    Text: |-
+                                      ="Compléments : 
+                                      " & Gallery5.Selected.'Commentaire état matériel'
+                                    Width: =1186
+                                    X: =12
+                                    Y: =44
+                        - Container11_13:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =187
+                              Width: =1201
+                              X: =18
+                              Y: =228
+                            Children:
+                              - Label27_13:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Justify
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =133
+                                    Overflow: =Overflow.Scroll
+                                    Text: |-
+                                      ="Compléments : 
+                                      " & Gallery5.Selected.'Commentaires complétude'
+                                    Width: =1175
+                                    X: =12
+                                    Y: =45
+                              - Label27_16:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =36
+                                    Overflow: =Overflow.Scroll
+                                    Text: |-
+                                      ="Complétude du materiel : " & Gallery5.Selected.Complétude.Value
+                                    Width: =505
+                                    X: =12
+                                    Y: =9
+            - Container5_5:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =83
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =1310
+                  X: =26
+                  Y: =674
+                Children:
+                  - Container7_6:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =51
+                        Y: =8
+                      Children:
+                        - Icon19_29:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =Icon.DetailList
+                              OnSelect: =Navigate(Screen14)
+                              Width: =48
+                              X: =42
+                        - Label23_60:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Tableau matériel"
+                              Width: =136
+                              Y: =41
+                  - Container7_7:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =257
+                        Y: =8
+                      Children:
+                        - Icon19_6:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: |-
+                                =If(
+                                    Toggle1.Checked = true,
+                                    DisplayMode.Disabled,
+                                    If(
+                                        First(
+                                            Filter(
+                                                'Agents et rôles OGADE',
+                                                User().Email = Agent.Email
+                                            )
+                                        ).Magasinier,
+                                        DisplayMode.Disabled,
+                                        If(
+                                            Gallery5.Selected.'En transit '.Value = "En attente" Or Gallery5.Selected.'En prêt'.Value = "Non",
+                                            DisplayMode.Disabled,
+                                            DisplayMode.Edit
+                                        )
+                                    )
+                                )
+                              Height: =45
+                              Icon: = Icon.Send
+                              OnSelect: |-
+                                =Set(
+                                    Variabledéplacementmatériel,
+                                    If (
+                                        Gallery5.Selected.'En transit '.Value = "Oui",
+                                        "Réception du matériel",
+                                        "Envoi du matériel"
+                                    )
+                                );
+                                If (
+                                    Gallery5.Selected.'En transit '.Value = "Oui",
+                                    EditForm(Form3_4),
+                                    NewForm('FormulaireDemandeD''envoiMatériel')
+                                );
+                                Navigate(Screen14_4)
+                              Rotation: =If (Gallery5.Selected.'En transit '.Value = "Oui" , 180,0)
+                              Width: =48
+                              X: =46
+                        - Label23_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =If (Gallery5.Selected.'En transit '.Value = "Oui" , "Réception","Envoi")
+                              Width: =136
+                              Y: =45
+                  - Container7_8:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =464
+                        Y: =8
+                      Children:
+                        - Icon19_7:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =
+                              OnSelect: |-
+                                =EditForm(Form3_1);
+                                Clear(SelectionOptionEntreprise);
+                                Set(VariablePrêtmatériel, If (Gallery5.Selected.Entreprise.Value = "EDF" , "Prêt du matériel à un fournisseur", "Retour matériel"));
+                                Navigate(Screen14_3)
+                              Width: =48
+                              X: =46
+                        - Label23_7:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =19
+                              Size: =10
+                              Text: =If (Gallery5.Selected.'En prêt'.Value <> "Oui"  ,"Réservation","Retour réservation")
+                              Width: =136
+                              Y: =40
+                        - Icon19_8:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =If(Toggle1.Checked = true,DisplayMode.Disabled,If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit))
+                              Height: =45
+                              Icon: =If (Gallery5.Selected.'En transit '.Value <> "Oui" , Icon.Export, Icon.Export)
+                              OnSelect: |-
+                                =EditForm(Form3_1);
+                                Clear(SelectionOptionEntreprise);
+                                Set(VariablePrêtmatériel, If (Gallery5.Selected.'En prêt'.Value <> "Oui"  ,  "Prêt matériel","Retour matériel"));
+                                Navigate(Screen14_3)
+                              Rotation: =If (Gallery5.Selected.'En prêt'.Value <> "Oui"  , 0, 180)
+                              Width: =48
+                              X: =44
+                  - Container7_11:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =1140
+                        Y: =8
+                      Children:
+                        - Icon19_11:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit)
+                              Height: =45
+                              Icon: =Icon.AddLibrary
+                              OnSelect: |-
+                                =NewForm(Form3);
+                                Set(VarModifouajout,"Nouvel élément");
+                                Navigate(Screen14_2)
+                              Width: =48
+                              X: =46
+                        - Label23_10:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Ajout matériel"
+                              Width: =136
+                              Y: =45
+                  - Container7_9:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =690
+                        Y: =8
+                      Children:
+                        - Icon19_9:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =Icon.Information
+                              OnSelect: =Navigate(Screen14_1)
+                              Width: =48
+                              X: =46
+                              Y: =2
+                        - Label23_8:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Informations "
+                              Width: =136
+                              Y: =45
+                  - Container7_10:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =917
+                        Y: =8
+                      Children:
+                        - Label23_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =If(User().Email = Gallery5.Selected.'Responsable '.Email,RGBA(0, 0, 0, 1),RGBA(215, 223, 240, 100))
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Modification"
+                              Width: =136
+                              Y: =45
+                        - Icon19_10:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(215, 223, 240, 1)
+                              DisplayMode: |-
+                                =If(
+                                    Toggle1.Checked = true,
+                                    DisplayMode.Edit,
+                                    If(
+                                        User().Email = Gallery5.Selected.'Responsable '.Email Or User().Email = Gallery5.Selected.'Créé par'.Email Or Not IsEmpty(
+                                            Filter(
+                                                'Agents et rôles',
+                                                'Nom de l''agent'.Email = User().Email,
+                                                'OGADE_Responsable matériel' = true,
+                                                Périmètre_OGADE_Matériel.Value = Gallery5.Selected.'Propriétaire du matériel'.Value
+                                            )
+                                        ) Or Not IsEmpty(
+                                            Filter(
+                                                'Agents et rôles',
+                                                'Nom de l''agent'.Email = User().Email,
+                                                OGADE_Matériels_Admin = true
+                                            )
+                                        ),
+                                        DisplayMode.Edit,
+                                        DisplayMode.Disabled
+                                    )
+                                )
+                              Height: =44
+                              Icon: =Icon.Edit
+                              OnSelect: |-
+                                =EditForm(Form3);
+                                Set(VarModifouajout,"Modification" );
+                                Navigate(Screen14_2)
+                              Width: =56
+                              X: =40
+                              Y: =1
+                        - InfoButtonCanvas1_1:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              Content: |-
+                                ="Modification possible uniquement par la
+                                 personne responsable du matériel"
+                              Height: =25
+                              Width: =25
+                              X: =101
+            - Container5_28:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =477
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =If(TabList3_1.Selected.Value = "Historique", true , false)
+                  Width: =1310
+                  X: =26
+                  Y: =170
+                Children:
+                  - Container11_17:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =345
+                        Width: =1213
+                        X: =46
+                        Y: =88
+                      Children:
+                        - Label32:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =329
+                              Overflow: =Overflow.Scroll
+                              Text: =PlainText(Gallery5.Selected.Historique)
+                              Width: =1191
+                              X: =10
+                              Y: =10
+                  - Label26_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =32
+                        Text: |-
+                          ="Historique : "
+                        Width: =302
+                        X: =40
+                        Y: =40
+      - PdfViewer2:
+          Control: PDFViewer@2.5.0
+          Properties:
+            Document: =Gallery6.Selected.Value
+            Height: =427
+            Visible: =If(TabList3_1.Selected.Value = "Pièces jointes", true , false)
+            Width: =554
+            X: =753
+            Y: =195
+      - Container5_7:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(215, 223, 240, 0.32)
+            Height: =477
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Visible: =If(TabList3_1.Selected.Value = "Photos du matériel", true , false)
+            Width: =1310
+            X: =26
+            Y: =170
+          Children:
+            - Container11_11:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =436
+                  Width: =1263
+                  X: =26
+                  Y: =18
+                Children:
+                  - Image12:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =396
+                        Image: =If(IsBlank(Gallery5.Selected.'Photo Envoie'),'istockphoto-1216251206-170667a'  ,Gallery5.Selected.'Photo Envoie'.Full)
+                        OnSelect: =
+                        Width: =570
+                        X: =40
+                        Y: =40
+                  - Image12_1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =396
+                        Image: =If(IsBlank(Gallery5.Selected.'Photo Réception'),'istockphoto-1216251206-170667a'  ,Gallery5.Selected.'Photo Réception'.Full)
+                        Width: =570
+                        X: =625
+                        Y: =40
+                  - Label28:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Photo envoi : "
+                        X: =20
+                  - Label28_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: |-
+                          ="Photo réception : "
+                        X: =735
+      - Container5_10:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(215, 223, 240, 0.32)
+            Height: =477
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Visible: =If(TabList3_1.Selected.Value = "QR code", true , false)
+            Width: =1310
+            X: =26
+            Y: =170
+          Children:
+            - Image1_2:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =427
+                  Image: ="https://quickchart.io/qr?text=" & Gallery5.Selected.Titre & "&size=600*600"
+                  Width: =918
+                  X: =180
+                  Y: =12
+            - Icon1_1:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Icon: =Icon.Print
+                  OnSelect: =Print()
+                  Visible: =Not Screen14_1.Printing
+                  X: =1205
+                  Y: =29
+            - Label9_1:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Size: =16
+                  Text: |-
+                    ="ID : " & Gallery5.Selected.Titre
+                  Width: =500
+                  X: =389
+                  Y: =437

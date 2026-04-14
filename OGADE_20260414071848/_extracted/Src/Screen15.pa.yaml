@@ -1,0 +1,439 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen15:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container48_1:
+          Control: GroupContainer@1.4.0
+          Variant: AutoLayout
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            DropShadow: =DropShadow.None
+            Height: =620
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =10
+            PaddingBottom: =10
+            PaddingLeft: =1
+            PaddingTop: =10
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =1310
+          Children:
+            - Container_Maquettes_1:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semilight
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                Children:
+                  - Container_Header_Maquettes_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(15, 84, 140, 1)
+                        Height: =40
+                        Width: =495
+                      Children:
+                        - TextCanvas25_5:
+                            Control: Text@0.0.51
+                            Properties:
+                              Font: =Font.'Segoe UI'
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Height: =40
+                              Size: =24
+                              Text: ="Maquettes"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =392
+                              X: =27
+                  - galNewHires_4:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =555
+                        Items: =Filter('Demandes d''envoi maquette' , 'ID Demande envoi mère' = IDRéceptionMultiple, Statut.Value = "Soldée")
+                        TemplateSize: =214
+                        Width: =495
+                        WrapCount: =2
+                        Y: =45
+                      Children:
+                        - Container7_136:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.Semilight
+                              Height: =198
+                              Width: =Parent.TemplateWidth - 20
+                              X: =9
+                              Y: =9
+                            Children:
+                              - Image6_4:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =60
+                                    Image: =If(IsBlank(LookUp('Gestion des maquettes', ID = ThisItem.Maquette.Id).'Photo maquette envoi') , 'No Photo' , LookUp('Gestion des maquettes', ID = ThisItem.Maquette.Id).'Photo maquette envoi')
+                                    OnSelect: |-
+                                      =Set(PopUp_RéceptionMultiple_VisulaisationPJ , true); 
+                                      Set(Image_RéceptionMultiple_VisulaisationPJ , LookUp('Gestion des maquettes', ID = ThisItem.Maquette.Id).'Photo maquette envoi'.Full)
+                                    RadiusBottomLeft: =60
+                                    RadiusBottomRight: =60
+                                    RadiusTopLeft: =60
+                                    RadiusTopRight: =60
+                                    Width: =60
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =11
+                              - TextCanvas7_13:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    FontColor: =App.Theme.Colors.Darker20
+                                    Height: =47
+                                    Size: =15
+                                    Text: =ThisItem.Maquette.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width
+                                    Y: =71
+                              - TextCanvas7_15:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Size: =16
+                                    Text: =Concat(LookUp('Gestion des maquettes', ID = ThisItem.Maquette.Id).Matière,Value & ", ")
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Y: =118
+                              - TextCanvas7_16:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    FontColor: =App.Theme.Colors.Lighter10
+                                    Size: =12
+                                    Text: =LookUp('Gestion des maquettes', ID = ThisItem.Maquette.Id).'Type de contrôle'.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width/2
+                                    X: =55
+                                    Y: =150
+                              - BadgeCanvas11_13:
+                                  Control: Badge@0.0.24
+                                  Properties:
+                                    Align: =Align.Center
+                                    Appearance: ='BadgeCanvas.Appearance'.Ghost
+                                    Content: |-
+                                      =Switch(ThisItem.'Statut : Réception'.Value , 
+                                      "Réceptionnée" , "✅" , 
+                                      "En attente" , "⌛" , 
+                                      Blank() , "⌛" , 
+                                      "Non réceptionnée" , "❌")
+                                    FontSize: =22
+                                    Height: =40
+                                    Shape: ='BadgeCanvas.Shape'.Rounded
+                                    ThemeColor: |-
+                                      =If(LookUp('Demandes d''envoi matériel' , ID = IDRéceptionMultiple ).'Statut : Réception'.Value = "En attente" , 'BadgeCanvas.ThemeColor'.Warning ,  'BadgeCanvas.ThemeColor'.Success)
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =40
+                                    X: =187
+                        - CheckboxCanvas1_4:
+                            Control: CheckBox@0.0.30
+                            Properties:
+                              CheckboxSize: =20
+                              Checked: =Not(IsEmpty(Filter(CollectionRéceptionMultipleMatériel , Value = ThisItem.ID, Liste = "Maquettes")))
+                              FontSize: =25
+                              Height: =33
+                              Label: =
+                              OnCheck: |-
+                                =Collect(CollectionRéceptionMultipleMatériel , {Value: ThisItem.ID, Liste : "Maquettes"})
+                              OnSelect: =Select(Parent)
+                              OnUncheck: =Remove(CollectionRéceptionMultipleMatériel , LookUp(CollectionRéceptionMultipleMatériel , Value = ThisItem.ID And Liste = "Maquettes"))
+                              Width: =41
+                              X: =9
+                              Y: =9
+            - Container_Matériels_1:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semilight
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                Children:
+                  - galNewHires_5:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =555
+                        Items: =Filter('Sous-demandes d''envoi matériel' , 'Demande d''envoi associée'.Value = IDRéceptionMultiple, Statut.Value = "Soldée")
+                        TemplateSize: =214
+                        Width: =495
+                        WrapCount: =2
+                        Y: =45
+                      Children:
+                        - Container7_137:
+                            Control: GroupContainer@1.4.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.Semilight
+                              Height: =198
+                              Width: =Parent.TemplateWidth - 20
+                              X: =9
+                              Y: =9
+                            Children:
+                              - Image6_5:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =60
+                                    Image: =If(IsBlank(LookUp('Gestion matériel END', ID = ThisItem.Matériel.Id).'Photo Envoie') , 'No Photo' , LookUp('Gestion matériel END', ID = ThisItem.Matériel.Id).'Photo Envoie')
+                                    OnSelect: |-
+                                      =Set(PopUp_RéceptionMultiple_VisulaisationPJ , true); 
+                                      Set(Image_RéceptionMultiple_VisulaisationPJ , LookUp('Gestion matériel END', ID = ThisItem.Matériel.Id).'Photo Envoie'.Full)
+                                    RadiusBottomLeft: =60
+                                    RadiusBottomRight: =60
+                                    RadiusTopLeft: =60
+                                    RadiusTopRight: =60
+                                    Width: =60
+                                    X: =(Parent.Width - Self.Width) / 2
+                                    Y: =11
+                              - TextCanvas7_17:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    FontColor: =App.Theme.Colors.Darker20
+                                    Height: =47
+                                    Size: =15
+                                    Text: =ThisItem.Matériel.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width
+                                    Y: =71
+                              - TextCanvas7_18:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Size: =16
+                                    Text: =LookUp('Gestion matériel END', ID = ThisItem.Matériel.Id).'Type de matériel'.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Y: =118
+                              - TextCanvas7_19:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    FontColor: =App.Theme.Colors.Lighter10
+                                    Size: =12
+                                    Text: =LookUp('Gestion matériel END', ID = ThisItem.Matériel.Id).Modèle
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width/2
+                                    X: =55
+                                    Y: =150
+                              - BadgeCanvas11_14:
+                                  Control: Badge@0.0.24
+                                  Properties:
+                                    Align: =Align.Center
+                                    Appearance: ='BadgeCanvas.Appearance'.Ghost
+                                    Content: |-
+                                      =Switch(ThisItem.'Statut : Réception'.Value , 
+                                      "Réceptionnée" , "✅" , 
+                                      "En attente" , "⌛" , 
+                                      Blank() , "⌛" , 
+                                      "Non réceptionnée" , "❌")
+                                    FontSize: =22
+                                    Height: =40
+                                    Shape: ='BadgeCanvas.Shape'.Rounded
+                                    ThemeColor: |-
+                                      =If(LookUp('Demandes d''envoi matériel' , ID = IDRéceptionMultiple ).'Statut : Réception'.Value = "En attente" , 'BadgeCanvas.ThemeColor'.Warning ,  'BadgeCanvas.ThemeColor'.Success)
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =40
+                                    X: =187
+                        - CheckboxCanvas1_5:
+                            Control: CheckBox@0.0.30
+                            Properties:
+                              CheckboxSize: =20
+                              Checked: =Not(IsEmpty(Filter(CollectionRéceptionMultipleMatériel , Value = ThisItem.ID , Liste = "Matériels")))
+                              FontSize: =25
+                              Height: =33
+                              Label: =
+                              OnCheck: |-
+                                =Collect(CollectionRéceptionMultipleMatériel , {Value: ThisItem.ID, Liste : "Matériels"})
+                              OnSelect: =Select(Parent)
+                              OnUncheck: =Remove(CollectionRéceptionMultipleMatériel , LookUp(CollectionRéceptionMultipleMatériel , Value = ThisItem.ID And Liste = "Matériels"))
+                              Width: =41
+                              X: =9
+                              Y: =9
+                  - Container_Header_Matériels_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(40, 134, 222, 1)
+                        Height: =40
+                        Width: =495
+                      Children:
+                        - TextCanvas25_6:
+                            Control: Text@0.0.51
+                            Properties:
+                              Font: =Font.'Segoe UI'
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Height: =40
+                              Size: =24
+                              Text: ="Matériels"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =392
+                              X: =28
+                        - ButtonCanvas26_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              Appearance: ='ButtonCanvas.Appearance'.Secondary
+                              FontColor: =RGBA(40, 134, 222, 1)
+                              Height: =40
+                              Icon: ="CheckmarkCircle"
+                              OnSelect: |-
+                                =ForAll(
+                                    Filter(
+                                        'Sous-demandes d''envoi matériel',
+                                        'Demande d''envoi associée'.Value = IDRéceptionMultiple,
+                                        Statut.Value = "Soldée"
+                                    ),
+                                    If(
+                                        IsEmpty(
+                                            Filter(
+                                                CollectionRéceptionMultipleMatériel,
+                                                ID = ThisRecord.Value,
+                                                Liste = "Matériels"
+                                            )
+                                        ),
+                                        Collect(
+                                            CollectionRéceptionMultipleMatériel,
+                                            {
+                                                Value: ID,
+                                                Liste: "Matériels"
+                                            }
+                                        )
+                                    )
+                                )
+                              Text: ="Tout sélectionner"
+                              Width: =165
+                              X: =330
+            - Container_Autres_1:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semilight
+                  FillPortions: =0
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  LayoutMinWidth: =150
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Width: =300
+                Children:
+                  - Container_Header_Autres_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =RGBA(62, 128, 149, 1)
+                        Height: =40
+                        Width: =300
+                      Children:
+                        - TextCanvas25_7:
+                            Control: Text@0.0.51
+                            Properties:
+                              Font: =Font.'Segoe UI'
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Height: =40
+                              Size: =24
+                              Text: ="Autres"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =250
+                              X: =28
+                  - Container7_138:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semilight
+                        Height: =Parent.Height - 40
+                        Width: '=Parent.Width '
+                        Y: =40
+                      Children:
+                        - TextCanvas7_20:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Justify
+                              Height: =484
+                              Size: =16
+                              Text: =LookUp('Demandes d''envoi matériel', ID = IDRéceptionMultiple).'Matériels supplémentaires non listés'
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =288
+                              X: =7
+                              Y: =60
+                        - TextCanvas7_21:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Start
+                              FontColor: =App.Theme.Colors.Darker20
+                              Height: =36
+                              Size: =17
+                              Text: |-
+                                ="Description : "
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =If(IsBlank(LookUp('Demandes d''envoi matériel', ID = IDRéceptionMultiple).'Matériels supplémentaires non listés') , false , true)
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =241
+                              X: =57
+                              Y: =6
+                        - BadgeCanvas11_15:
+                            Control: Badge@0.0.24
+                            Properties:
+                              Align: =Align.Center
+                              Appearance: ='BadgeCanvas.Appearance'.Ghost
+                              Content: |-
+                                =Switch(LookUp('Demandes d''envoi matériel', ID = IDRéceptionMultiple).'Statut : Réception_Matériels_non_listés'.Value , 
+                                "Réceptionnée" , "✅" , 
+                                "En attente" , "⌛" , 
+                                Blank() , "⌛" , 
+                                "Non réceptionnée" , "❌")
+                              FontSize: =22
+                              Height: =40
+                              Shape: ='BadgeCanvas.Shape'.Rounded
+                              ThemeColor: |-
+                                =If(LookUp('Demandes d''envoi matériel' , ID = IDRéceptionMultiple ).'Statut : Réception'.Value = "En attente" , 'BadgeCanvas.ThemeColor'.Warning ,  'BadgeCanvas.ThemeColor'.Success)
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =If(IsBlank(LookUp('Demandes d''envoi matériel', ID = IDRéceptionMultiple).'Matériels supplémentaires non listés') , false , true)
+                              Width: =40
+                              X: =260
+                  - CheckboxCanvas1_6:
+                      Control: CheckBox@0.0.30
+                      Properties:
+                        CheckboxSize: =20
+                        Checked: =Not(IsEmpty(Filter(CollectionRéceptionMultipleMatériel , Value = 9999999 , Liste = "Autres")))
+                        FontSize: =25
+                        Height: =33
+                        Label: =
+                        OnCheck: |-
+                          =Collect(CollectionRéceptionMultipleMatériel , {Value: 9999999, Liste : "Autres"})
+                        OnSelect: =
+                        OnUncheck: =Remove(CollectionRéceptionMultipleMatériel , LookUp(CollectionRéceptionMultipleMatériel , Value = 9999999 And Liste = "Autres"))
+                        Visible: =If(IsBlank(LookUp('Demandes d''envoi matériel', ID = IDRéceptionMultiple).'Matériels supplémentaires non listés') , false , true)
+                        Width: =41
+                        Y: =48

@@ -1,0 +1,1706 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_Envoi_Mutualisé_maquettes_ajout:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container5_47:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =69
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            Width: =1310
+            X: =26
+            Y: =11
+          Children:
+            - RectQuickActionBar2_16:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Height: =69
+                  Width: =1310
+            - Label19_14:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =53
+                  Size: =25
+                  Text: ="Sélection maquettes pour envoi multiple"
+                  Width: =840
+                  X: =220
+                  Y: =8
+            - Icon28_6:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Height: =53
+                  Icon: =Icon.ShoppingCart
+                  OnSelect: =If(PanierVisible = true , Set(PanierVisible,false), Set(PanierVisible,true))
+                  Width: =48
+                  X: =1238
+                  Y: =16
+            - BadgeCanvas1_8:
+                Control: Badge@0.0.24
+                Properties:
+                  BasePaletteColor: =RGBA(249, 83, 109, 1)
+                  Content: =CountRows(PanierTransfertMaquette)
+                  X: =1265
+                  Y: =5
+            - ButtonCanvas18_1:
+                Control: Button@0.0.45
+                Properties:
+                  Appearance: ='ButtonCanvas.Appearance'.Transparent
+                  FontColor: =RGBA(255, 255, 255, 1)
+                  FontSize: =45
+                  Height: =50
+                  Icon: ="ChevronLeft"
+                  Layout: ='ButtonCanvas.Layout'.IconOnly
+                  OnSelect: =Navigate(Screen_Envoi_Mutualisé)
+                  Width: =83
+                  Y: =11
+      - Container16_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =589
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =1354
+            X: =11
+            Y: =150
+          Children:
+            - Gallery8_1:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =589
+                  Items: "=Sort(Filter(\n    'Gestion des maquettes',\n    \n    IsBlank(TextInput1_4.Text) || TextInput1_4.Text = Référence,\n    IsBlank(ComboBox1_16.Selected) || ComboBox1_16.Selected.Value = 'Localisation : Entreprise'.Value,\n    IsBlank(ComboBox1_7.Selected) || ComboBox1_7.Selected.Value = Localisation.Value,\n    IsBlank(ComboBox1_17.Selected) || ComboBox1_17.Selected.Value = 'En transit'.Value,\n    IsBlank(ComboBox1_18.Selected) || ComboBox1_18.Selected.Value = Statut.Value,\n    \n    IsBlank(ComboBox1_20.Selected) || ComboBox1_20.Selected.Value = 'Forme de la maquette'.Value,\n    IsBlank(ComboBox1_22.Selected) || ComboBox1_22.Selected.Value = Composant.Value,\n\n    IsBlank(ComboBox1_24.Selected) || ComboBox1_24.Selected.Value = Catégorie.Value,\n    \n    \n    IsBlank(TextInput4_35.Text) || 'Hauteur maquette' >= Value(TextInput4_35.Text),\n    IsBlank(TextInput4_36.Text) || 'Hauteur maquette' <= Value(TextInput4_36.Text),\n    IsBlank(TextInput4_37.Text) || 'Largeur maquette ' >= Value(TextInput4_37.Text),\n    IsBlank(TextInput4_38.Text) || 'Largeur maquette ' <= Value(TextInput4_38.Text),\n    IsBlank(TextInput4_39.Text) || 'Longueur maquette' >= Value(TextInput4_39.Text),\n    IsBlank(TextInput4_40.Text) || 'Longueur maquette' <= Value(TextInput4_40.Text),\n    IsBlank(TextInput4_41.Text) || 'DN maquette ' >= Value(TextInput4_41.Text),\n    IsBlank(TextInput4_42.Text) || 'DN maquette ' <= Value(TextInput4_42.Text),\n    IsBlank(TextInput4_43.Text) || 'Epaisseur paroi maquette ' >= Value(TextInput4_43.Text),\n    IsBlank(TextInput4_44.Text) || 'Epaisseur paroi maquette ' <= Value(TextInput4_44.Text)\n) , Créé, SortOrder.Descending)"
+                  TemplateSize: =141
+                  Width: =1354
+                  WrapCount: =0
+                Children:
+                  - Title6_1:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =16
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =ThisItem.Référence
+                        Width: =101
+                        X: =100
+                        Y: =27
+                  - Subtitle5_1:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =59
+                        OnSelect: =Select(Parent)
+                        Overflow: =Overflow.Scroll
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =11
+                        Text: =Concat(ThisItem.Matière, Value, ", ")
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =123
+                        X: =85
+                        Y: =73
+                  - Separator4_1:
+                      Control: Rectangle@2.3.0
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =8
+                        OnSelect: =Select(Parent)
+                        Width: =Parent.TemplateWidth
+                        Y: =Parent.TemplateHeight - Self.Height
+                  - Rectangle5_1:
+                      Control: Rectangle@2.3.0
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(0, 18, 107, 1)
+                        Height: =132
+                        OnSelect: =Select(Parent)
+                        Visible: =ThisItem.IsSelected
+                        Width: =4
+                  - Label2_2:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =16
+                        OnSelect: =Select(Parent)
+                        Size: =12
+                        Text: |-
+                          ="Référence : "
+                        Width: =104
+                        X: =4
+                        Y: =26
+                  - Label8_5:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =127
+                        Overflow: =Overflow.Scroll
+                        Size: =11
+                        Text: |-
+                          ="Statut : " & ThisItem.Statut.Value & 
+                          "
+
+                          Description :
+                          " & ThisItem.Description
+                        Width: =246
+                        X: =967
+                        Y: =5
+                  - Label2_7:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        Align: =Align.Right
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =18
+                        OnSelect: =Select(Parent)
+                        Size: =12
+                        Text: ="Matière :"
+                        Width: =80
+                        X: =4
+                        Y: =73
+                  - Label2_5:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =42
+                        OnSelect: =Select(Parent)
+                        Size: =11
+                        Text: "=If (ThisItem.'Forme de la maquette'.Value = \"Parallélépipède\" Or ThisItem.'Forme de la maquette'.Value = \"Autres\", \"Dimensions maquette : \" & ThisItem.'Longueur maquette' & \" x \" & ThisItem.'Largeur maquette ' & \" x \" & ThisItem.'Hauteur maquette' ,\"Dimensions maquette : Ø \" & ThisItem.'DN maquette '  & \" x \" & ThisItem.'Longueur maquette' & \"mm | Ep : \" & ThisItem.'Epaisseur paroi maquette '& \" mm\") "
+                        Width: =275
+                        X: =310
+                        Y: =13
+                  - Label2_6:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =79
+                        OnSelect: =Select(Parent)
+                        Overflow: =Overflow.Scroll
+                        Size: =11
+                        Text: |-
+                          ="Type de défaut : " & If(IsBlank(ThisItem.'Description des défauts ') , "", Concat(Distinct(Table(ParseJSON(ThisItem.'Description des défauts ')),ThisRecord.Value.Type),Value &", "))
+                        Width: =275
+                        X: =310
+                        Y: =55
+                  - Label8_3:
+                      Control: Label@2.5.1
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =130
+                        LineHeight: =1
+                        Overflow: =Overflow.Scroll
+                        Size: =11
+                        Text: |-
+                          = If (ThisItem.'En transit'.Value = "OUI", "En transit vers : 
+
+                          " , If (ThisItem.'En transit'.Value ="Envoi en attente" ,"(Envoi en attente) Localisation : 
+
+                          " ,"Localisation : 
+                          "))& ThisItem.Localisation.Value  & If(IsBlank(ThisItem.Localisation_Salle), " ",  " 
+
+                          Salle : " & ThisItem.Localisation_Salle & ", 
+                          Rayonnage : " & ThisItem.Localisation_Rayonnage)
+                        Width: =205
+                        X: =601
+                        Y: =2
+                  - Rectangle2_1:
+                      Control: Rectangle@2.3.0
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =If (ThisItem.Statut.Value = "Disponible" And ThisItem.'En transit'.Value = "NON",   RGBA(209, 232, 178, 1), RGBA(220, 153, 153, 1))
+                        Height: =134
+                        OnSelect: =Select(Parent)
+                        Width: =50
+                        X: =1290
+                  - Image4_19:
+                      Control: Image@2.2.3
+                      Group: Group6_1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =42
+                        Image: ='badge-facebook'
+                        Visible: =If (ThisItem.'Informations certifiées' = true , true, false)
+                        Width: =33
+                        X: =1237
+                        Y: =39
+                  - Container28_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Regular
+                        Fill: =If(ThisItem.IsSelected, RGBA(230, 233, 235, 0.15) ,RGBA(0, 0, 0, 0))
+                        Height: =134
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =1340
+                      Children:
+                        - ButtonCanvas19:
+                            Control: Button@0.0.45
+                            Properties:
+                              AccessibleLabel: ="L'envoi de la maquette est impossible lorsque celle-ci n'a pas été réservée au préalable, qu'elle est en cours de fabrication ou qu'une demande d'envoi est en attente. Veuillez vérifier son état actuel et apporter les modifications nécessaires pour procéder à l'envoi."
+                              Appearance: ='ButtonCanvas.Appearance'.Transparent
+                              DisplayMode: = If((ThisItem.Statut.Value = "Disponible" Or ThisItem.Statut.Value = "En cours de fabrication" Or ThisItem.Statut.Value = "Envoi en attente") Or ThisItem.'En transit'.Value = "Envoi en attente"  , DisplayMode.Disabled , DisplayMode.Edit)
+                              FontColor: =RGBA(9, 33, 98, 1)
+                              FontSize: =35
+                              Height: =134
+                              Icon: ="Cart"
+                              Layout: ='ButtonCanvas.Layout'.IconOnly
+                              OnSelect: |-
+                                =If (CountRows(
+                                   Filter(
+                                      PanierTransfertMaquette,
+                                      Référence=ThisItem.Référence
+                                   )
+                                )>0 , false , Collect(PanierTransfertMaquette, ThisItem) )
+                              Visible: |-
+                                =If (CountRows(
+                                   Filter(
+                                      PanierTransfertMaquette,
+                                      Référence = ThisItem.Référence
+                                   )
+                                )>0 , false , true )
+                              Width: =50
+                              X: =1290
+                        - Image43:
+                            Control: Image@2.2.3
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =130
+                              Image: |+
+                                =With(
+                                    {
+                                        _img:
+                                            Last(
+                                                Filter(
+                                                    ThisItem.'Pièces jointes',
+                                                    EndsWith(Lower(DisplayName), ".jpg")
+                                                        || EndsWith(Lower(DisplayName), ".jpeg")
+                                                        || EndsWith(Lower(DisplayName), ".png")
+                                                        || EndsWith(Lower(DisplayName), ".gif")
+                                                )
+                                            )
+                                    },
+                                    Coalesce(
+                                        _img.Value,         // contenu binaire (idéal pour les vraies images)
+                                        _img.AbsoluteUri,   // fallback URL si affichable
+                                        Blank()
+                                    )
+                                )
+                              X: =210
+                              Y: =2
+                        - InfoButtonCanvas2_13:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              AccessibleLabel: =
+                              BasePaletteColor: =RGBA(5, 102, 178, 1)
+                              Content: ="L'envoi de la maquette est impossible lorsque celle-ci n'a pas été réservée au préalable, qu'elle est en cours de fabrication ou qu'une demande d'envoi est en attente. Veuillez vérifier son état actuel et apporter les modifications nécessaires pour procéder à l'envoi."
+                              FontColor: =RGBA(215, 58, 60, 1)
+                              FontSize: =16
+                              Height: =35
+                              Visible: |-
+                                =true
+                                //If((Gallery8.Selected.Statut.Value = "Disponible" Or Gallery8.Selected.Statut.Value = "En cours de fabrication") And Gallery8.Selected.'En transit'.Value = "NON" ; true ; false)
+                              Width: =46
+                              X: =1293
+                              Y: =5
+                  - TextCanvas15_1:
+                      Control: Text@0.0.51
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Height: =27
+                        Text: ="Référent(s) maquettes :"
+                        Width: =193
+                        X: =806
+                        Y: =7
+                  - TextCanvas19_1:
+                      Control: Text@0.0.51
+                      Properties:
+                        Height: =61
+                        Text: =Concat(ThisItem.'Référent(s) maquette' , DisplayName & ", ")
+                        VerticalAlign: =VerticalAlign.Top
+                        Weight: ='TextCanvas.Weight'.Medium
+                        Width: =162
+                        X: =806
+                        Y: =34
+      - Container20_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =618
+            Visible: =varPopUpfiltre
+            Width: =825
+            X: =26
+            Y: =130
+          Children:
+            - Filtres_3:
+                Control: FluidGrid@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =606
+                  Visible: =varPopUpfiltre
+                  Width: =805
+                  X: =10
+                  Y: =5
+                Children:
+                  - DataCard5_4:
+                      Control: DataCard@1.0.2
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =2
+                        Height: =273
+                        Width: =802
+                        X: =0
+                        Y: =0
+                      Children:
+                        - Label1_88:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="Lieu de stockage"
+                              Width: =154
+                              X: =51
+                              Y: =40
+                        - Icon6_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =42
+                              Icon: =Icon.Location
+                              Width: =32
+                              X: =14
+                              Y: =39
+                        - Label1_89:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="Entreprise"
+                              Width: =140
+                              X: =51
+                              Y: =101
+                        - ComboBox1_16:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: |-
+                                =Choices([@'Gestion des maquettes'].'Localisation : Entreprise')
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =225
+                              Y: =100
+                        - Label3_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Statut/Localisation : "
+                              Underline: =true
+                              Width: =295
+                        - ComboBox1_7:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].Localisation)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =225
+                              Y: =41
+                        - Icon5_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =39
+                              Icon: =Icon.OfficeBuilding
+                              Width: =39
+                              X: =12
+                              Y: =101
+                        - Icon10_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =41
+                              Icon: =Icon.Erase
+                              OnSelect: |+
+                                =Reset( ComboBox1_7);
+                                Reset( ComboBox1_16);
+                                Reset( ComboBox1_19);
+                                Reset( ComboBox1_18);
+                                Reset( ComboBox1_17);
+                                Reset( TextInput4_36);
+                                Reset( TextInput4_35);
+                                Reset( TextInput4_38);
+                                Reset( TextInput4_37);
+                                Reset( TextInput4_40);
+                                Reset( TextInput4_39);
+                                Reset( TextInput4_42);
+                                Reset( TextInput4_41);
+                                Reset( TextInput4_44);
+                                Reset( TextInput4_43);
+
+                                Reset( TextInput4_46);
+                                Reset( TextInput4_45);
+                                Reset( TextInput4_52);
+                                Reset( TextInput4_51);
+                                Reset( TextInput4_48);
+                                Reset( TextInput4_47);
+                                Reset( TextInput4_50);
+                                Reset( TextInput4_49)
+                              Width: =31
+                              X: =717
+                        - Label1_90:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="En transit"
+                              Width: =154
+                              X: =51
+                              Y: =156
+                        - Label1_91:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="Disponibilité"
+                              Width: =140
+                              X: =51
+                              Y: =217
+                        - ComboBox1_18:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =Choices([@'Gestion des maquettes'].Statut)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =225
+                              Y: =216
+                        - ComboBox1_17:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].'En transit')
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =225
+                              Y: =157
+                        - Icon4_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =42
+                              Icon: =Icon.Cars
+                              Width: =32
+                              X: =15
+                              Y: =156
+                        - Icon11_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =42
+                              Icon: =Icon.Check
+                              Width: =34
+                              X: =12
+                              Y: =217
+                  - DataCard6_1:
+                      Control: DataCard@1.0.2
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Height: =761
+                        Width: =804
+                        X: =0
+                        Y: =1
+                      Children:
+                        - Label1_92:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="Matière"
+                              Width: =174
+                              X: =40
+                              Y: =41
+                        - ComboBox1_19:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =Choices([@'Gestion des maquettes'].Matière)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =214
+                              Y: =40
+                        - Label1_94:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Hauteur : "
+                              Width: =91
+                              X: =40
+                              Y: =181
+                        - Label3_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Paramètres influents : "
+                              Underline: =true
+                              Width: =295
+                              X: =5
+                        - Label1_96:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =183
+                        - TextInput4_36:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie", DisplayMode.Disabled, DisplayMode.Edit)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer hauteur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =183
+                        - Label1_97:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =183
+                        - Label1_95:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =181
+                        - TextInput4_35:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie", DisplayMode.Disabled, DisplayMode.Edit)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer hauteur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =182
+                        - Label1_106:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="DN : "
+                              Width: =105
+                              X: =40
+                              Y: =317
+                        - Label1_107:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =317
+                        - TextInput4_42:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie" Or ComboBox1_20.Selected.Value = "Autres", DisplayMode.Edit, DisplayMode.Disabled)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer diamètre max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =319
+                        - Label1_109:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =317
+                        - Label1_108:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =317
+                        - TextInput4_41:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie" Or ComboBox1_20.Selected.Value = "Autres", DisplayMode.Edit, DisplayMode.Disabled)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer diamètre min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =319
+                        - Label1_98:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Largeur : "
+                              Width: =91
+                              X: =40
+                              Y: =229
+                        - Label1_100:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =231
+                        - TextInput4_38:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie", DisplayMode.Disabled, DisplayMode.Edit)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer largeur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =231
+                        - Label1_101:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =231
+                        - Label1_99:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =229
+                        - TextInput4_37:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie", DisplayMode.Disabled, DisplayMode.Edit)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer largeur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =230
+                        - Label1_102:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Longueur : "
+                              Width: =98
+                              X: =40
+                              Y: =273
+                        - Label1_104:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =275
+                        - TextInput4_40:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer longueur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =275
+                        - Label1_105:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =275
+                        - Label1_103:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =273
+                        - TextInput4_39:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer longueur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =274
+                        - Label3_10:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Dimensions maquette : "
+                              Underline: =true
+                              Width: =295
+                              X: =5
+                              Y: =136
+                        - Label1_115:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Profondeur : "
+                              Width: =126
+                              X: =12
+                              Y: =555
+                        - Label1_117:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =557
+                        - TextInput4_46:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer pronfondeur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =557
+                        - Label1_118:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =557
+                        - Label1_116:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =555
+                        - TextInput4_45:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer profondeur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =556
+                        - Label1_127:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Diamètre : "
+                              Width: =105
+                              X: =33
+                              Y: =691
+                        - Label1_128:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =691
+                        - TextInput4_52:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer diamètre max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =693
+                        - Label1_130:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =691
+                        - Label1_129:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =691
+                        - TextInput4_51:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer diamètre min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =693
+                        - Label1_119:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Largeur : "
+                              Width: =91
+                              X: =40
+                              Y: =603
+                        - Label1_121:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =605
+                        - TextInput4_48:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer largeur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =605
+                        - Label1_122:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =605
+                        - Label1_120:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =603
+                        - TextInput4_47:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer largeur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =604
+                        - Label1_123:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Longueur : "
+                              Width: =98
+                              X: =33
+                              Y: =647
+                        - Label1_125:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =649
+                        - TextInput4_50:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer longueur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =649
+                        - Label1_126:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =649
+                        - Label1_124:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =647
+                        - TextInput4_49:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer longueur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =648
+                        - Label3_12:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Dimensions du défaut : "
+                              Underline: =true
+                              Width: =295
+                              X: =5
+                              Y: =517
+                        - Label1_110:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Epaisseur paroi: "
+                              Width: =105
+                              X: =33
+                              Y: =367
+                        - Label1_111:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =334
+                              Y: =367
+                        - TextInput4_44:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie" Or ComboBox1_20.Selected.Value = "Autres", DisplayMode.Edit, DisplayMode.Disabled)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer épaisseur max"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =456
+                              Y: =369
+                        - Label1_113:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="mm"
+                              Width: =51
+                              X: =640
+                              Y: =367
+                        - Label1_112:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="et"
+                              Width: =51
+                              X: =405
+                              Y: =367
+                        - TextInput4_43:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Default: =""
+                              DisplayMode: =If(ComboBox1_20.Selected.Value = "Tuyauterie" Or ComboBox1_20.Selected.Value = "Autres", DisplayMode.Edit, DisplayMode.Disabled)
+                              Font: =Font.'Open Sans'
+                              Format: =TextFormat.Number
+                              HintText: ="Entrer épaisseur min"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Width: =184
+                              X: =150
+                              Y: =369
+                        - Label1_93:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =43
+                              Text: ="Forme de la maquette :"
+                              Width: =202
+                              X: =12
+                              Y: =93
+                        - ComboBox1_20:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].'Forme de la maquette')
+                              OnChange: |-
+                                =Reset(TextInput4_35);
+                                Reset(TextInput4_36);
+                                Reset(TextInput4_37);
+                                Reset(TextInput4_38);
+                                Reset(TextInput4_42);
+                                Reset(TextInput4_41);
+                                Reset(TextInput4_44);
+                                Reset(TextInput4_43)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              X: =214
+                              Y: =93
+                        - Label3_11:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Caractérisitque du défaut : "
+                              Underline: =true
+                              Width: =295
+                              X: =5
+                              Y: =426
+                        - Label1_114:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =43
+                              Text: |-
+                                ="Type de défaut : "
+                              Width: =202
+                              X: =12
+                              Y: =474
+                        - ComboBox1_21:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              Height: =43
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: =Choices([@'Gestion des maquettes'].'Type de défaut')
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =460
+                              X: =214
+                              Y: =474
+                  - DataCard7_1:
+                      Control: DataCard@1.0.2
+                      Variant: BlankCard
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Height: =245
+                        Width: =804
+                        X: =0
+                        Y: =2
+                      Children:
+                        - Label1_131:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Composant : "
+                              Width: =209
+                              X: =24
+                              Y: =60
+                        - Label3_13:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Text: |-
+                                ="Autres caractéristiques : "
+                              Underline: =true
+                              Width: =295
+                              X: =2
+                              Y: =5
+                        - ComboBox1_22:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].Composant)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =518
+                              X: =160
+                              Y: =62
+                        - Label1_132:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: ="Pièce :"
+                              Width: =209
+                              X: =24
+                              Y: =117
+                        - ComboBox1_23:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Distinct('Gestion des maquettes',Pièces)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =518
+                              X: =160
+                              Y: =119
+                        - Label1_133:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =42
+                              Text: |-
+                                ="Catégorie : "
+                              Width: =209
+                              X: =24
+                              Y: =172
+                        - ComboBox1_24:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              ChevronBackground: =RGBA(56, 96, 178, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DispName","City"]
+                              Font: =Font.'Open Sans'
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =Choices([@'Gestion des maquettes'].Catégorie)
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Width: =518
+                              X: =160
+                              Y: =174
+      - TextInput1_4:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Clear: =true
+            Default: =
+            Font: =Font.'Open Sans'
+            Height: =35
+            HintText: ="Référence exacte de la maquette"
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            PaddingRight: =4.5
+            PaddingTop: =4.5
+            Size: =11.7
+            Width: =850
+            X: =26
+            Y: =95
+      - Bas_9:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 0, 0, 1)
+            Height: =39
+            Icon: =Icon.ChevronDown
+            OnSelect: |-
+              =If (varPopUpfiltre = true, 
+              UpdateContext({varPopUpfiltre : false}) & Set(Varrot, 0),
+              UpdateContext({varPopUpfiltre : true}) & Set(Varrot, 180) )
+            Rotation: =Varrot
+            Width: =27
+            X: =812
+            Y: =95
+      - Container15_2:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =333
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Visible: =PanierVisible
+            Width: =789
+            X: =530
+            Y: =80
+          Children:
+            - Button2_8:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(255, 0, 0, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =Clear(PanierTransfertMaquette);
+                    Set(PanierVisible,false)
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Text: ="Vider"
+                  Visible: =If(CountRows(PanierTransfertMaquette) = 0 , false , true)
+                  Width: =92
+                  X: =13
+                  Y: =280
+            - Gallery9_2:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =280
+                  Items: =PanierTransfertMaquette
+                  TemplateSize: =64
+                  Visible: =If(CountRows(PanierTransfertMaquette) = 0 , false , true)
+                  Width: =779
+                Children:
+                  - Title5_14:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =25
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Référence
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =221
+                        X: =14
+                        Y: =6
+                  - Separator7_2:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =8
+                        OnSelect: =Select(Parent)
+                        Width: =Parent.TemplateWidth
+                        Y: =Parent.TemplateHeight - Self.Height
+                  - Title5_16:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =23
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.'Type de maquette'.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =221
+                        X: =14
+                        Y: =31
+                  - Icon30_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =39
+                        Icon: =Icon.Cancel
+                        OnSelect: =Remove(PanierTransfertMaquette,ThisItem)
+                        Width: =48
+                        X: =715
+                        Y: =15
+                  - Title5_15:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =58
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: |-
+                          ="Localisation : 
+                          "& ThisItem.'Localisation : Entreprise'.Value & " / " & ThisItem.Localisation.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =372
+                        X: =262
+                        Y: =6
+            - Icon31_2:
+                Control: Classic/Icon@2.5.0
+                Group: Group5_2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =190
+                  Icon: =Icon.ShoppingCart
+                  Visible: =If(CountRows(PanierTransfertMaquette) = 0 , true , false)
+                  Width: =310
+                  X: =121
+                  Y: =35
+            - Icon32_2:
+                Control: Classic/Icon@2.5.0
+                Group: Group5_2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =192
+                  Icon: =Icon.Cancel
+                  Visible: =If(CountRows(PanierTransfertMaquette) = 0 , true , false)
+                  Width: =278
+                  X: =153
+                  Y: =18
+            - Label21_2:
+                Control: Label@2.5.1
+                Group: Group5_2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Size: =19
+                  Text: ="Panier vide"
+                  Visible: =If(CountRows(PanierTransfertMaquette) = 0 , true , false)
+                  Width: =200
+                  X: =192
+                  Y: =225

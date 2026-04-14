@@ -1,0 +1,2275 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen14_5:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Gallery10:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =483
+            Items: =Filter('Gestion matériel END',First(PanierTransfert).Titre = Titre)
+            Visible: =false
+            Width: =1286
+            X: =40
+            Y: =132
+          Children:
+            - NextArrow2:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  AccessibleLabel: =Self.Tooltip
+                  BorderColor: =RGBA(0, 0, 0, 1)
+                  Color: =RGBA(166, 166, 166, 1)
+                  DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                  DisabledColor: =RGBA(119, 119, 119, 1)
+                  Height: =50
+                  Icon: =Icon.ChevronRight
+                  OnSelect: =Select(Parent)
+                  PaddingBottom: =16
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =16
+                  Tooltip: ="Afficher les détails de l'élément"
+                  Width: =50
+                  X: =Parent.TemplateWidth - Self.Width - 12
+                  Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            - Separator8:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =8
+                  OnSelect: =Select(Parent)
+                  Width: =Parent.TemplateWidth
+                  Y: =Parent.TemplateHeight - Self.Height
+            - Rectangle19:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Height: =Parent.TemplateHeight - Separator8.Height
+                  OnSelect: =Select(Parent)
+                  Visible: =ThisItem.IsSelected
+                  Width: =4
+            - Label20:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =37
+                  OnSelect: =Select(Parent)
+                  Text: =ThisItem.Titre
+                  Width: =360
+                  X: =40
+                  Y: =40
+      - Container6_5:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(241, 244, 249, 0.45)
+            Height: =768
+            Width: =1366
+          Children:
+            - Container5_20:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =69
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =1310
+                  X: =26
+                  Y: =11
+                Children:
+                  - Rectangle14_5:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =69
+                        Width: =128
+                  - RectQuickActionBar2_7:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =69
+                        Width: =1182
+                        X: =128
+                  - Image8_18:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =69
+                        Image: ='edf logo'
+                        OnSelect: |+
+                          =Navigate('Home Page')
+                        Width: =103
+                        X: =12
+                  - Label19_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =46
+                        Size: =25
+                        Text: ="Gestion du matériel END"
+                        Width: =658
+                        X: =510
+                        Y: =11
+                  - Icon28_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =53
+                        Icon: =Icon.ShoppingCart
+                        OnSelect: =If(PanierVisible = true , Set(PanierVisible,false), Set(PanierVisible,true))
+                        Width: =48
+                        X: =1228
+                        Y: =11
+                  - BadgeCanvas1_1:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =CountRows(PanierTransfert)
+                        X: =1255
+            - TabList3_5:
+                Control: TabList@2.2.31
+                Properties:
+                  Alignment: ='TabList.Alignment'.Horizontal
+                  Height: =63
+                  Items: =["Envoi multiple matériel"]
+                  Size: ='TabList.Size'.Medium
+                  Width: =409
+                  X: =26
+                  Y: =79
+                Children:
+                  - Titre3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Titre"
+                        FieldName: ="Title"
+                        FieldType: ="s"
+                        Order: =8
+                  - Validité (an)3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Validité (an)"
+                        FieldName: ="Validit_x00e9__x0028_an_x0029_"
+                        FieldType: ="n"
+                        Order: =9
+                  - Responsable 3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Responsable "
+                        FieldName: ="Responsabledelamaquette"
+                        FieldType: ="E"
+                        Order: =10
+                  - Complétude3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Complétude"
+                        FieldName: ="Compl_x00e9_tude"
+                        FieldType: ="E"
+                        Order: =11
+                  - Etat du matériel3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Etat du matériel"
+                        FieldName: ="Etatdumat_x00e9_riel"
+                        FieldType: ="E"
+                        Order: =12
+                  - Commentaire état matériel3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Commentaire état matériel"
+                        FieldName: ="Commentaire_x00e9_tatmat_x00e9_r"
+                        FieldType: ="s"
+                        Order: =13
+                  - Commentaires complétude3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Commentaires complétude"
+                        FieldName: ="Commentairescompl_x00e9_tude"
+                        FieldType: ="s"
+                        Order: =13
+                  - N° de FIEC3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="N° de FIEC"
+                        FieldName: ="N_x00b0_deFIEC"
+                        FieldType: ="s"
+                        Order: =14
+                  - Fournisseur du matériel3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Fournisseur du matériel"
+                        FieldName: ="Fournisseurdumat_x00e9_riel"
+                        FieldType: ="E"
+                        Order: =15
+                  - Photo Envoie3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Photo Envoie"
+                        FieldName: ="PhotoEnvoie"
+                        FieldType: ="I"
+                        Order: =16
+                  - Photo Réception3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Photo Réception"
+                        FieldName: ="PhotoR_x00e9_ception"
+                        FieldType: ="I"
+                        Order: =17
+                  - Pièces jointes3_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Pièces jointes"
+                        FieldName: ="{Attachments}"
+                        FieldType: ="r*"
+                        Order: =18
+                  - Value1_5:
+                      Control: TabListDataField@1.5.0
+                      Variant: textualColumn
+                      IsLocked: true
+                      Properties:
+                        FieldDisplayName: ="Value"
+                        FieldName: ="Value"
+                        FieldType: ="s"
+                        Order: =2
+            - Container5_21:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =383
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Width: =1310
+                  X: =26
+                  Y: =274
+                Children:
+                  - Form3_5:
+                      Control: Form@2.4.4
+                      Variant: Classic
+                      Layout: Vertical
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataSource: ='Gestion matériel END'
+                        Height: =352
+                        Item: =First(Gallery10.AllItems)
+                        Width: =1259
+                        X: =28
+                        Y: =11
+                      Children:
+                        - DataCard1:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =47
+                              Width: =1257
+                              X: =0
+                              Y: =0
+                            Children:
+                              - Container13_47:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =38
+                                    Width: =1189
+                                    X: =30
+                                    Y: =5
+                                  Children:
+                                    - Label23_83:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =31
+                                          Text: |-
+                                            ="Localisation du matériel avant envoi : "
+                                          Width: =446
+                                          X: =15
+                                          Y: =5
+                        - Groupe_DataCard2:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Groupe"
+                              Default: =ThisItem.Groupe
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Groupe)
+                              Required: =false
+                              Update: =Dropdown2.Selected
+                              Width: =419
+                              X: =0
+                              Y: =1
+                            Children:
+                              - DataCardKey100:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue88:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].Groupe)
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey100.Y + DataCardKey100.Height + 5
+                              - ErrorMessage99:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue88.Y + DataCardValue88.Height
+                              - StarVisible100:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey100.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey100.Y
+                        - Site_DataCard2:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Site"
+                              Default: =ThisItem.Site
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Site)
+                              Required: =false
+                              Update: =Dropdown2_1.Selected
+                              Width: =419
+                              X: =1
+                              Y: =1
+                            Children:
+                              - DataCardKey98:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue87:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =DisplayMode.Disabled
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].Site)
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey98.Y + DataCardKey98.Height + 5
+                              - ErrorMessage97:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue87.Y + DataCardValue87.Height
+                              - StarVisible98:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey98.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey98.Y
+                        - DataCard30_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =70
+                              Width: =1257
+                              X: =0
+                              Y: =2
+                            Children:
+                              - Container13_39:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =38
+                                    Width: =1189
+                                    X: =36
+                                    Y: =18
+                                  Children:
+                                    - Label23_69:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =31
+                                          Text: |-
+                                            ="Complétude et état du matériel avant envoi : "
+                                          Width: =446
+                                          X: =15
+                                          Y: =5
+                        - Complétude_DataCard1_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Compl_x00e9_tude"
+                              Default: =ThisItem.Complétude
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Complétude)
+                              Height: =80
+                              Required: =true
+                              Update: =DataCardValue21_5.Selected
+                              Width: =419
+                              X: =0
+                              Y: =3
+                            Children:
+                              - DataCardKey22_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue21_5:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].Complétude)
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey22_5.Y + DataCardKey22_5.Height + 5
+                              - ErrorMessage22_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue21_5.Y + DataCardValue21_5.Height
+                              - StarVisible22_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey22_5.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey22_5.Y
+                        - Commentaires complétude_DataCard1_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicTextualEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Commentairescompl_x00e9_tude"
+                              Default: =ThisItem.'Commentaires complétude'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Commentaires complétude')
+                              Height: =158
+                              MaxLength: =DataSourceInfo([@'Gestion matériel END'], DataSourceInfo.MaxLength, 'Commentaires complétude')
+                              Required: =false
+                              Update: =DataCardValue24_5.Text
+                              Width: =838
+                              X: =1
+                              Y: =3
+                            Children:
+                              - DataCardKey25_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue24_5:
+                                  Control: Classic/TextInput@2.3.2
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    Default: =Parent.Default
+                                    DelayOutput: =true
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    Height: =75
+                                    HoverBorderColor: =RGBA(0, 18, 107, 1)
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    MaxLength: =Parent.MaxLength
+                                    Mode: =TextMode.MultiLine
+                                    PaddingLeft: =5
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey25_5.Y + DataCardKey25_5.Height + 5
+                              - ErrorMessage25_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue24_5.Y + DataCardValue24_5.Height
+                              - StarVisible25_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey25_5.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey25_5.Y
+                        - Etat du matériel_DataCard1_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Etatdumat_x00e9_riel"
+                              Default: =ThisItem.'Etat du matériel'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Etat du matériel')
+                              Required: =true
+                              Update: =DataCardValue22_5.Selected
+                              Width: =419
+                              X: =0
+                              Y: =4
+                            Children:
+                              - DataCardKey23_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue22_5:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].'Etat du matériel')
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey23_5.Y + DataCardKey23_5.Height + 5
+                              - ErrorMessage23_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue22_5.Y + DataCardValue22_5.Height
+                              - StarVisible23_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey23_5.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey23_5.Y
+                        - Commentaire état matériel_DataCard1_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicTextualEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Commentaire_x00e9_tatmat_x00e9_r"
+                              Default: =ThisItem.'Commentaire état matériel'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Commentaire état matériel')
+                              MaxLength: =DataSourceInfo([@'Gestion matériel END'], DataSourceInfo.MaxLength, 'Commentaire état matériel')
+                              Required: =false
+                              Update: =DataCardValue23_5.Text
+                              Width: =838
+                              X: =1
+                              Y: =4
+                            Children:
+                              - DataCardKey24_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue23_5:
+                                  Control: Classic/TextInput@2.3.2
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    Default: =Parent.Default
+                                    DelayOutput: =true
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    Height: =90
+                                    HoverBorderColor: =RGBA(0, 18, 107, 1)
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    MaxLength: =Parent.MaxLength
+                                    Mode: =TextMode.MultiLine
+                                    PaddingLeft: =5
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey24_5.Y + DataCardKey24_5.Height + 5
+                              - ErrorMessage24_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue23_5.Y + DataCardValue23_5.Height
+                              - StarVisible24_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey24_5.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey24_5.Y
+                        - En transit _DataCard3_1:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Entransit"
+                              Default: =ThisItem.'En transit '
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'En transit ')
+                              Required: =false
+                              Update: ={Value:Text(Label29_1.Text)}
+                              Visible: =false
+                              Width: =419
+                              X: =0
+                              Y: =5
+                            Children:
+                              - DataCardKey73_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - ErrorMessage72_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =Label29_1.Y + Label29_1.Height
+                              - StarVisible73_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey73_1.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey73_1.Y
+                              - Label29_1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Text: ="Oui"
+                                    X: =40
+                                    Y: =40
+                        - Photo Envoie_DataCard2:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicLargePicture
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="PhotoEnvoie"
+                              Default: =ThisItem.'Photo Envoie'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Photo Envoie')
+                              Required: =false
+                              Update: =Image23.Image
+                              Width: =838
+                              X: =1
+                              Y: =5
+                            Children:
+                              - DataCardKey99:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: ="Photo envoi"
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - Image23:
+                                  Control: Image@2.2.3
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    DisplayMode: =Parent.DisplayMode
+                                    Height: =AddPicture8.Height
+                                    Image: =If(IsBlank(AddPicture8.Media), Parent.Default, AddPicture8.Media)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =AddPicture8.Width
+                                    X: =AddPicture8.X
+                                    Y: =AddPicture8.Y
+                              - AddPicture8:
+                                  Control: AddMedia@2.2.1
+                                  MetadataKey: AddPicture
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Height: =200
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey99.Y + DataCardKey99.Height + 5
+                              - ErrorMessage98:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =Image23.Y + Image23.Height
+                              - StarVisible99:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey99.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey99.Y
+                        - Historique_DataCard6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicTextualEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Historique"
+                              Default: =ThisItem.Historique
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Historique)
+                              MaxLength: =DataSourceInfo([@'Gestion matériel END'], DataSourceInfo.MaxLength, Historique)
+                              Required: =false
+                              Update: =DataCardValue97.Text
+                              Visible: =false
+                              Width: =419
+                              X: =2
+                              Y: =5
+                            Children:
+                              - DataCardKey109:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue97:
+                                  Control: Classic/TextInput@2.3.2
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    Default: |-
+                                      =" - Le " & Today() & " : Le matériel a été transféré à "& Dropdown2_1.Selected.Value & " par " & User().FullName & ". Etat avant envoi : " & DataCardValue22_5.Selected.Value & ". Complétude : " & DataCardValue21_5.Selected.Value &".
+                                      " & Char(10) & PlainText(Parent.Default)
+                                    DelayOutput: =true
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    Height: =197
+                                    HoverBorderColor: =RGBA(0, 18, 107, 1)
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    MaxLength: =Parent.MaxLength
+                                    Mode: =TextMode.MultiLine
+                                    PaddingLeft: =5
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey109.Y + DataCardKey109.Height + 5
+                              - ErrorMessage108:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue97.Y + DataCardValue97.Height
+                              - StarVisible109:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey109.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey109.Y
+            - Button1_5:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =
+                    If(Form3_5.Valid ,SubmitForm(Form3_5); Remove(PanierTransfert, First(PanierTransfert)); If(IsEmpty(PanierTransfert),Navigate(Screen14) , EditForm(Form3_5)) , SubmitForm(Form3_5))
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Text: ="Valider"
+                  X: =1144
+                  Y: =91
+            - Container5_22:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.32)
+                  Height: =477
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Visible: =If (TabList3_5.Selected.Value = "Réception du matériel" , true,false)
+                  Width: =1310
+                  X: =26
+                  Y: =170
+                Children:
+                  - Form3_6:
+                      Control: Form@2.4.4
+                      Variant: Classic
+                      Layout: Vertical
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DataSource: ='Gestion matériel END'
+                        Height: =436
+                        Item: =Gallery5.Selected
+                        Width: =1259
+                        X: =28
+                        Y: =24
+                      Children:
+                        - DataCard20_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =120
+                              Width: =1257
+                              X: =0
+                              Y: =0
+                            Children:
+                              - Container13_40:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =37
+                                    Width: =1207
+                                    X: =21
+                                    Y: =15
+                                  Children:
+                                    - Label23_70:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =30
+                                          Text: |-
+                                            ="Localisation actuelle : "
+                                          Width: =266
+                                          X: =15
+                                          Y: =5
+                              - Container13_41:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(215, 223, 240, 0.1)
+                                    Height: =38
+                                    Width: =829
+                                    X: =40
+                                    Y: =76
+                                  Children:
+                                    - Label23_71:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =33
+                                          Text: |-
+                                            = "Entreprise : " & ThisItem.Entreprise.Value &"     Groupe : " & ThisItem.Groupe.Value & "      Site :  " & ThisItem.Site.Value
+                                          Width: =810
+                                          X: =15
+                                          Y: =5
+                        - DataCard22_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =76
+                              Width: =1257
+                              X: =0
+                              Y: =1
+                            Children:
+                              - Container13_42:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =36
+                                    Width: =1204
+                                    X: =24
+                                    Y: =24
+                                  Children:
+                                    - Label23_72:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =30
+                                          Text: |-
+                                            ="Informations retour : "
+                                          Width: =266
+                                          X: =15
+                                          Y: =5
+                        - DataCard32_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =60
+                              Width: =1257
+                              X: =0
+                              Y: =2
+                            Children:
+                              - Container13_43:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(215, 223, 240, 0.1)
+                                    Height: =38
+                                    Width: =656
+                                    X: =36
+                                    Y: =12
+                                  Children:
+                                    - Label23_73:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =32
+                                          Text: "= \"Responsable EDF actuel : \" & ThisItem.'Responsable '.DisplayName "
+                                          Width: =635
+                                          X: =15
+                                          Y: =5
+                        - Entreprise_DataCard1_5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Entreprise"
+                              Default: =ThisItem.Entreprise
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Entreprise)
+                              Height: =107
+                              Required: =true
+                              Update: ={Value:Text(Label23_74.Text)}
+                              Width: =1257
+                              X: =0
+                              Y: =3
+                            Children:
+                              - DataCardKey17_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: ="Entreprise :"
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - ErrorMessage17_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =Label23_74.Y + Label23_74.Height
+                              - StarVisible17_5:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey17_5.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey17_5.Y
+                              - Container13_44:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(215, 223, 240, 0.1)
+                                    Height: =38
+                                    Width: =156
+                                    X: =30
+                                    Y: =44
+                                  Children:
+                                    - Label23_74:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =27
+                                          Text: = "EDF"
+                                          Width: =124
+                                          X: =15
+                                          Y: =5
+                        - DataCard30_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: BlankCard
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =70
+                              Width: =1257
+                              X: =0
+                              Y: =4
+                            Children:
+                              - Container13_45:
+                                  Control: GroupContainer@1.4.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =38
+                                    Width: =1189
+                                    X: =36
+                                    Y: =18
+                                  Children:
+                                    - Label23_75:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 18, 107, 1)
+                                          DisabledColor: =RGBA(0, 0, 0, 1)
+                                          DisplayMode: =DisplayMode.Disabled
+                                          Font: =Font.'Open Sans'
+                                          Height: =31
+                                          Text: |-
+                                            ="Complétude et état du matériel au retour : "
+                                          Width: =446
+                                          X: =15
+                                          Y: =5
+                        - Complétude_DataCard1_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Compl_x00e9_tude"
+                              Default: =ThisItem.Complétude
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,Complétude)
+                              Required: =true
+                              Update: =DataCardValue21_6.Selected
+                              Width: =419
+                              X: =0
+                              Y: =5
+                            Children:
+                              - DataCardKey22_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue21_6:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].Complétude)
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey22_6.Y + DataCardKey22_6.Height + 5
+                              - ErrorMessage22_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue21_6.Y + DataCardValue21_6.Height
+                              - StarVisible22_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey22_6.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey22_6.Y
+                        - Commentaires complétude_DataCard1_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicTextualEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Commentairescompl_x00e9_tude"
+                              Default: =ThisItem.'Commentaires complétude'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Commentaires complétude')
+                              Height: =158
+                              MaxLength: =DataSourceInfo([@'Gestion matériel END'], DataSourceInfo.MaxLength, 'Commentaires complétude')
+                              Required: =false
+                              Update: =DataCardValue24_6.Text
+                              Width: =1257
+                              X: =0
+                              Y: =6
+                            Children:
+                              - DataCardKey25_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue24_6:
+                                  Control: Classic/TextInput@2.3.2
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    Default: =Parent.Default
+                                    DelayOutput: =true
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    Height: =75
+                                    HoverBorderColor: =RGBA(0, 18, 107, 1)
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    MaxLength: =Parent.MaxLength
+                                    Mode: =TextMode.MultiLine
+                                    PaddingLeft: =5
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey25_6.Y + DataCardKey25_6.Height + 5
+                              - ErrorMessage25_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue24_6.Y + DataCardValue24_6.Height
+                              - StarVisible25_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey25_6.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey25_6.Y
+                        - Etat du matériel_DataCard1_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Etatdumat_x00e9_riel"
+                              Default: =ThisItem.'Etat du matériel'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Etat du matériel')
+                              Required: =true
+                              Update: =DataCardValue22_6.Selected
+                              Width: =419
+                              X: =0
+                              Y: =7
+                            Children:
+                              - DataCardKey23_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue22_6:
+                                  Control: Classic/ComboBox@2.4.0
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    ChevronBackground: =RGBA(56, 96, 178, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                                    ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                                    DefaultSelectedItems: =Parent.Default
+                                    DisplayFields: =["Value"]
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    Items: =Choices([@'Gestion matériel END'].'Etat du matériel')
+                                    PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                                    PressedColor: =RGBA(255, 255, 255, 1)
+                                    PressedFill: =RGBA(0, 18, 107, 1)
+                                    SearchFields: =["Value"]
+                                    SelectMultiple: =false
+                                    SelectionColor: =RGBA(255, 255, 255, 1)
+                                    SelectionFill: =RGBA(56, 96, 178, 1)
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey23_6.Y + DataCardKey23_6.Height + 5
+                              - ErrorMessage23_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue22_6.Y + DataCardValue22_6.Height
+                              - StarVisible23_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey23_6.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey23_6.Y
+                        - Commentaire état matériel_DataCard1_6:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicTextualEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Commentaire_x00e9_tatmat_x00e9_r"
+                              Default: =ThisItem.'Commentaire état matériel'
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'Commentaire état matériel')
+                              MaxLength: =DataSourceInfo([@'Gestion matériel END'], DataSourceInfo.MaxLength, 'Commentaire état matériel')
+                              Required: =false
+                              Update: =DataCardValue23_6.Text
+                              Width: =1257
+                              X: =0
+                              Y: =8
+                            Children:
+                              - DataCardKey24_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - DataCardValue23_6:
+                                  Control: Classic/TextInput@2.3.2
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                                    Default: =Parent.Default
+                                    DelayOutput: =true
+                                    DisplayMode: =Parent.DisplayMode
+                                    Font: =Font.'Open Sans'
+                                    Height: =90
+                                    HoverBorderColor: =RGBA(0, 18, 107, 1)
+                                    HoverFill: =RGBA(186, 202, 226, 1)
+                                    MaxLength: =Parent.MaxLength
+                                    Mode: =TextMode.MultiLine
+                                    PaddingLeft: =5
+                                    RadiusBottomLeft: =0
+                                    RadiusBottomRight: =0
+                                    RadiusTopLeft: =0
+                                    RadiusTopRight: =0
+                                    Tooltip: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardKey24_6.Y + DataCardKey24_6.Height + 5
+                              - ErrorMessage24_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =DataCardValue23_6.Y + DataCardValue23_6.Height
+                              - StarVisible24_6:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey24_6.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey24_6.Y
+                        - En transit _DataCard4_1:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ClassicComboBoxEdit
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DataField: ="Entransit"
+                              Default: =ThisItem.'En transit '
+                              DisplayName: =DataSourceInfo([@'Gestion matériel END'],DataSourceInfo.DisplayName,'En transit ')
+                              Required: =true
+                              Update: |-
+                                ={Value : Text(Label30_1.Text)}
+                              Visible: =false
+                              Width: =419
+                              X: =1
+                              Y: =8
+                            Children:
+                              - DataCardKey74_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =34
+                                    Text: =Parent.DisplayName
+                                    Width: =Parent.Width - 60
+                                    Wrap: =false
+                                    X: =30
+                                    Y: =10
+                              - ErrorMessage73_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    AutoHeight: =true
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(168, 0, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =10
+                                    Live: =Live.Assertive
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =14
+                                    Text: =Parent.Error
+                                    Visible: =Parent.DisplayMode=DisplayMode.Edit
+                                    Width: =Parent.Width - 60
+                                    X: =30
+                                    Y: =Label30_1.Y + Label30_1.Height
+                              - StarVisible74_1:
+                                  Control: Label@2.5.1
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: =Align.Center
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =DataCardKey74_1.Height
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Wrap: =false
+                                    Y: =DataCardKey74_1.Y
+                              - Label30_1:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Text: ="Non"
+                                    X: =40
+                                    Y: =40
+            - Button1_6:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =SubmitForm(Form3_6);
+                    If(Form3_6.Valid , Navigate(Screen14))
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  Text: ="Valider"
+                  Visible: =If (TabList3_5.Selected.Value = "Réception du matériel" , true,false)
+                  X: =1157
+                  Y: =104
+            - Container5_23:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Height: =83
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Width: =1310
+                  X: =26
+                  Y: =674
+                Children:
+                  - Container7_30:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =51
+                        Y: =8
+                      Children:
+                        - Icon19_35:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =Icon.DetailList
+                              OnSelect: =Navigate(Screen14)
+                              Width: =48
+                              X: =42
+                        - Label23_76:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Tableau matériel"
+                              Width: =136
+                              Y: =45
+                  - Container7_31:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =257
+                        Y: =8
+                      Children:
+                        - Icon19_36:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(9, 33, 98, 0.46)
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =45
+                              Icon: = Icon.Send
+                              OnSelect: |-
+                                =Set(Variabledéplacementmatériel, If (Gallery5.Selected.'En transit '.Value = "Oui" , "Réception du matériel", "Envoie du matériel"));
+                                If (Gallery5.Selected.'En transit '.Value = "Oui" , EditForm(Form3_6), EditForm(Form3_5));
+                                Navigate(Screen14_5)
+                              Rotation: =If (Gallery5.Selected.'En transit '.Value = "Oui" , 180,0)
+                              Width: =48
+                              X: =46
+                        - Label23_77:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =If (Gallery5.Selected.'En transit '.Value = "Oui" , "Réception","Envoi")
+                              Width: =136
+                              Y: =45
+                  - Container7_32:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =464
+                        Y: =8
+                      Children:
+                        - Icon19_38:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Icon: =
+                              OnSelect: |-
+                                =EditForm(Form3_1);
+                                Clear(SelectionOptionEntreprise);
+                                Set(VariablePrêtmatériel, If (Gallery5.Selected.Entreprise.Value = "EDF" , "Prêt du matériel à un fournisseur", "Retour matériel"));
+                                Navigate(Screen14_3)
+                              Width: =48
+                              X: =46
+                        - Label23_78:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =If (Gallery5.Selected.Entreprise.Value = "EDF" ,"Réservation","Retour réservation")
+                              Width: =136
+                              Y: =45
+                        - Icon19_37:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(9, 33, 98, 0.45)
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =45
+                              Icon: =Icon.Export
+                              OnSelect: |-
+                                =EditForm(Form3_1);
+                                Clear(SelectionOptionEntreprise);
+                                Set(VariablePrêtmatériel, If (Gallery5.Selected.Entreprise.Value = "EDF" , "Prêt du matériel à un fournisseur", "Retour matériel"));
+                                Navigate(Screen14_3)
+                              Rotation: =If (Gallery5.Selected.Entreprise.Value = "EDF" , 0, 180)
+                              Width: =48
+                              X: =44
+                  - Container7_35:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =1140
+                        Y: =8
+                      Children:
+                        - Icon19_41:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(9, 33, 98, 0.45)
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =45
+                              Icon: =Icon.AddLibrary
+                              OnSelect: |-
+                                =NewForm(Form3);
+                                Set(VarModifouajout,"Nouvel élément");
+                                Navigate(Screen14_2)
+                              Width: =48
+                              X: =46
+                        - Label23_81:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Ajout matériel"
+                              Width: =136
+                              Y: =45
+                  - Container7_33:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =690
+                        Y: =8
+                      Children:
+                        - Icon19_39:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(9, 33, 98, 0.45)
+                              DisplayMode: =DisplayMode.Disabled
+                              Height: =45
+                              Icon: =Icon.Information
+                              OnSelect: =Navigate(Screen14_1)
+                              Width: =48
+                              X: =46
+                        - Label23_79:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Informations "
+                              Width: =136
+                              Y: =45
+                  - Container7_34:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semibold
+                        Height: =65
+                        RadiusBottomLeft: =30
+                        RadiusBottomRight: =30
+                        RadiusTopLeft: =30
+                        RadiusTopRight: =30
+                        Width: =136
+                        X: =917
+                        Y: =8
+                      Children:
+                        - Label23_80:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =If(User().Email = Gallery5.Selected.'Responsable '.Email,RGBA(0, 0, 0, 1),RGBA(215, 223, 240, 100))
+                              DisabledColor: =RGBA(0, 0, 0, 1)
+                              DisplayMode: =DisplayMode.Disabled
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: ="Modification"
+                              Width: =136
+                              Y: =45
+                        - Icon19_40:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              DisabledColor: =RGBA(9, 33, 98, 0.45)
+                              DisplayMode: = DisplayMode.Disabled
+                              Height: =44
+                              Icon: =Icon.Edit
+                              OnSelect: |-
+                                =EditForm(Form3);
+                                Set(VarModifouajout,"Modification" );
+                                Navigate(Screen14_2)
+                              Width: =56
+                              X: =40
+                              Y: =1
+                        - InfoButtonCanvas1_5:
+                            Control: InfoButton@0.0.33
+                            Properties:
+                              Content: ="Modification possible uniquement par la personne responsable du matériel"
+                              Height: =14
+                              Width: =18
+                              X: =118
+                              Y: =16
+            - Container13_33:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(215, 223, 240, 0.1)
+                  Height: =38
+                  Width: =656
+                  X: =353
+                  Y: =93
+                Children:
+                  - Label23_64:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =32
+                        Text: "=First(Gallery10.AllItems).'Type de matériel'.Value & \" \" & First(Gallery10.AllItems).'Fournisseur du matériel'.Value & \" ID : \" & First(Gallery10.AllItems).Titre "
+                        Width: =635
+                        X: =15
+                        Y: =5
+            - Label24:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(9, 33, 98, 1)
+                  Font: =Font.'Open Sans'
+                  Text: ="Groupe"
+                  X: =82
+                  Y: =182
+            - Label24_1:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(9, 33, 98, 1)
+                  Font: =Font.'Open Sans'
+                  Text: ="Site"
+                  X: =496
+                  Y: =182
+            - Dropdown2:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  ChevronBackground: =RGBA(56, 96, 178, 1)
+                  ChevronFill: =RGBA(255, 255, 255, 1)
+                  ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  Items: =Choices([@'Gestion matériel END'].Groupe)
+                  Items.Value: =Value
+                  PressedColor: =RGBA(255, 255, 255, 1)
+                  PressedFill: =RGBA(0, 18, 107, 1)
+                  SelectionColor: =RGBA(255, 255, 255, 1)
+                  SelectionFill: =RGBA(56, 96, 178, 1)
+                  Width: =361
+                  X: =82
+                  Y: =222
+            - Dropdown2_1:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  ChevronBackground: =RGBA(56, 96, 178, 1)
+                  ChevronFill: =RGBA(255, 255, 255, 1)
+                  ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  Items: =Choices([@'Gestion matériel END'].Site)
+                  Items.Value: =Value
+                  PressedColor: =RGBA(255, 255, 255, 1)
+                  PressedFill: =RGBA(0, 18, 107, 1)
+                  SelectionColor: =RGBA(255, 255, 255, 1)
+                  SelectionFill: =RGBA(56, 96, 178, 1)
+                  Width: =361
+                  X: =496
+                  Y: =222
+            - Container13_46:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =38
+                  Width: =1189
+                  X: =82
+                  Y: =142
+                Children:
+                  - Label23_82:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        DisabledColor: =RGBA(0, 0, 0, 1)
+                        DisplayMode: =DisplayMode.Disabled
+                        Font: =Font.'Open Sans'
+                        Height: =31
+                        Text: |-
+                          ="Destination des matériels: "
+                        Width: =446
+                        X: =15
+                        Y: =5

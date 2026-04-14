@@ -1,0 +1,351 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Home Page:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container23:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Height: =577
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =426
+            X: =20
+            Y: =117
+          Children:
+            - Button6_2:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(24, 63, 128, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =577
+                  HoverBorderColor: =Self.Fill
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =Self.Fill
+                  OnSelect: |-
+                    =Refresh('Gestion matériel END');
+                    Navigate(Screen14)
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Fill
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =18
+                  Text: |-
+                    ="
+
+
+
+
+
+                    Materiels END "
+                  Tooltip: ="Matériels END"
+                  Width: =426
+            - Image11_1:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =240
+                  Image: ='Annotation 2023-08-23 145513'
+                  ImagePosition: =ImagePosition.Fill
+                  OnSelect: |-
+                    = Refresh('Gestion matériel END');
+                    Navigate(Screen14)
+                  Width: =260
+                  X: =83
+                  Y: =73
+      - Container23_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Height: =577
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =426
+            X: =472
+            Y: =117
+          Children:
+            - Button6_3:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(3, 45, 116, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =577
+                  HoverBorderColor: =Self.Fill
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =Self.Fill
+                  OnSelect: |+
+                    =Refresh([@'Gestion des maquettes']);
+                    Navigate(Screen8) 
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Fill
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =18
+                  Text: |-
+                    ="
+
+
+
+
+
+                    Maquettes"
+                  Tooltip: ="Maquettes"
+                  Width: =426
+            - Image10_1:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DisplayMode: "=If(LookUp('Agents et rôles OGADE',User().Email = Agent.Email).Magasinier = true , DisplayMode.Disabled , DisplayMode.Edit) "
+                  Height: =230
+                  Image: ='Annotation 2023-08-23 145324'
+                  ImagePosition: =ImagePosition.Fill
+                  OnSelect: |+
+                    =Refresh([@'Gestion des maquettes']);
+                    Navigate(Screen8)
+                  Width: =249
+                  X: =97
+                  Y: =73
+      - Container23_2:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Height: =577
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =426
+            X: =920
+            Y: =117
+          Children:
+            - ButtonCanvas7:
+                Control: Button@0.0.45
+                Properties:
+                  Appearance: ='ButtonCanvas.Appearance'.Primary
+                  BasePaletteColor: =RGBA(125, 168, 201, 1)
+                  FontSize: =245
+                  Height: =577
+                  Icon: ="Circle"
+                  IconStyle: ='ButtonCanvas.IconStyle'.Filled
+                  Layout: ='ButtonCanvas.Layout'.IconOnly
+                  OnSelect: =If(LookUp('Agents et rôles OGADE',User().Email = Agent.Email).Magasinier Or LookUp('Agents et rôles OGADE',User().Email = Agent.Email).'Référent logistique DQI' Or LookUp('Agents et rôles OGADE',User().Email = Agent.Email).'Référent maquette' Or LookUp('Agents et rôles',User().Email = 'Nom de l''agent'.Email).OGADE_Matériels_Admin, Navigate('Menu magasin') , Set(PopUpModuleMagasinseulement, true))
+                  PaddingTop: =60
+                  VerticalAlign: =VerticalAlign.Top
+                  Width: =426
+            - Image34:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =133
+                  Image: =warehouse
+                  Width: =140
+                  X: =143
+                  Y: =120
+            - TextCanvas7:
+                Control: Text@0.0.51
+                Properties:
+                  Align: ='TextCanvas.Align'.Center
+                  Font: =Font.'Open Sans'
+                  FontColor: =RGBA(255, 255, 255, 1)
+                  Height: =54
+                  Size: =22
+                  Text: ="Module logistique"
+                  Weight: ='TextCanvas.Weight'.Semibold
+                  Width: =346
+                  X: =39
+                  Y: =371
+      - Container18_1:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =78
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =1323
+            X: =20
+            Y: =14
+          Children:
+            - RectQuickActionBar2_12:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =78
+                  Width: =1318
+                  X: =6
+            - TextCanvas6:
+                Control: Text@0.0.51
+                Properties:
+                  FontColor: =RGBA(0, 0, 0, 1)
+                  Height: =76
+                  PaddingLeft: =30
+                  Size: =28
+                  Text: ="Bienvenue sur OGADE, l'outil de gestion des actifs END de la DQI"
+                  VerticalAlign: =VerticalAlign.Middle
+                  Width: =866
+                  X: =153
+            - Rectangle6_2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =78
+                  Width: =96
+            - Image8_4:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =78
+                  Image: ='edf logo'
+                  OnSelect: |+
+                    =Navigate('Home Page')
+                  PaddingBottom: =15
+                  PaddingTop: =15
+                  Width: =153
+            - Image29:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =49
+                  Image: ='help (1)'
+                  OnSelect: =Launch("https://edfonline.sharepoint.com/sites/DISC-DSC-DQI-MAQUETTES/Documents%20partages/MOD'OP%20OGADE.pdf?CT=1731684206319&OR=ItemsView")
+                  Tooltip: ="Accès Mode Opératoire"
+                  Width: =77
+                  X: =1228
+                  Y: =13
+      - Container29:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(250, 250, 250, 0.39)
+            Height: =768
+            Visible: =PopUpModuleMagasinseulement
+            Width: =1366
+          Children:
+            - Container30:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =458
+                  RadiusBottomLeft: =15
+                  RadiusBottomRight: =15
+                  RadiusTopLeft: =15
+                  RadiusTopRight: =15
+                  X: =435
+                  Y: =95
+                Children:
+                  - TextCanvas8:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        Font: =Font.'Open Sans'
+                        Height: =102
+                        Size: =25
+                        Text: ="Ce module est réservé aux équipes logistiques"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =418
+                        X: =40
+                        Y: =20
+                  - Image35:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =166
+                        Image: =restrictions
+                        Width: =192
+                        X: =165
+                        Y: =141
+                  - ButtonCanvas8:
+                      Control: Button@0.0.45
+                      Properties:
+                        Appearance: ='ButtonCanvas.Appearance'.Secondary
+                        FontSize: =25
+                        Height: =54
+                        OnSelect: =Set(PopUpModuleMagasinseulement, false)
+                        Text: ="OK"
+                        Width: =246
+                        X: =126
+                        Y: =352
+      - Container23_3:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Height: =46
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =878
+            X: =20
+            Y: =710
+          Children:
+            - ButtonCanvas16:
+                Control: Button@0.0.45
+                Properties:
+                  BasePaletteColor: =RGBA(141, 229, 250, 1)
+                  DisplayMode: =If(First(Filter('Agents et rôles OGADE', User().Email = Agent.Email)).Magasinier,DisplayMode.Disabled , DisplayMode.Edit)
+                  FontSize: =22
+                  Height: =46
+                  Icon: ="Airplane"
+                  OnSelect: |-
+                    =NewForm('FormulaireDemandeD''envoiMatériel_2') ; 
+                    Navigate(Screen_Envoi_Mutualisé)
+                  Text: ="Création d'une demande d'envoi mutualisée (matériel/maquette)"
+                  Width: =878
+      - Container23_4:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.Semibold
+            Height: =46
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Width: =426
+            X: =920
+            Y: =710
+          Children:
+            - ButtonCanvas16_1:
+                Control: Button@0.0.45
+                Properties:
+                  BasePaletteColor: =RGBA(246, 142, 104, 1)
+                  DisplayMode: =DisplayMode.Disabled
+                  FontSize: =22
+                  Height: =46
+                  Icon: ="Cart"
+                  OnSelect: =Navigate(Screen_RéceptionMultiple)
+                  Text: ="Réception multiple"
+                  Width: =426

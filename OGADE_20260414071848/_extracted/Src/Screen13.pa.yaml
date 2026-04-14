@@ -1,0 +1,573 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen13:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - RectQuickActionBar2_1:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(56, 96, 178, 1)
+            Height: =88
+            Width: =1216
+            X: =150
+      - Image8_12:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =88
+            Image: ='edf logo'
+            OnSelect: |+
+              =Navigate('Home Page')
+            Width: =103
+            X: =18
+      - Label19:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            Height: =46
+            Size: =25
+            Text: ="Gestion du matériel END"
+            Width: =658
+            X: =526
+            Y: =21
+      - Icon18:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =48
+            Icon: =Icon.Sync
+            OnSelect: =Refresh('Gestion matériel END')
+            Width: =30
+            X: =1323
+            Y: =88
+      - Container3:
+          Control: GroupContainer@1.4.0
+          Variant: AutoLayout
+          Properties:
+            Height: =616
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutOverflowX: =LayoutOverflow.Scroll
+            LayoutWrap: =true
+            Width: =1366
+            Y: =136
+          Children:
+            - Container4:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Start
+                  Height: =74
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  LayoutMinHeight: =40
+                  LayoutMinWidth: =2400
+                  Width: =700
+                Children:
+                  - Label22:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Text: ="ID Matériel"
+                        X: =18
+                        Y: =5
+                  - Rectangle13:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =70
+                        Width: =2
+                        X: =168
+                  - Label22_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =45
+                        Text: ="Type"
+                        Width: =220
+                        X: =182
+                        Y: =5
+                  - Rectangle13_2:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =71
+                        Width: =2
+                        X: =418
+                  - Rectangle13_5:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =2
+                        Width: =515
+                        X: =420
+                        Y: =34
+                  - Label22_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Groupe"
+                        Width: =170
+                        X: =420
+                        Y: =34
+                  - Rectangle13_6:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =36
+                        Width: =2
+                        X: =592
+                        Y: =34
+                  - Label22_3:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =37
+                        Text: ="Site"
+                        Width: =170
+                        X: =592
+                        Y: =34
+                  - Rectangle13_7:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =36
+                        Width: =2
+                        X: =762
+                        Y: =34
+                  - Label22_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Entreprise"
+                        Width: =170
+                        X: =765
+                        Y: =34
+                  - Rectangle13_8:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =71
+                        Width: =2
+                        X: =933
+                  - Label22_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Localisation"
+                        Width: =513
+                        X: =420
+                  - Rectangle13_9:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =2
+                        Width: =1400
+                        Y: =71
+                  - Rectangle13_12:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =2
+                        Width: =515
+                        X: =935
+                        Y: =34
+                  - Label22_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Date d'étalonnage"
+                        Width: =170
+                        X: =935
+                        Y: =34
+                  - Rectangle13_13:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =36
+                        Width: =2
+                        X: =1107
+                        Y: =34
+                  - Label22_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =37
+                        Text: ="Validité"
+                        Width: =170
+                        X: =1107
+                        Y: =34
+                  - Rectangle13_14:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =36
+                        Width: =2
+                        X: =1277
+                        Y: =34
+                  - Label22_8:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Date échéance"
+                        Width: =170
+                        X: =1280
+                        Y: =34
+                  - Rectangle13_15:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =71
+                        Width: =2
+                        X: =1448
+                  - Label22_9:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Text: ="Etalonnage"
+                        Width: =513
+                        X: =935
+            - Gallery2:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  AlignInContainer: =AlignInContainer.Start
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  FillPortions: =2
+                  Height: =627
+                  Items: ='Gestion matériel END'
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  LayoutMinHeight: =10
+                  LayoutMinWidth: =2400
+                  ShowNavigation: =true
+                  TemplateSize: =75
+                  Width: =2400
+                  X: =3
+                  Y: =132
+                Children:
+                  - Image7:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =72
+                        Image: =ThisItem.'Photo Envoie'
+                        OnSelect: =Select(Parent)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =72
+                        Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                  - Title2:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =58
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =14
+                        Text: =ThisItem.Titre
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =167
+                        X: =1
+                        Y: =15
+                  - Subtitle2:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =60
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.'Type de matériel'.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =246
+                        X: =170
+                        Y: =13
+                  - Separator2:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =8
+                        OnSelect: =Select(Parent)
+                        Width: =Parent.TemplateWidth
+                        Y: =Parent.TemplateHeight - Self.Height
+                  - Rectangle12:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(0, 18, 107, 1)
+                        Height: =Parent.TemplateHeight - Separator2.Height
+                        OnSelect: =Select(Parent)
+                        Visible: =ThisItem.IsSelected
+                        Width: =1
+                  - Rectangle13_1:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =168
+                  - Rectangle13_3:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =417
+                        Y: =2
+                  - Rectangle13_4:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =592
+                  - Rectangle13_10:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =762
+                  - Rectangle13_11:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =934
+                  - Subtitle2_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Groupe.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =175
+                        X: =417
+                        Y: =15
+                  - Subtitle2_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =35
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Site.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =167
+                        X: =595
+                        Y: =18
+                  - Subtitle2_3:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Entreprise.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =170
+                        X: =764
+                        Y: =15
+                  - Rectangle13_16:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =1109
+                  - Rectangle13_17:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =1279
+                  - Rectangle13_18:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =73
+                        Width: =2
+                        X: =1364
+                        Y: =2
+                  - Subtitle2_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.'Date dernier étalonnage'
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =175
+                        X: =934
+                        Y: =15
+                  - Subtitle2_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.Entreprise.Value
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =
+                        X: =1181
+                        Y: =13
+                  - Subtitle2_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =ThisItem.'Date d''échéance'
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =175
+                        X: =1191
+                        Y: =17
+                  - Subtitle2_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =38
+                        OnSelect: =Select(Parent)
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =12
+                        Text: =If (ThisItem.'Validité (mois)' = 1 ,ThisItem.'Validité (mois)'  & " an" , ThisItem.'Validité (mois)'  & " ans")
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =168
+                        X: =1113
+                        Y: =14
+                  - Rectangle13_19:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(56, 96, 178, 1)
+                        Height: =2
+                        Width: =1366
+                        Y: =73

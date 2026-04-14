@@ -1,0 +1,480 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_RéceptionMultiple:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Container_Entête:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =69
+            RadiusBottomLeft: =10
+            RadiusBottomRight: =10
+            RadiusTopLeft: =10
+            RadiusTopRight: =10
+            Width: =1310
+            X: =26
+            Y: =11
+          Children:
+            - Rectangle14_12:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =69
+                  Width: =128
+            - RectQuickActionBar2_19:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(199, 77, 6, 1)
+                  Height: =69
+                  Width: =1182
+                  X: =128
+            - Label19_17:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =46
+                  Size: =25
+                  Text: ="Module de réception multiple"
+                  Width: =658
+                  X: =400
+                  Y: =11
+            - Icon35_18:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  Color: =RGBA(199, 77, 6, 1)
+                  Height: =69
+                  HoverColor: =ColorFade(Self.Color, 10%)
+                  Icon: =Icon.Home
+                  OnSelect: =Navigate('Home Page')
+                  PaddingBottom: =15
+                  PaddingTop: =15
+                  TabIndex: =0
+                  Tooltip: ="Retour à l'accueil"
+                  Width: =130
+      - Container_TableRéceptionMultiple:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =650
+            Width: =Container_Entête.Width
+            X: =Container_Entête.X
+            Y: =Container_Entête.Y + Container_Entête.Height + 20
+          Children:
+            - RéceptionMultiple_Table:
+                Control: Gallery@2.15.0
+                Variant: VariableHeight
+                Group: Tableau Réception multiple
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =595
+                  Items: |+
+                    =Sort(Filter('Demandes d''envoi matériel', 
+                    Statut.Value = "Soldée") , Créé , SortOrder.Descending)
+                    /*IsBlank('Filter_REXMeO_Site/tranche'.Selected) || 'Filter_REXMeO_Site/tranche'.Selected.Value = 'Site/tranche'.Value;
+                    IsBlank('Filter_REXMeO_Typed''intervention'.Selected) || 'Filter_REXMeO_Typed''intervention'.Selected.Value = 'Type d''intervention'.Value;
+                    IsBlank(Filter_REXMeO_Statut.Selected) || Filter_REXMeO_Statut.Selected.Value = Statut.Value;
+                    IsBlank(Filter_REXMeO_Pôle.Selected) || Filter_REXMeO_Pôle.Selected.Value = Pôle.Value;
+                    IsBlank(Filter_REXMeO_Méthode.Selected) || Filter_REXMeO_Méthode.Selected.Value = Méthode.Value;
+                    IsBlank(Filter_REXMeO_Adresse.Selected) || Filter_REXMeO_Adresse.Selected.Value = 'Adresse du site' ;
+                    IsBlank(Filter_REXMeO_Procédure.Selected) || Filter_REXMeO_Procédure.Selected.Value = Procédure ; 
+                    IsBlank(Filter_REXMeO_Météo.Selected) || Filter_REXMeO_Météo.Selected.Value = 'Météo globale de l''activité'.Value ; 
+                    IsBlank(SearchBar_REXMeO.Value) || SearchBar_REXMeO.Value in 'REX : Préparation logistique' Or SearchBar_REXMeO.Value in 'REX : Intervention' Or SearchBar_REXMeO.Value in 'Co-Activité : REX positif' Or SearchBar_REXMeO.Value in 'Co-Activité : REX négatif' Or SearchBar_REXMeO.Value in Aléas Or SearchBar_REXMeO.Value in  'Analyse et rapportage' Or SearchBar_REXMeO.Value in 'Repli de chantier' Or SearchBar_REXMeO.Value in 'Bonnes pratiques'*/
+
+                  OnSelect: =Set(REXGIPEC_MenuGalerie , false)
+                  TemplatePadding: =4
+                  Width: =1247
+                  X: =24
+                  Y: =Container38_4.Height + 5 + Container38_4.Y
+                Children:
+                  - Image40_1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =38
+                        Image: =If(IsBlank(ThisItem.'Matériels supplémentaires non listés') , 'out-of-stock' , package )
+                        Width: =84
+                        X: =1078
+                        Y: =8
+                  - ButtonCanvas5_4:
+                      Control: Button@0.0.45
+                      Properties:
+                        Appearance: ='ButtonCanvas.Appearance'.Transparent
+                        FontSize: =34
+                        Height: =21
+                        Icon: =If(ThisItem.IsSelected , REXGIPEC_GalerieFlèche , "ChevronDown")
+                        Layout: ='ButtonCanvas.Layout'.IconOnly
+                        OnSelect: |-
+                          =Select(Parent); 
+                          If(REXGIPEC_GalerieFlèche <> "ChevronUp" ,  Set(REXGIPEC_GalerieFlèche , "ChevronUp") , Set(REXGIPEC_GalerieFlèche , "ChevronDown"))
+                        Text: =
+                        Width: =35
+                        X: =15
+                        Y: =16
+                  - ButtonCanvas6_4:
+                      Control: Button@0.0.45
+                      Properties:
+                        Appearance: ='ButtonCanvas.Appearance'.Transparent
+                        FontSize: =30
+                        Height: =30
+                        Icon: ="MoreHorizontal"
+                        Layout: ='ButtonCanvas.Layout'.IconOnly
+                        OnSelect: |
+                          =If(Not ThisItem.IsSelected  ,  Select(Parent)); 
+                          If (REXGIPEC_MenuGalerie <> true , Set(REXGIPEC_MenuGalerie , true),Set(REXGIPEC_MenuGalerie , false));
+                        Text: =
+                        Width: =47
+                        X: =1174
+                        Y: =16
+                  - RectangleBas:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(0, 0, 0, 1)
+                        Height: =0.5
+                        OnSelect: =Select(Parent)
+                        Width: =1239
+                        Y: = If(ThisItem.IsSelected And REXGIPEC_GalerieFlèche = "ChevronUp" , 285 , If (ThisItem.IsSelected And REXGIPEC_MenuGalerie = true , 60, 60))
+                  - BadgeCanvas10:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =ThisItem.ID
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        Width: =41
+                        X: =64
+                        Y: =10
+                  - BadgeCanvas11_2:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Appearance: ='BadgeCanvas.Appearance'.Filled
+                        Content: |-
+                          =ThisItem.'Statut : Réception'.Value
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        ThemeColor: |-
+                          =If(ThisItem.'Statut : Réception'.Value = "En attente" , 'BadgeCanvas.ThemeColor'.Warning ,  'BadgeCanvas.ThemeColor'.Success)
+                        Width: =136
+                        X: =121
+                        Y: =10
+                  - BadgeCanvas10_14:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =ThisItem.'Date de réception souhaitée'
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        Width: =132
+                        X: =272
+                        Y: =10
+                  - BadgeCanvas10_15:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: |-
+                          ="Matériels : " & CountRows(Filter('Sous-demandes d''envoi matériel' , 'Demande d''envoi associée'.Value = ThisItem.ID, Statut.Value = "Soldée")) & " | " & "Maquettes : " &  CountRows(Filter('Demandes d''envoi maquette' , 'ID Demande envoi mère' = ThisItem.ID, Statut.Value = "Soldée"))
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        Width: =165
+                        X: =410
+                        Y: =10
+                  - BadgeCanvas10_16:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: |-
+                          =ThisItem.'Destinataire : Adresse'
+                        FontSize: =9
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        Width: =315
+                        X: =581
+                        Y: =10
+                  - BadgeCanvas10_17:
+                      Control: Badge@0.0.24
+                      Properties:
+                        Content: =ThisItem.'Créé par'.DisplayName
+                        Height: =36
+                        Shape: ='BadgeCanvas.Shape'.Rounded
+                        Width: =141
+                        X: =907
+                        Y: =8
+                  - ContainerMenu:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.Semilight
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =46
+                        Visible: =If(ThisItem.IsSelected  , REXGIPEC_MenuGalerie , false)
+                        Width: =292
+                        X: =880
+                        Y: =8
+                      Children:
+                        - ButtonCanvas7_1:
+                            Control: Button@0.0.45
+                            Properties:
+                              Align: =Align.Center
+                              Appearance: ='ButtonCanvas.Appearance'.Primary
+                              BasePaletteColor: =RGBA(141, 229, 250, 1)
+                              Font: =Font.'Open Sans'
+                              FontSize: =15
+                              FontWeight: =FontWeight.Semibold
+                              Height: =30
+                              Icon: ="Eye"
+                              IconStyle: ='ButtonCanvas.IconStyle'.Outline
+                              Layout: ='ButtonCanvas.Layout'.IconBefore
+                              OnSelect: "=Set(IDRéceptionMultiple , ThisItem.ID) ; \r\nClear(CollectionRéceptionMultipleMatériel);\r\nNavigate(Screen_RéceptionMultiple_Détails , Transition.Push ) "
+                              Text: ="Consultation"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =130
+                              X: =150
+                              Y: =8
+                        - ButtonCanvas7_4:
+                            Control: Button@0.0.45
+                            Properties:
+                              Appearance: ='ButtonCanvas.Appearance'.Primary
+                              BasePaletteColor: =RGBA(249, 83, 109, 1)
+                              DisplayMode: =If(User().Email = ThisItem.'Créé par'.Email Or User().Email in Concat(ThisItem.'Accès partagé en modification', Email &","),If(ThisItem.Statut.Value = "Brouillon" ,DisplayMode.Edit, DisplayMode.Disabled), DisplayMode.Disabled)
+                              FontSize: =15
+                              Height: =30
+                              Icon: ="Delete"
+                              IconStyle: ='ButtonCanvas.IconStyle'.Outline
+                              OnSelect: |-
+                                =Set(REXGIPEC_AnnulationActivité, true);
+                                Set(REXGIPEC_MenuGalerie , false)
+                              Text: ="Annulation"
+                              Width: =130
+                              X: =12
+                              Y: =8
+                  - Container44:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Visible: =If(ThisItem.IsSelected And REXGIPEC_GalerieFlèche = "ChevronUp"   ,true,false)
+                        Width: =380
+                        X: =15
+                        Y: =61
+                      Children:
+                        - Image19_1:
+                            Control: Image@2.2.3
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =45
+                              Image: =
+                              Width: =42
+                              X: =4
+                              Y: =2
+                        - Gallery15:
+                            Control: Gallery@2.15.0
+                            Variant: Vertical
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =153
+                              Items: =Filter('Sous-demandes d''envoi matériel' , 'Demande d''envoi associée'.Value = ThisItem.ID, Statut.Value = "Soldée")
+                              TemplateSize: =37
+                              Width: =380
+                              Y: =47
+                            Children:
+                              - TextCanvas19:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Height: =35
+                                    Text: =ThisItem.Matériel.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =106
+                                    X: =15
+                        - TextCanvas15_2:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Font: =Font.'Open Sans'
+                              FontUnderline: =true
+                              Text: ="Liste des matériels"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =260
+                              X: =50
+                              Y: =8
+                  - Container44_1:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Visible: =If(ThisItem.IsSelected And REXGIPEC_GalerieFlèche = "ChevronUp"   ,true,false)
+                        Width: =380
+                        X: =422
+                        Y: =61
+                      Children:
+                        - TextCanvas15_3:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Font: =Font.'Open Sans'
+                              FontUnderline: =true
+                              Text: ="Liste des maquettes"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =284
+                              X: =50
+                              Y: =8
+                        - Gallery15_1:
+                            Control: Gallery@2.15.0
+                            Variant: Vertical
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =153
+                              Items: =Filter('Demandes d''envoi maquette' , 'ID Demande envoi mère' = ThisItem.ID, Statut.Value = "Soldée")
+                              TemplateSize: =37
+                              Width: =380
+                              Y: =47
+                            Children:
+                              - TextCanvas19_2:
+                                  Control: Text@0.0.51
+                                  Properties:
+                                    Height: =35
+                                    Text: =ThisItem.Maquette.Value
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =106
+                                    X: =15
+                  - Container44_2:
+                      Control: GroupContainer@1.4.0
+                      Variant: ManualLayout
+                      Properties:
+                        Visible: =If(ThisItem.IsSelected And REXGIPEC_GalerieFlèche = "ChevronUp"   ,true,false)
+                        Width: =380
+                        X: =830
+                        Y: =61
+                      Children:
+                        - TextCanvas15_4:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Center
+                              Font: =Font.'Open Sans'
+                              FontUnderline: =true
+                              Text: ="Autre"
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =260
+                              X: =59
+                              Y: =8
+                        - HtmlText4:
+                            Control: HtmlViewer@2.1.0
+                            Properties:
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =160
+                              HtmlText: =ThisItem.'Matériels supplémentaires non listés'
+                              Width: =376
+                              X: =4
+                              Y: =40
+            - Container38_4:
+                Control: GroupContainer@1.4.0
+                Variant: AutoLayout
+                Group: Tableau Réception multiple
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Height: =44
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =5
+                  PaddingLeft: =60
+                  Width: =1235
+                  X: =24
+                  Y: =5
+                Children:
+                  - TextCanvas9_17:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: ="ID"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =50
+                  - TextCanvas9_18:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: |-
+                          ="Statut : Réception"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =150
+                  - TextCanvas9_19:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: ="Date réception"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =150
+                  - TextCanvas9_20:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: ="Contenu"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =150
+                  - TextCanvas9_21:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: |-
+                          ="Destinataire : Adresse"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =325
+                  - TextCanvas9_22:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: ="Demandeur"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =145
+                  - TextCanvas9_23:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Center
+                        Font: =Font.'Open Sans'
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Text: ="Matériels non listés ? "
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =145
+            - RectangleBas_5:
+                Control: Rectangle@2.3.0
+                Group: Tableau Réception multiple
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0, 0, 0, 1)
+                  Height: =0.5
+                  OnSelect: =
+                  Width: =RéceptionMultiple_Table.Width
+                  X: =24
+                  Y: =Container38_4.Height + Container38_4.Y

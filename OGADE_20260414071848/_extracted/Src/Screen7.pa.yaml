@@ -1,0 +1,238 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen7:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - ViewInMR2:
+          Control: ViewInMR@1.0.34
+          Properties:
+            Height: =52
+            Source: =GallerydesPJ.Selected.Value
+            Visible: |-
+              =If(
+                  ".glb" in GallerydesPJ.Selected.DisplayName 
+                  Or ".obj" in GallerydesPJ.Selected.DisplayName 
+                  Or ".stl" in GallerydesPJ.Selected.DisplayName , true , false )
+            Width: =258
+            X: =495
+            Y: =716
+      - GallerydesPJ:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Height: =631
+            Items: =Gallery8.Selected.'Pièces jointes'
+            Transition: =Transition.Pop
+            Width: =436
+            X: =16
+            Y: =114
+          Children:
+            - Container31:
+                Control: GroupContainer@1.4.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.Semilight
+                  Height: =96
+                  RadiusBottomLeft: =6
+                  RadiusBottomRight: =6
+                  RadiusTopLeft: =6
+                  RadiusTopRight: =6
+                  Width: =If(ThisItem.IsSelected, 430, 418)
+                  X: =2
+                Children:
+                  - Image3:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =72
+                        Image: =ThisItem.AbsoluteUri
+                        OnSelect: =
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =74
+                        X: =21
+                        Y: =11
+                  - Title1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 1)
+                        Color: =RGBA(50, 49, 48, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                        Height: =77
+                        OnSelect: =
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =ThisItem.DisplayName
+                        Width: =242
+                        X: =109
+                        Y: =11
+                  - Rectangle1:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(0, 18, 107, 1)
+                        Height: =
+                        OnSelect: =
+                        Visible: =ThisItem.IsSelected
+                        Width: =4
+                        X: =21
+                  - Icon25:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =25
+                        Icon: =Icon.Download
+                        OnSelect: =Launch(ThisItem.AbsoluteUri)
+                        Width: =33
+                        X: =379
+                        Y: =34
+      - Container19_9:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =74
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            Visible: =Not Screen2.Printing
+            Width: =1327
+            X: =19
+            Y: =14
+          Children:
+            - RectQuickActionBar3_2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(56, 96, 178, 1)
+                  Height: =74
+                  Width: =1182
+                  X: =144
+            - LblAppName3_12:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =73
+                  Size: =18
+                  Text: |-
+                    ="Consultation des pièces jointes de la maquette : " & Gallery8.Selected.Référence
+                  Width: =763
+                  X: =374
+                  Y: =1
+            - Image4_13:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =42
+                  Image: ='badge-facebook'
+                  Visible: =If (Gallery8.Selected.'Informations certifiées' = true , true, false)
+                  Width: =33
+                  X: =157
+                  Y: =16
+            - Rectangle6_4:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =74
+                  Width: =130
+            - ButtonCanvas11:
+                Control: Button@0.0.45
+                Properties:
+                  Appearance: ='ButtonCanvas.Appearance'.Secondary
+                  FontSize: =17
+                  FontWeight: =FontWeight.Semibold
+                  Height: =78
+                  Icon: ="ArrowUndo"
+                  OnSelect: =Back(ScreenTransition.CoverRight)
+                  Text: ="Retour"
+                  Width: =98
+                  X: =1231
+                  Y: =-2
+            - Icon35_20:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(214, 221, 224, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =74
+                  HoverColor: =ColorFade(Self.Color, 10%)
+                  Icon: =Icon.Home
+                  OnSelect: =Navigate('Home Page')
+                  PaddingBottom: =15
+                  PaddingTop: =15
+                  TabIndex: =0
+                  Tooltip: ="Retour à l'accueil"
+                  Width: =144
+      - Container32:
+          Control: GroupContainer@1.4.0
+          Variant: ManualLayout
+          Properties:
+            Height: =631
+            Width: =894
+            X: =452
+            Y: =114
+          Children:
+            - Image27:
+                Control: Image@2.2.3
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Height: =631
+                  Image: =GallerydesPJ.Selected.AbsoluteUri
+                  Visible: |-
+                    =If(
+                        ".JPG" in GallerydesPJ.Selected.DisplayName 
+                        Or ".jpeg" in GallerydesPJ.Selected.DisplayName 
+                        Or ".JPEG" in GallerydesPJ.Selected.DisplayName
+                        Or ".gif" in GallerydesPJ.Selected.DisplayName
+                        Or ".png" in GallerydesPJ.Selected.DisplayName
+                        Or ".bmp" in GallerydesPJ.Selected.DisplayName
+                        Or ".tif" in GallerydesPJ.Selected.DisplayName
+                        Or ".tiff" in GallerydesPJ.Selected.DisplayName
+                        Or ".svg" in GallerydesPJ.Selected.DisplayName,
+                        true,
+                        false
+                    )
+                  Width: =867
+                  X: =27
+      - ViewIn3D2:
+          Control: ViewIn3D@1.2.23
+          Properties:
+            Height: =601
+            Source: =GallerydesPJ.Selected.Value
+            Visible: |-
+              =If(
+                  ".glb" in GallerydesPJ.Selected.DisplayName 
+                  Or ".obj" in GallerydesPJ.Selected.DisplayName 
+                  Or ".stl" in GallerydesPJ.Selected.DisplayName , true , false )
+            Width: =863
+            X: =464
+            Y: =128
+      - PdfViewer1:
+          Control: PDFViewer@2.5.0
+          Properties:
+            DisplayMode: =DisplayMode.View
+            Document: =GallerydesPJ.Selected.Value
+            Height: =601
+            ShowControls: =true
+            Visible: "=If(\".pdf\" in GallerydesPJ.Selected.DisplayName\r\nOr \".PDF\" in GallerydesPJ.Selected.DisplayName , true , false ) "
+            Width: =863
+            X: =464
+            Y: =128
