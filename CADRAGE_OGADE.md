@@ -627,18 +627,15 @@ Migrations Prisma appliquées par CI/CD sur chaque env (pipeline dédié).
 
 ---
 
-## 10. Points ouverts / questions restantes
+## 10. Contraintes projet (réponses finales)
 
-Questions du cadrage non tranchées — **à arbitrer avant démarrage du dev** :
-
-| # | Question | Impact | Suggestion |
-|---|---|---|---|
-| Q10.2 | Double écriture vs read-only — non applicable car Big Bang choisi | Nul | Ignoré |
-| Q10.4 | **Critères go/no-go** pour la bascule | 🟠 | Proposition §10.1 ci-dessous |
-| B.1 | **Échéance contrainte** (fin de vie PA, audit EDF, fusion d'entités) | 🔴 | À préciser — jalonne le planning |
-| B.2 | **Budget cadre** (CAPEX/OPEX) | 🔴 | À préciser — dimensionne la prestation |
-| B.3 | **Équipe projet** (PO, devs, testeurs, prestation externe) | 🔴 | À préciser — dimensionne les délais |
-| B.4 | **MOD'OP à mettre à jour** (parallèle ou décorrélé ?) | 🟠 | Proposition §10.2 ci-dessous |
+| # | Question | Réponse |
+|---|---|---|
+| Q10.4 | Critères go/no-go pour la bascule | **Acceptés** (proposition §10.1 ci-dessous) |
+| B.1 | Échéance contrainte | **Environ fin mai 2026** (~5 semaines) — pas d'échéance formelle |
+| B.2 | Budget cadre | **Aucun budget** — 1 dev solo utilisant **Claude Code à 100 %** (offre Pro) |
+| B.3 | Équipe projet | **1 développeur** (le porteur du projet) + **1 testeur métier** |
+| B.4 | MOD'OP | **Décorrélée** du dev — mise à jour à la fin, après bascule |
 
 ### 10.1 Proposition de critères go/no-go bascule
 
@@ -651,11 +648,11 @@ Questions du cadrage non tranchées — **à arbitrer avant démarrage du dev** 
 
 **No-go** : report d'au moins 2 semaines + nouveau comité de bascule.
 
-### 10.2 Proposition MOD'OP
+### 10.2 MOD'OP
 
-- **Mise à jour en parallèle** du développement, avec **jalon à J-3 semaines** avant bascule pour gel du MOD'OP
+- **Mise à jour décorrélée** — produite après la bascule, pas de blocage sur le dev
 - Version PDF hébergée sur SharePoint (inchangé)
-- Lien depuis l'app web vers la nouvelle version
+- Lien depuis l'app web vers la version existante en attendant
 
 ### 10.3 Questions supplémentaires à clarifier en début de projet
 
@@ -678,67 +675,118 @@ Questions du cadrage non tranchées — **à arbitrer avant démarrage du dev** 
 | R5 | Différences de comportement Power Fx → code | 🟠 | Moyenne | Tests E2E Playwright alignés sur les scénarios PA |
 | R6 | Gouvernance / sécurité Azure Blob (fuite d'URL SAS) | 🟠 | Faible | TTL court (5-15 min) + logs d'accès + scope minimal |
 | R7 | Azure AD : changements de claims / groupes | 🟠 | Faible | Découplage rôles AD / rôles métier (hybride) |
-| R8 | Retard de livraison si équipe EDF réduite | 🔴 | À qualifier | Question B.3 à clarifier |
+| R8 | **1 dev solo + 5 semaines** : scope ambitieux, risque de dépassement | 🔴 | Élevée | MVP strict (cf. §12), Claude Code maximise la vélocité, report des fonctionnalités non critiques en v1.1 |
 | R9 | QR codes imprimés existants avec ancien format | 🟠 | Moyenne | Conserver la compatibilité de l'URL encodée (ex : `ogade.edf.fr/m/{id}`) |
 | R10 | Oubli de fonctionnalités mineures dans PA (écrans explorés partiellement) | 🟡 | Moyenne | Revue de couverture fonctionnelle dédiée en début de dev |
 
 ---
 
-## 12. Prochaines étapes & plan de travail
+## 12. Plan de travail — 1 dev + Claude Code, 5 semaines
 
-### 12.1 Jalons macro proposés
+### 12.0 Contexte révisé
+
+- **Équipe** : 1 développeur solo assisté par **Claude Code (offre Pro)** à 100 %
+- **Testeur métier** : 1 personne disponible pour la recette
+- **Deadline** : **fin mai 2026** (~5 semaines depuis le 21 avril)
+- **Budget** : aucun (hors abonnement Claude Pro)
+- **Conséquence** : scope MVP strict — les fonctionnalités non critiques passent en v1.1
+
+### 12.1 Scope MVP (v1.0 — fin mai) vs v1.1 (post-bascule)
+
+| Fonctionnalité | v1.0 MVP | v1.1 | Commentaire |
+|---|---|---|---|
+| Scaffold monorepo + Docker + PG + NestJS + React | ✅ | | Fondation |
+| Auth SSO Azure AD (MSAL) | ✅ | | Bloquant pour déploiement |
+| CRUD Matériels END (liste, fiche, création, édition) | ✅ | | Cœur métier |
+| CRUD Maquettes (liste, fiche, création, édition) | ✅ | | Cœur métier |
+| Cycle de vie maquettes (emprunt / retour / contrôle) | ✅ | | Cœur métier |
+| Envoi / réception matériels | ✅ | | Cœur métier |
+| Demandes d'envoi mutualisées (fusion, CRUD) | ✅ | | Cœur métier |
+| RBAC (guards API + affichage conditionnel front) | ✅ | | Sécurité |
+| Génération QR code (serveur) | ✅ | | Petite lib |
+| Upload photos (Azure Blob ou local FS) | ✅ | | Upload SAS ou fallback FS |
+| Recherche / filtres / pagination | ✅ | | UX de base |
+| Admin droits (attribution rôles métier) | | ✅ | Script SQL ou seed en attendant |
+| Réception multiple 🆕 | | ✅ | Fonctionnalité nouvelle, complexe |
+| Table `defauts` (extraction JSON) | | ✅ | Simplification : champ texte en v1.0 |
+| Table `evenements` (event sourcing) | | ✅ | Logs applicatifs en attendant |
+| Scan QR caméra navigateur | | ✅ | Pas bloquant pour la bascule |
+| Historique des mouvements (UI) | | ✅ | Logs côté API en v1.0 |
+| Reprise données SP → PG (ETL) | | ✅ | Saisie fresh + import CSV en v1.0 |
+
+### 12.2 Planning semaine par semaine
 
 ```
-J0 ┬─ Cadrage validé (ce document)
-   │
-J+2 sem ─ Atelier UX/UI : wireframes écrans principaux
-   │
-J+4 sem ─ POC technique : stack montée bout en bout (auth + 1 CRUD)
-   │                      Validation React/NestJS/PG/MSAL/Blob
-   │
-J+6 sem ─ Modèle de données finalisé + migrations Prisma
-   │
-J+10 sem ─ Dev sprint 1-2 : matériels + maquettes CRUD + recherche
-   │
-J+14 sem ─ Dev sprint 3-4 : demandes d'envoi + réception multiple 🆕
-   │
-J+18 sem ─ Dev sprint 5-6 : historique événementiel + défauts + admin droits
-   │
-J+22 sem ─ Recette interne + stabilisation
-   │
-J+24 sem ─ Pilote gestionnaires maquettes (2 sem)
-   │
-J+26 sem ─ Big Bang
-   │
-J+30 sem ─ Clôture phase 1 + rétrospective
-   │
-(Post) ─ Phase 2 : reprise historique SP + app mobile native + refonte emails
+S1 (21-27 avr) ┬─ FONDATION
+               ├─ Scaffold monorepo (pnpm workspaces)
+               ├─ Schéma Prisma complet + migrations
+               ├─ API NestJS : modules matériels + maquettes + agents (CRUD)
+               ├─ Docker Compose (PG + API + web dev)
+               ├─ Seed de données de test
+               └─ React shell : routing, layout, auth mock
+
+S2 (28 avr - 4 mai) ┬─ CRUD CORE
+                     ├─ Frontend : pages liste + fiche matériels
+                     ├─ Frontend : pages liste + fiche maquettes
+                     ├─ Formulaires création / édition (React Hook Form + Zod)
+                     ├─ Upload photos (SAS Azure Blob ou local FS)
+                     ├─ Intégration API ↔ Frontend (TanStack Query)
+                     └─ QR code génération endpoint
+
+S3 (5-11 mai) ┬─ WORKFLOWS MÉTIER
+              ├─ Cycle de vie maquettes (emprunt, retour, contrôle, rebut)
+              ├─ Envoi / réception matériels
+              ├─ Demandes d'envoi mutualisées (CRUD + lignes)
+              ├─ RBAC : guards NestJS + affichage conditionnel React
+              └─ Menu magasin (accès restreint par rôle)
+
+S4 (12-18 mai) ┬─ AUTH + INTÉGRATION
+               ├─ Azure AD : app registration + MSAL React + OIDC NestJS
+               ├─ Provisionnement Azure Blob Storage (si pas fait)
+               ├─ Docker images production (multi-stage)
+               ├─ Déploiement conteneur (recette)
+               ├─ Branchement auth réel → tests bout en bout
+               └─ Recherche / filtres / pagination (finition)
+
+S5 (19-25 mai) ┬─ RECETTE + STABILISATION
+               ├─ Recette avec testeur métier (gestionnaires maquettes)
+               ├─ Corrections bugs critiques / majeurs
+               ├─ Seed rôles production (SQL direct)
+               ├─ Import CSV données initiales (matériels + maquettes actifs)
+               ├─ Formation express utilisateurs pilotes
+               └─ Go/No-go → Big Bang
 ```
 
-Ordre de grandeur : **6 mois** pour la v1 web, hypothèse équipe EDF 1 PO + 2 devs fullstack + 1 tech lead à 50 %.
+**Buffer** : derniers jours de mai pour stabilisation post-bascule.
 
-### 12.2 Livrables immédiats après validation de ce cadrage
+### 12.3 Stratégie Claude Code
 
-1. **Document de conception détaillée** (specs fonctionnelles écran par écran)
-2. **Atelier UX/UI** : wireframes Figma
-3. **POC technique** (2 semaines) : monter la stack bout en bout sur 1 écran (ex : liste matériels avec SSO + API + PG + 1 upload Blob)
-4. **Checklist de recette** (à construire à partir de la cartographie §2)
-5. **Plan de reprise des données** (script ETL initial — spec + dry-run)
+Pour maximiser la vélocité avec Claude Code :
+1. **Génération du scaffold** : monorepo complet en une session (Prisma schema, modules NestJS, pages React)
+2. **Itération par module** : 1 session = 1 module (matériels, maquettes, envois...) — prompt incluant le contexte du cadrage + le schema Prisma
+3. **Tests** : Claude Code génère les tests unitaires API en même temps que les endpoints
+4. **Reviews** : commit fréquent, relecture des diffs avant push
+5. **Priorisation stricte** : si une fonctionnalité prend trop de temps, elle passe en v1.1 — pas de scope creep
 
-### 12.3 Organisation suggérée
+### 12.4 Actions immédiates (cette semaine)
 
-- **Cadence** : sprints de 2 semaines
-- **Comité de pilotage** : mensuel, point d'avancement + arbitrages
-- **Démo utilisateurs** : toutes les 2 semaines avec le pilote gestionnaires maquettes
-- **Revue de sécurité** : à la fin de chaque sprint majeur (auth, upload, admin droits)
+| # | Action | Qui | Quand |
+|---|---|---|---|
+| 1 | Valider ce cadrage | Porteur projet | J |
+| 2 | Créer l'app registration Azure AD | Porteur projet (portail Azure) | S1 |
+| 3 | Créer le compte Azure Blob Storage | Porteur projet (portail Azure) | S1 |
+| 4 | Scaffold monorepo avec Claude Code | Dev + Claude Code | S1 |
+| 5 | Schéma Prisma + seed | Dev + Claude Code | S1 |
+| 6 | Premier endpoint API fonctionnel | Dev + Claude Code | S1 |
 
-### 12.4 Éléments à produire en parallèle
+### 12.5 Prérequis Azure (actions manuelles du porteur de projet)
 
-- Demande de tenant Azure AD (app registration OGADE)
-- Provisionnement Azure Blob Storage
-- Provisionnement cluster conteneurs (AKS / Container Apps)
-- Enregistrement DNS `ogade.edf.fr` (ou équivalent)
-- Certificat TLS
+À faire **avant S4** (idéalement S1) pour ne pas bloquer le déploiement :
+- **Azure AD** : créer une App Registration avec redirect URI `http://localhost:5173` (dev) + URL prod
+- **Azure Blob** : créer un Storage Account + container `ogade-files`
+- **Conteneur** : provisioner un service conteneur (Azure Container Apps recommandé pour la simplicité)
+- **DNS** : demander le FQDN cible (ou utiliser le domaine Azure par défaut en recette)
+- **PostgreSQL** : Azure Database for PostgreSQL Flexible Server (ou PG en conteneur si contrainte coût)
 
 ---
 
@@ -777,7 +825,11 @@ Ordre de grandeur : **6 mois** pour la v1 web, hypothèse équipe EDF 1 PO + 2 d
 | D29 | Bascule | Big Bang | Q10.1 |
 | D30 | Bascule | Pilote gestionnaires maquettes | Q10.3 |
 | D31 | Bascule | Power Apps gelée post-bascule | Q10.5 |
+| D32 | Projet | Échéance cible : fin mai 2026 (~5 semaines) | B.1 |
+| D33 | Projet | Budget zéro — 1 dev solo + Claude Code Pro | B.2 |
+| D34 | Projet | Équipe : 1 dev + 1 testeur métier | B.3 |
+| D35 | Projet | MOD'OP mise à jour décorrélée (post-bascule) | B.4 |
 
 ---
 
-*Fin du document de cadrage — validé par questions-réponses du 2026-04-21.*
+*Fin du document de cadrage — validé par questions-réponses du 2026-04-21. Mis à jour le 2026-04-21 avec contraintes projet (B.1-B.4) et plan 5 semaines.*
