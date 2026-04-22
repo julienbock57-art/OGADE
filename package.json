@@ -1,0 +1,36 @@
+{
+  "name": "ogade",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OGADE — Outil de Gestion des Actifs END de la DQI",
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:api": "pnpm --filter @ogade/api run dev",
+    "dev:web": "pnpm --filter @ogade/web run dev",
+    "build": "pnpm -r run build",
+    "build:shared": "pnpm --filter @ogade/shared run build",
+    "build:api": "pnpm --filter @ogade/api run build",
+    "build:web": "pnpm --filter @ogade/web run build",
+    "db:generate": "pnpm --filter @ogade/api run db:generate",
+    "db:migrate": "pnpm --filter @ogade/api run db:migrate",
+    "db:seed": "pnpm --filter @ogade/api run db:seed",
+    "db:studio": "pnpm --filter @ogade/api run db:studio",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
+  }
+}

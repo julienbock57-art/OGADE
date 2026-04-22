@@ -1,0 +1,95 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  Body,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  createAgentSchema,
+  updateAgentSchema,
+  assignRoleSchema,
+  paginationSchema,
+} from '@ogade/shared';
+import { AgentsService } from './agents.service';
+import { CurrentUser, RequestUser } from '../auth/auth.guard';
+
+@ApiTags('Agents')
+@ApiBearerAuth()
+@Controller('api/v1/agents')
+export class AgentsController {
+  constructor(private readonly agentsService: AgentsService) {}
+
+  @Get()
+  async findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const pagination = paginationSchema.parse({ page, pageSize });
+    return this.agentsService.findAll(pagination);
+  }
+
+  @Get('me')
+  async me(@CurrentUser() user: RequestUser | null) {
+    if (!user) {
+      return null;
+    }
+    return this.agentsService.findOne(user.agentId);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.agentsService.findOne(id);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() body: any) {
+    const result = createAgentSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.agentsService.create(result.data);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    const result = updateAgentSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.agentsService.update(id, result.data);
+  }
+
+  @Post(':id/roles')
+  async assignRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    const result = assignRoleSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.agentsService.assignRole(id, result.data.roleCode, user?.agentId);
+  }
+
+  @Delete(':id/roles/:roleCode')
+  async removeRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('roleCode') roleCode: string,
+  ) {
+    return this.agentsService.removeRole(id, roleCode);
+  }
+}
