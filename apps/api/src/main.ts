@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { join } from 'path';
+import { existsSync } from 'fs';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use(helmet());
 
@@ -31,7 +34,12 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.API_PORT || 3000;
+  const webDistPath = join(__dirname, '..', '..', 'web', 'dist');
+  if (existsSync(webDistPath)) {
+    app.useStaticAssets(webDistPath);
+  }
+
+  const port = process.env.PORT || process.env.API_PORT || 3000;
   await app.listen(port);
 
   console.log(`Application running on: http://localhost:${port}`);

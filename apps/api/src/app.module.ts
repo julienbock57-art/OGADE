@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { MaterielsModule } from './materiels/materiels.module';
@@ -7,6 +7,7 @@ import { AgentsModule } from './agents/agents.module';
 import { DemandesEnvoiModule } from './demandes-envoi/demandes-envoi.module';
 import { FichiersModule } from './fichiers/fichiers.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
+import { SpaFallbackMiddleware } from './spa-fallback.middleware';
 
 @Module({
   imports: [
@@ -20,4 +21,8 @@ import { QrcodeModule } from './qrcode/qrcode.module';
     QrcodeModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SpaFallbackMiddleware).forRoutes('*');
+  }
+}
