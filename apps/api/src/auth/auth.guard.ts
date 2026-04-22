@@ -38,7 +38,7 @@ export class AuthGuard implements CanActivate {
     request.user = {
       agentId: agent.id,
       email: agent.email,
-      roles: agent.roles.map((ar) => ar.role.code),
+      roles: agent.roles.map((ar: { role: { code: string } }) => ar.role.code),
     } satisfies RequestUser;
 
     return true;
