@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -61,37 +61,27 @@ model AgentRole {
 }
 
 // ─── MAQUETTES ──────────────────────────────────────────────────
-
-enum EtatMaquette {
-  STOCK
-  EMPRUNTEE
-  EN_CONTROLE
-  REBUT
-  EN_REPARATION
-  ENVOYEE
-
-  @@map("etat_maquette")
-}
+// etat: STOCK | EMPRUNTEE | EN_CONTROLE | REBUT | EN_REPARATION | ENVOYEE
 
 model Maquette {
-  id              Int           @id @default(autoincrement())
-  reference       String        @unique
+  id              Int       @id @default(autoincrement())
+  reference       String    @unique
   libelle         String
-  etat            EtatMaquette  @default(STOCK)
+  etat            String    @default("STOCK")
   localisation    String?
   description     String?
   site            String?
-  typeMaquette    String?       @map("type_maquette")
-  maquetteMereId  Int?          @map("maquette_mere_id")
-  proprietaireId  Int?          @map("proprietaire_id")
-  emprunteurId    Int?          @map("emprunteur_id")
-  dateEmprunt     DateTime?     @map("date_emprunt")
-  dateRetour      DateTime?     @map("date_retour")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  createdById     Int?          @map("created_by")
-  updatedById     Int?          @map("updated_by")
-  deletedAt       DateTime?     @map("deleted_at")
+  typeMaquette    String?   @map("type_maquette")
+  maquetteMereId  Int?      @map("maquette_mere_id")
+  proprietaireId  Int?      @map("proprietaire_id")
+  emprunteurId    Int?      @map("emprunteur_id")
+  dateEmprunt     DateTime? @map("date_emprunt")
+  dateRetour      DateTime? @map("date_retour")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdById     Int?      @map("created_by")
+  updatedById     Int?      @map("updated_by")
+  deletedAt       DateTime? @map("deleted_at")
 
   maquetteMere    Maquette?  @relation("maquette_hierarchie", fields: [maquetteMereId], references: [id])
   sousElements    Maquette[] @relation("maquette_hierarchie")
@@ -107,35 +97,25 @@ model Maquette {
 }
 
 // ─── MATERIELS ──────────────────────────────────────────────────
-
-enum EtatMateriel {
-  DISPONIBLE
-  EN_SERVICE
-  EN_REPARATION
-  REBUT
-  PRETE
-  ENVOYEE
-
-  @@map("etat_materiel")
-}
+// etat: DISPONIBLE | EN_SERVICE | EN_REPARATION | REBUT | PRETE | ENVOYEE
 
 model Materiel {
-  id              Int           @id @default(autoincrement())
-  reference       String        @unique
+  id              Int       @id @default(autoincrement())
+  reference       String    @unique
   libelle         String
-  etat            EtatMateriel  @default(DISPONIBLE)
-  typeMateriel    String?       @map("type_materiel")
-  numeroSerie     String?       @map("numero_serie")
+  etat            String    @default("DISPONIBLE")
+  typeMateriel    String?   @map("type_materiel")
+  numeroSerie     String?   @map("numero_serie")
   localisation    String?
   site            String?
   description     String?
-  dateEtalonnage  DateTime?     @map("date_etalonnage")
+  dateEtalonnage  DateTime? @map("date_etalonnage")
   dateProchainEtalonnage DateTime? @map("date_prochain_etalonnage")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  createdById     Int?          @map("created_by")
-  updatedById     Int?          @map("updated_by")
-  deletedAt       DateTime?     @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdById     Int?      @map("created_by")
+  updatedById     Int?      @map("updated_by")
+  deletedAt       DateTime? @map("deleted_at")
 
   createdBy    Agent?              @relation("materiel_createur", fields: [createdById], references: [id])
   updatedBy    Agent?              @relation("materiel_maj", fields: [updatedById], references: [id])
@@ -146,26 +126,19 @@ model Materiel {
 }
 
 // ─── DEFAUTS MAQUETTES ──────────────────────────────────────────
-
-enum SeveriteDefaut {
-  MINEUR
-  MAJEUR
-  CRITIQUE
-
-  @@map("severite_defaut")
-}
+// severite: MINEUR | MAJEUR | CRITIQUE
 
 model Defaut {
-  id           Int             @id @default(autoincrement())
-  maquetteId   Int             @map("maquette_id")
-  typeDefaut   String          @map("type_defaut")
+  id           Int      @id @default(autoincrement())
+  maquetteId   Int      @map("maquette_id")
+  typeDefaut   String   @map("type_defaut")
   position     String?
   dimension    String?
   description  String?
-  severite     SeveriteDefaut  @default(MINEUR)
-  detecteLe    DateTime        @map("detecte_le") @db.Date
-  detecteParId Int?            @map("detecte_par_id")
-  createdAt    DateTime        @default(now()) @map("created_at")
+  severite     String   @default("MINEUR")
+  detecteLe    DateTime @map("detecte_le")
+  detecteParId Int?     @map("detecte_par_id")
+  createdAt    DateTime @default(now()) @map("created_at")
 
   maquette   Maquette @relation(fields: [maquetteId], references: [id], onDelete: Cascade)
   detectePar Agent?   @relation("defaut_detecteur", fields: [detecteParId], references: [id])
@@ -175,41 +148,24 @@ model Defaut {
 }
 
 // ─── DEMANDES D'ENVOI ───────────────────────────────────────────
-
-enum TypeDemande {
-  MATERIEL
-  MAQUETTE
-  MUTUALISEE
-
-  @@map("type_demande")
-}
-
-enum StatutDemande {
-  BROUILLON
-  ENVOYEE
-  EN_TRANSIT
-  RECUE
-  CLOTUREE
-  ANNULEE
-
-  @@map("statut_demande")
-}
+// type: MATERIEL | MAQUETTE | MUTUALISEE
+// statut: BROUILLON | ENVOYEE | EN_TRANSIT | RECUE | CLOTUREE | ANNULEE
 
 model DemandeEnvoi {
-  id                Int           @id @default(autoincrement())
-  numero            String        @unique
-  type              TypeDemande
-  demandeurId       Int           @map("demandeur_id")
+  id                Int       @id @default(autoincrement())
+  numero            String    @unique
+  type              String
+  demandeurId       Int       @map("demandeur_id")
   destinataire      String
-  siteDestinataire  String?       @map("site_destinataire")
+  siteDestinataire  String?   @map("site_destinataire")
   motif             String?
-  dateSouhaitee     DateTime?     @map("date_souhaitee") @db.Date
-  statut            StatutDemande @default(BROUILLON)
-  dateEnvoi         DateTime?     @map("date_envoi")
-  dateReception     DateTime?     @map("date_reception")
+  dateSouhaitee     DateTime? @map("date_souhaitee")
+  statut            String    @default("BROUILLON")
+  dateEnvoi         DateTime? @map("date_envoi")
+  dateReception     DateTime? @map("date_reception")
   commentaire       String?
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   demandeur Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   lignes    DemandeEnvoiLigne[]
@@ -241,14 +197,14 @@ model Evenement {
   entityType String   @map("entity_type")
   entityId   Int      @map("entity_id")
   eventType  String   @map("event_type")
-  payload    Json?
+  payload    String?
   acteurId   Int?     @map("acteur_id")
   occurredAt DateTime @default(now()) @map("occurred_at")
 
   acteur Agent? @relation("evenement_acteur", fields: [acteurId], references: [id])
 
-  @@index([entityType, entityId, occurredAt(sort: Desc)])
-  @@index([acteurId, occurredAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@index([acteurId])
   @@map("evenements")
 }
 
