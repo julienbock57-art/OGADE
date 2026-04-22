@@ -35,4 +35,3 @@ jobs:
           app-name: ${{ vars.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: .
-          startup-command: "pnpm run db:migrate:deploy && pnpm run start"
