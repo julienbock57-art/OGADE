@@ -40,27 +40,17 @@ jobs:
           # Web: built frontend (served as static by NestJS)
           cp -r apps/web/dist deploy/apps/web/
 
-          # Create production package.json (no workspace refs, no devDeps)
-          jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
+          # Create production package.json: add prisma CLI as regular dep, remove workspace refs
+          jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .dependencies.prisma = "^5.20.0" | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
 
-          # Install production dependencies (flat node_modules Azure understands)
-          cd deploy
-          npm install --omit=dev
+          # Bundle shared package for install at startup
+          mkdir -p deploy/packages/shared
+          cp -r packages/shared/dist deploy/packages/shared/
+          cp packages/shared/package.json deploy/packages/shared/
 
-          # Install Prisma CLI (needed for migrate deploy at startup)
-          npm install prisma@5
-
-          # Generate Prisma client for this platform
-          npx prisma generate --schema=apps/api/prisma/schema.prisma
-
-          # Add shared package into node_modules
-          mkdir -p node_modules/@ogade/shared
-          cp -r ../packages/shared/dist node_modules/@ogade/shared/
-          cp ../packages/shared/package.json node_modules/@ogade/shared/
-
-          # Copy startup script from repo
-          cp ../scripts/start.sh start.sh
-          chmod +x start.sh
+          # Copy startup script
+          cp scripts/start.sh deploy/start.sh
+          chmod +x deploy/start.sh
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
