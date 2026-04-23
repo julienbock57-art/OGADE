@@ -63,9 +63,14 @@ jobs:
           cp ../scripts/start.sh start.sh
           chmod +x start.sh
 
+          # Create ZIP manually to ensure node_modules is included
+          cd ..
+          cd deploy && zip -qr ../deploy.zip . && cd ..
+          echo "deploy.zip size: $(du -sh deploy.zip | cut -f1)"
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: deploy
+          package: deploy.zip
