@@ -4,24 +4,29 @@ cd /home/site/wwwroot
 
 echo "=== OGADE startup ==="
 
-# Oryx extracts node_modules.tar.gz to /node_modules and adds
-# /node_modules/.bin to PATH. We work WITH Oryx, not against it.
-
-# Clean up Oryx leftovers (old real node_modules backup)
+# Clean any stale Oryx artifacts to prevent future interference
+rm -f node_modules.tar.gz oryx-manifest.toml
 rm -rf _del_node_modules
 
-# Verify prisma is available (should be in /node_modules/.bin via PATH)
-echo "Checking prisma..."
-which prisma && echo "prisma found at: $(which prisma)" || {
-  echo "FATAL: prisma not found in PATH"
-  echo "PATH=$PATH"
-  ls -la /node_modules/.bin/prisma 2>/dev/null || echo "/node_modules/.bin/prisma does not exist"
+# Restore node_modules if Oryx replaced it with a symlink
+if [ -L node_modules ]; then
+  echo "Removing Oryx symlink..."
+  rm -f node_modules
+fi
+
+# Verify prisma CLI exists
+if [ ! -f node_modules/.bin/prisma ]; then
+  echo "FATAL: node_modules/.bin/prisma not found"
+  echo "Contents of wwwroot:"
+  ls -la
+  echo "node_modules/.bin contents:"
+  ls node_modules/.bin/ 2>/dev/null | head -20 || echo "directory missing"
   exit 1
-}
+fi
 
 # Run Prisma migrations
 echo "Running Prisma migrations..."
-prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
 
 # Start the app
 echo "Starting NestJS on port ${PORT:-8080}..."
