@@ -4,32 +4,34 @@ cd /home/site/wwwroot
 
 echo "=== OGADE startup ==="
 
-# Oryx's startup script finds a stale node_modules.tar.gz, extracts
-# broken modules to /node_modules, moves our real node_modules to
-# _del_node_modules, and creates a symlink. Undo all of that.
+# Undo Oryx's node_modules manipulation if it happened
 if [ -L node_modules ] && [ -d _del_node_modules ]; then
   echo "Undoing Oryx: restoring real node_modules..."
   rm -f node_modules
   mv _del_node_modules node_modules
 fi
 
-# Delete stale Oryx files so this doesn't happen on next restart
+# Delete stale Oryx files to prevent interference on next restart
 rm -f node_modules.tar.gz oryx-manifest.toml 2>/dev/null || true
 rm -rf _del_node_modules 2>/dev/null || true
 
-# Verify prisma CLI exists
-if [ ! -f node_modules/.bin/prisma ]; then
-  echo "FATAL: node_modules/.bin/prisma not found"
-  echo "Contents of wwwroot:"
-  ls -la
-  echo "node_modules/.bin/ contents:"
-  ls node_modules/.bin/ 2>/dev/null | head -20 || echo "directory missing"
+# Fix .bin symlinks broken by ZIP extraction
+if [ -f node_modules/.bin/prisma ] && [ ! -L node_modules/.bin/prisma ]; then
+  echo "Fixing broken prisma symlink..."
+  rm -f node_modules/.bin/prisma
+  ln -s ../prisma/build/index.js node_modules/.bin/prisma
+fi
+
+# Verify prisma works
+if [ ! -f node_modules/prisma/build/index.js ]; then
+  echo "FATAL: node_modules/prisma/build/index.js not found"
+  ls -la node_modules/prisma/build/ 2>/dev/null || echo "prisma/build/ missing"
   exit 1
 fi
 
 # Run Prisma migrations
 echo "Running Prisma migrations..."
-./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+node node_modules/prisma/build/index.js migrate deploy --schema=apps/api/prisma/schema.prisma
 
 # Start the app
 echo "Starting NestJS on port ${PORT:-8080}..."
