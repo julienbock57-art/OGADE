@@ -26,12 +26,38 @@ jobs:
       - name: Build (shared → web → api)
         run: pnpm run build
 
-      - name: Generate Prisma client
-        run: pnpm run db:generate
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deploy/apps/api deploy/apps/web
+
+          # API: compiled output + Prisma schema/migrations
+          cp -r apps/api/dist deploy/apps/api/
+          cp -r apps/api/prisma deploy/apps/api/
+
+          # Web: built frontend (served as static by NestJS)
+          cp -r apps/web/dist deploy/apps/web/
+
+          # Create production package.json (no workspace refs, no devDeps)
+          jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
+
+          # Install production dependencies (flat node_modules Azure understands)
+          cd deploy
+          npm install --omit=dev
+
+          # Install Prisma CLI (needed for migrate deploy at startup)
+          npm install prisma@5
+
+          # Generate Prisma client for this platform
+          npx prisma generate --schema=apps/api/prisma/schema.prisma
+
+          # Add shared package into node_modules
+          mkdir -p node_modules/@ogade/shared
+          cp -r ../packages/shared/dist node_modules/@ogade/shared/
+          cp ../packages/shared/package.json node_modules/@ogade/shared/
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: .
+          package: deploy
