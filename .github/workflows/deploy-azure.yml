@@ -58,33 +58,38 @@ jobs:
           cp -r ../packages/shared/dist node_modules/@ogade/shared/
           cp ../packages/shared/package.json node_modules/@ogade/shared/
 
-          # Bundled node_modules archive for Oryx to detect and skip (empty archive)
-          # This overrides any stale archive from previous deployments
-          tar -czf node_modules.tar.gz --files-from=/dev/null
+          # Write startup script (use heredoc with <<- to strip tabs)
+          cat > start.sh <<'STARTEOF'
+#!/bin/bash
+set -e
+cd /home/site/wwwroot
 
-          # Robust startup script that handles Oryx's interference
-          cat > start.sh << 'STARTEOF'
-          #!/bin/bash
-          set -e
-          cd /home/site/wwwroot
+# If Oryx moved our node_modules, restore it
+if [ -d _del_node_modules ]; then
+  rm -rf node_modules
+  mv _del_node_modules node_modules
+fi
 
-          # If Oryx replaced our node_modules with a symlink, restore the real one
-          if [ -L node_modules ]; then
-            rm -f node_modules
-          fi
-          if [ -d _del_node_modules ] && [ ! -d node_modules ]; then
-            mv _del_node_modules node_modules
-          fi
+# If Oryx replaced node_modules with a symlink, remove it
+if [ -L node_modules ]; then
+  rm -f node_modules
+fi
 
-          # Clean Oryx triggers so they don't cause issues on next restart
-          rm -f node_modules.tar.gz oryx-manifest.toml
+# Clean Oryx artifacts
+rm -f node_modules.tar.gz oryx-manifest.toml
 
-          # Run Prisma migrations using the bundled binary (absolute path, no npx)
-          ./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+if [ ! -f node_modules/.bin/prisma ]; then
+  echo "FATAL: node_modules/.bin/prisma not found. Ensure SCM_DO_BUILD_DURING_DEPLOYMENT=false is set."
+  ls -la node_modules/.bin/ 2>/dev/null || echo "node_modules/.bin/ does not exist"
+  exit 1
+fi
 
-          # Start the app
-          exec node apps/api/dist/main.js
-          STARTEOF
+# Run Prisma migrations
+./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+
+# Start the app
+exec node apps/api/dist/main.js
+STARTEOF
           chmod +x start.sh
 
       - name: Deploy to Azure App Service
