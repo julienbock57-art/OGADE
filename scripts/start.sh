@@ -15,9 +15,9 @@ fi
 rm -f node_modules.tar.gz oryx-manifest.toml 2>/dev/null || true
 rm -rf _del_node_modules 2>/dev/null || true
 
-# Run Prisma migrations using the .bin binary (wasm files copied alongside it in CI)
+# Run Prisma migrations from the real path (not .bin/ which has broken symlinks)
 echo "Running Prisma migrations..."
-./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+node node_modules/prisma/build/index.js migrate deploy --schema=apps/api/prisma/schema.prisma
 
 # Start the app
 echo "Starting NestJS on port ${PORT:-8080}..."
