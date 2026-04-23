@@ -16,10 +16,17 @@ fi
 # Clean Oryx artifacts
 rm -f node_modules.tar.gz oryx-manifest.toml
 
+# Install dependencies if node_modules is missing or incomplete
 if [ ! -f node_modules/.bin/prisma ]; then
-  echo "FATAL: node_modules/.bin/prisma not found. Ensure SCM_DO_BUILD_DURING_DEPLOYMENT=false is set."
-  ls -la node_modules/.bin/ 2>/dev/null || echo "node_modules/.bin/ does not exist"
-  exit 1
+  echo "node_modules missing or incomplete — installing dependencies..."
+  npm install --omit=dev
+  echo "Generating Prisma client..."
+  npx prisma generate --schema=apps/api/prisma/schema.prisma
+  # Copy shared package into node_modules
+  mkdir -p node_modules/@ogade/shared
+  cp -r packages/shared/dist node_modules/@ogade/shared/
+  cp packages/shared/package.json node_modules/@ogade/shared/
+  echo "Dependencies installed."
 fi
 
 # Run Prisma migrations
