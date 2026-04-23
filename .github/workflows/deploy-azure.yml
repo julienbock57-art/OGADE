@@ -4,73 +4,39 @@ on:
   push:
     branches: [main]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          version: 9
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v4
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
         with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate Prisma client
-        run: pnpm run db:generate
-
-      - name: Build (shared → web → api)
-        run: pnpm run build
-
-      - name: Prepare deployment package
-        run: |
-          mkdir -p deploy/apps/api deploy/apps/web
-
-          # API: compiled output + Prisma schema/migrations
-          cp -r apps/api/dist deploy/apps/api/
-          cp -r apps/api/prisma deploy/apps/api/
-
-          # Web: built frontend (served as static by NestJS)
-          cp -r apps/web/dist deploy/apps/web/
-
-          # Create production package.json (no workspace refs, prisma as regular dep)
-          jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .dependencies.prisma = "^5.20.0" | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
-
-          # Install production dependencies
-          cd deploy
-          npm install --omit=dev
-
-          # Generate Prisma client for linux
-          npx prisma generate --schema=apps/api/prisma/schema.prisma
-
-          # Add shared package into node_modules
-          mkdir -p node_modules/@ogade/shared
-          cp -r ../packages/shared/dist node_modules/@ogade/shared/
-          cp ../packages/shared/package.json node_modules/@ogade/shared/
-
-          # Verify prisma CLI is installed
-          ls -la node_modules/.bin/prisma
-          echo "node_modules size: $(du -sh node_modules | cut -f1)"
-
-          # Copy startup script
-          cp ../scripts/start.sh start.sh
-          chmod +x start.sh
-
-          # Create ZIP manually to ensure node_modules is included
-          cd ..
-          cd deploy && zip -qr ../deploy.zip . && cd ..
-          echo "deploy.zip size: $(du -sh deploy.zip | cut -f1)"
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: deploy.zip
+          images: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}

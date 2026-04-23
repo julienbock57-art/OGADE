@@ -1,0 +1,8 @@
+node_modules
+.git
+*.md
+deploy
+deploy.zip
+.env
+.env.*
+!.env.example
