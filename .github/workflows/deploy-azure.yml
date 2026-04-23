@@ -58,6 +58,35 @@ jobs:
           cp -r ../packages/shared/dist node_modules/@ogade/shared/
           cp ../packages/shared/package.json node_modules/@ogade/shared/
 
+          # Bundled node_modules archive for Oryx to detect and skip (empty archive)
+          # This overrides any stale archive from previous deployments
+          tar -czf node_modules.tar.gz --files-from=/dev/null
+
+          # Robust startup script that handles Oryx's interference
+          cat > start.sh << 'STARTEOF'
+          #!/bin/bash
+          set -e
+          cd /home/site/wwwroot
+
+          # If Oryx replaced our node_modules with a symlink, restore the real one
+          if [ -L node_modules ]; then
+            rm -f node_modules
+          fi
+          if [ -d _del_node_modules ] && [ ! -d node_modules ]; then
+            mv _del_node_modules node_modules
+          fi
+
+          # Clean Oryx triggers so they don't cause issues on next restart
+          rm -f node_modules.tar.gz oryx-manifest.toml
+
+          # Run Prisma migrations using the bundled binary (absolute path, no npx)
+          ./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+
+          # Start the app
+          exec node apps/api/dist/main.js
+          STARTEOF
+          chmod +x start.sh
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
