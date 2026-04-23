@@ -3,38 +3,26 @@ set -e
 cd /home/site/wwwroot
 
 echo "=== OGADE startup ==="
-echo "Listing wwwroot:"
-ls -la
 
-# If Oryx moved our node_modules to _del_node_modules, restore it
-if [ -d _del_node_modules ]; then
-  echo "Restoring node_modules from Oryx backup..."
-  rm -rf node_modules
-  mv _del_node_modules node_modules
-fi
+# Oryx extracts node_modules.tar.gz to /node_modules and adds
+# /node_modules/.bin to PATH. We work WITH Oryx, not against it.
 
-# If Oryx replaced node_modules with a symlink, remove it
-if [ -L node_modules ]; then
-  echo "Removing Oryx symlink for node_modules..."
-  rm -f node_modules
-fi
+# Clean up Oryx leftovers (old real node_modules backup)
+rm -rf _del_node_modules
 
-echo "node_modules status:"
-ls -la node_modules/.bin/prisma 2>/dev/null && echo "prisma found" || echo "prisma NOT found"
-
-if [ ! -f node_modules/.bin/prisma ]; then
-  echo "FATAL: prisma binary missing after all restore attempts."
-  echo "Contents of wwwroot:"
-  ls -la
-  echo "Contents of node_modules (if any):"
-  ls node_modules/ 2>/dev/null | head -20
+# Verify prisma is available (should be in /node_modules/.bin via PATH)
+echo "Checking prisma..."
+which prisma && echo "prisma found at: $(which prisma)" || {
+  echo "FATAL: prisma not found in PATH"
+  echo "PATH=$PATH"
+  ls -la /node_modules/.bin/prisma 2>/dev/null || echo "/node_modules/.bin/prisma does not exist"
   exit 1
-fi
+}
 
 # Run Prisma migrations
 echo "Running Prisma migrations..."
-./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+prisma migrate deploy --schema=apps/api/prisma/schema.prisma
 
 # Start the app
-echo "Starting NestJS..."
+echo "Starting NestJS on port ${PORT:-8080}..."
 exec node apps/api/dist/main.js
