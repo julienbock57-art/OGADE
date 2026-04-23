@@ -2,35 +2,39 @@
 set -e
 cd /home/site/wwwroot
 
-# If Oryx moved our node_modules, restore it
+echo "=== OGADE startup ==="
+echo "Listing wwwroot:"
+ls -la
+
+# If Oryx moved our node_modules to _del_node_modules, restore it
 if [ -d _del_node_modules ]; then
+  echo "Restoring node_modules from Oryx backup..."
   rm -rf node_modules
   mv _del_node_modules node_modules
 fi
 
 # If Oryx replaced node_modules with a symlink, remove it
 if [ -L node_modules ]; then
+  echo "Removing Oryx symlink for node_modules..."
   rm -f node_modules
 fi
 
-# Clean Oryx artifacts
-rm -f node_modules.tar.gz oryx-manifest.toml
+echo "node_modules status:"
+ls -la node_modules/.bin/prisma 2>/dev/null && echo "prisma found" || echo "prisma NOT found"
 
-# Install dependencies if node_modules is missing or incomplete
 if [ ! -f node_modules/.bin/prisma ]; then
-  echo "node_modules missing or incomplete — installing dependencies..."
-  npm install --omit=dev
-  echo "Generating Prisma client..."
-  npx prisma generate --schema=apps/api/prisma/schema.prisma
-  # Copy shared package into node_modules
-  mkdir -p node_modules/@ogade/shared
-  cp -r packages/shared/dist node_modules/@ogade/shared/
-  cp packages/shared/package.json node_modules/@ogade/shared/
-  echo "Dependencies installed."
+  echo "FATAL: prisma binary missing after all restore attempts."
+  echo "Contents of wwwroot:"
+  ls -la
+  echo "Contents of node_modules (if any):"
+  ls node_modules/ 2>/dev/null | head -20
+  exit 1
 fi
 
 # Run Prisma migrations
+echo "Running Prisma migrations..."
 ./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma
 
 # Start the app
+echo "Starting NestJS..."
 exec node apps/api/dist/main.js

@@ -40,10 +40,23 @@ jobs:
           # Web: built frontend (served as static by NestJS)
           cp -r apps/web/dist deploy/apps/web/
 
-          # Create production package.json: add prisma CLI as regular dep, remove workspace refs
+          # Create production package.json (no workspace refs, prisma as regular dep)
           jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .dependencies.prisma = "^5.20.0" | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
 
-          # Bundle shared package for install at startup
+          # Install production dependencies into deploy/node_modules
+          cd deploy
+          npm install --omit=dev
+
+          # Generate Prisma client for linux-x64
+          npx prisma generate --schema=apps/api/prisma/schema.prisma
+
+          # Add shared package into node_modules
+          mkdir -p node_modules/@ogade/shared
+          cp -r ../packages/shared/dist node_modules/@ogade/shared/
+          cp ../packages/shared/package.json node_modules/@ogade/shared/
+          cd ..
+
+          # Keep a copy of shared source as fallback for start.sh
           mkdir -p deploy/packages/shared
           cp -r packages/shared/dist deploy/packages/shared/
           cp packages/shared/package.json deploy/packages/shared/
