@@ -43,27 +43,31 @@ jobs:
           # Create production package.json (no workspace refs, prisma as regular dep)
           jq 'del(.dependencies["@ogade/shared"]) | del(.devDependencies) | del(.prisma) | .dependencies.prisma = "^5.20.0" | .scripts = { "start": "node apps/api/dist/main.js" }' apps/api/package.json > deploy/package.json
 
-          # Install production dependencies into deploy/node_modules
+          # Install production dependencies
           cd deploy
           npm install --omit=dev
 
-          # Generate Prisma client for linux-x64
+          # Generate Prisma client for linux
           npx prisma generate --schema=apps/api/prisma/schema.prisma
 
           # Add shared package into node_modules
           mkdir -p node_modules/@ogade/shared
           cp -r ../packages/shared/dist node_modules/@ogade/shared/
           cp ../packages/shared/package.json node_modules/@ogade/shared/
-          cd ..
 
-          # Keep a copy of shared source as fallback for start.sh
-          mkdir -p deploy/packages/shared
-          cp -r packages/shared/dist deploy/packages/shared/
-          cp packages/shared/package.json deploy/packages/shared/
+          # Verify prisma is installed
+          ls -la node_modules/.bin/prisma
+
+          # Create node_modules.tar.gz for Oryx to extract at startup
+          tar -czf node_modules.tar.gz -C node_modules .
+          echo "node_modules.tar.gz size: $(du -h node_modules.tar.gz | cut -f1)"
+
+          # Remove node_modules dir (Oryx will restore from tar.gz)
+          rm -rf node_modules
 
           # Copy startup script
-          cp scripts/start.sh deploy/start.sh
-          chmod +x deploy/start.sh
+          cp ../scripts/start.sh start.sh
+          chmod +x start.sh
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
