@@ -7,6 +7,7 @@ import { AgentsModule } from './agents/agents.module';
 import { DemandesEnvoiModule } from './demandes-envoi/demandes-envoi.module';
 import { FichiersModule } from './fichiers/fichiers.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
+import { HealthController } from './health.controller';
 import { SpaFallbackMiddleware } from './spa-fallback.middleware';
 
 @Module({
@@ -20,6 +21,7 @@ import { SpaFallbackMiddleware } from './spa-fallback.middleware';
     FichiersModule,
     QrcodeModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
