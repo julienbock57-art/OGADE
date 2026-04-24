@@ -10,10 +10,15 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
 
+  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: corsOrigin === '*' ? true : corsOrigin,
     credentials: true,
   });
 
@@ -40,7 +45,7 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT || process.env.API_PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`Application running on: http://localhost:${port}`);
   console.log(`Swagger UI: http://localhost:${port}/api/docs`);
