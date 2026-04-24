@@ -30,6 +30,14 @@ export type DemandeEnvoi = {
   dateEnvoi?: string | Date | null;
   dateReception?: string | Date | null;
   commentaire?: string | null;
+  urgence?: string | null;
+  justificationUrgence?: string | null;
+  contact?: string | null;
+  contactTelephone?: string | null;
+  adresseDestination?: string | null;
+  convention?: boolean;
+  souscriptionAssurance?: boolean;
+  produitsChimiques?: boolean;
   createdAt: string | Date;
   updatedAt: string | Date;
 };
