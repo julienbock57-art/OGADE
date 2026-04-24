@@ -24,6 +24,14 @@ export const createDemandeEnvoiSchema = z.object({
   motif: z.string().optional(),
   dateSouhaitee: z.coerce.date().optional(),
   commentaire: z.string().optional(),
+  urgence: z.string().optional(),
+  justificationUrgence: z.string().optional(),
+  contact: z.string().optional(),
+  contactTelephone: z.string().optional(),
+  adresseDestination: z.string().optional(),
+  convention: z.boolean().optional(),
+  souscriptionAssurance: z.boolean().optional(),
+  produitsChimiques: z.boolean().optional(),
   lignes: z.array(ligneSchema),
 });
 
@@ -33,6 +41,14 @@ export const updateDemandeEnvoiSchema = z.object({
   motif: z.string().optional(),
   dateSouhaitee: z.coerce.date().optional(),
   commentaire: z.string().optional(),
+  urgence: z.string().optional(),
+  justificationUrgence: z.string().optional(),
+  contact: z.string().optional(),
+  contactTelephone: z.string().optional(),
+  adresseDestination: z.string().optional(),
+  convention: z.boolean().optional(),
+  souscriptionAssurance: z.boolean().optional(),
+  produitsChimiques: z.boolean().optional(),
   statut: z
     .enum([
       StatutDemande.BROUILLON,

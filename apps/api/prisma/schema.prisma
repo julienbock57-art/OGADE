@@ -84,6 +84,36 @@ model Maquette {
   updatedById     Int?      @map("updated_by")
   deletedAt       DateTime? @map("deleted_at")
 
+  // Classification (PowerApps: Gestion des maquettes)
+  composant       String?   @map("composant")
+  categorie       String?   @map("categorie")
+  forme           String?   @map("forme")
+  typeAssemblage  String?   @map("type_assemblage")
+  matiere         String?   @map("matiere")
+  procedures      String?   @map("procedures")
+  typeControle    String?   @map("type_controle")
+
+  // Flags
+  referenceASN           Boolean @default(false) @map("reference_asn")
+  horsPatrimoine         Boolean @default(false) @map("hors_patrimoine")
+  informationsCertifiees Boolean @default(false) @map("informations_certifiees")
+  enTransit              Boolean @default(false) @map("en_transit")
+
+  // Dimensions
+  longueur        Float?    @map("longueur")
+  largeur         Float?    @map("largeur")
+  hauteur         Float?    @map("hauteur")
+  dn              Float?    @map("dn")
+  epaisseurParoi  Float?    @map("epaisseur_paroi")
+  poids           Float?    @map("poids")
+  quantite        Int?      @map("quantite")
+
+  // Informations complémentaires
+  commentaires     String?   @map("commentaires")
+  poleEntite       String?   @map("pole_entite")
+  entreprise       String?   @map("entreprise")
+  valeurFinanciere Float?    @map("valeur_financiere")
+
   maquetteMere    Maquette?  @relation("maquette_hierarchie", fields: [maquetteMereId], references: [id])
   sousElements    Maquette[] @relation("maquette_hierarchie")
   proprietaire    Agent?     @relation("maquette_proprietaire", fields: [proprietaireId], references: [id])
@@ -117,6 +147,29 @@ model Materiel {
   createdById     Int?      @map("created_by")
   updatedById     Int?      @map("updated_by")
   deletedAt       DateTime? @map("deleted_at")
+
+  // Classification (PowerApps: Gestion matériel END)
+  modele             String?   @map("modele")
+  typeTraducteur     String?   @map("type_traducteur")
+  typeEND            String?   @map("type_end")
+  groupe             String?   @map("groupe")
+  fournisseur        String?   @map("fournisseur")
+
+  // Étalonnage
+  validiteEtalonnage Int?      @map("validite_etalonnage")
+  soumisVerification Boolean   @default(false) @map("soumis_verification")
+
+  // Prêt
+  enPret             Boolean   @default(false) @map("en_pret")
+  motifPret          String?   @map("motif_pret")
+  dateRetourPret     DateTime? @map("date_retour_pret")
+
+  // Complétude et état
+  completude            String?  @map("completude")
+  informationVerifiee   Boolean  @default(false) @map("information_verifiee")
+  produitsChimiques     Boolean  @default(false) @map("produits_chimiques")
+  commentaires          String?  @map("commentaires")
+  entreprise            String?  @map("entreprise")
 
   createdBy    Agent?              @relation("materiel_createur", fields: [createdById], references: [id])
   updatedBy    Agent?              @relation("materiel_maj", fields: [updatedById], references: [id])
@@ -167,6 +220,16 @@ model DemandeEnvoi {
   commentaire       String?
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Champs PowerApps supplémentaires
+  urgence               String?  @map("urgence")
+  justificationUrgence  String?  @map("justification_urgence")
+  contact               String?  @map("contact")
+  contactTelephone      String?  @map("contact_telephone")
+  adresseDestination    String?  @map("adresse_destination")
+  convention            Boolean  @default(false) @map("convention")
+  souscriptionAssurance Boolean  @default(false) @map("souscription_assurance")
+  produitsChimiques     Boolean  @default(false) @map("produits_chimiques")
 
   demandeur Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   lignes    DemandeEnvoiLigne[]

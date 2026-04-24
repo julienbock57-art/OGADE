@@ -11,6 +11,21 @@ export const createMaterielSchema = z.object({
   description: z.string().optional(),
   dateEtalonnage: z.coerce.date().optional(),
   dateProchainEtalonnage: z.coerce.date().optional(),
+  modele: z.string().optional(),
+  typeTraducteur: z.string().optional(),
+  typeEND: z.string().optional(),
+  groupe: z.string().optional(),
+  fournisseur: z.string().optional(),
+  validiteEtalonnage: z.number().optional(),
+  soumisVerification: z.boolean().optional(),
+  enPret: z.boolean().optional(),
+  motifPret: z.string().optional(),
+  dateRetourPret: z.coerce.date().optional(),
+  completude: z.string().optional(),
+  informationVerifiee: z.boolean().optional(),
+  produitsChimiques: z.boolean().optional(),
+  commentaires: z.string().optional(),
+  entreprise: z.string().optional(),
 });
 
 export const updateMaterielSchema = createMaterielSchema.partial().extend({
