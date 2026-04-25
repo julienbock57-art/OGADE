@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { MaterielsModule } from './materiels/materiels.module';
@@ -8,7 +8,6 @@ import { DemandesEnvoiModule } from './demandes-envoi/demandes-envoi.module';
 import { FichiersModule } from './fichiers/fichiers.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
 import { HealthController } from './health.controller';
-import { SpaFallbackMiddleware } from './spa-fallback.middleware';
 
 @Module({
   imports: [
@@ -23,8 +22,4 @@ import { SpaFallbackMiddleware } from './spa-fallback.middleware';
   ],
   controllers: [HealthController],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SpaFallbackMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
