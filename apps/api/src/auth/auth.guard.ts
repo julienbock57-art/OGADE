@@ -25,21 +25,25 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const agent = await this.prisma.agent.findUnique({
-      where: { email },
-      include: { roles: { include: { role: true } } },
-    });
+    try {
+      const agent = await this.prisma.agent.findUnique({
+        where: { email },
+        include: { roles: { include: { role: true } } },
+      });
 
-    if (!agent) {
+      if (!agent) {
+        request.user = null;
+        return true;
+      }
+
+      request.user = {
+        agentId: agent.id,
+        email: agent.email,
+        roles: agent.roles.map((ar: { role: { code: string } }) => ar.role.code),
+      } satisfies RequestUser;
+    } catch {
       request.user = null;
-      return true;
     }
-
-    request.user = {
-      agentId: agent.id,
-      email: agent.email,
-      roles: agent.roles.map((ar: { role: { code: string } }) => ar.role.code),
-    } satisfies RequestUser;
 
     return true;
   }
