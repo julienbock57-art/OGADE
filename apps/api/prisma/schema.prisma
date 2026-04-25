@@ -272,6 +272,53 @@ model Evenement {
   @@map("evenements")
 }
 
+// ─── REFERENTIELS (LISTES DE CHOIX) ─────────────────────────────
+
+model Referentiel {
+  id       Int     @id @default(autoincrement())
+  type     String
+  code     String
+  label    String
+  position Int     @default(0)
+  actif    Boolean @default(true)
+
+  @@unique([type, code])
+  @@index([type])
+  @@map("referentiels")
+}
+
+model Site {
+  id         Int     @id @default(autoincrement())
+  code       String  @unique
+  label      String
+  adresse    String?
+  codePostal String? @map("code_postal")
+  ville      String?
+  pays       String? @default("France")
+  telephone  String?
+  email      String?
+  actif      Boolean @default(true)
+
+  @@map("ref_sites")
+}
+
+model Entreprise {
+  id         Int     @id @default(autoincrement())
+  code       String  @unique
+  label      String
+  type       String  @default("ENTREPRISE")
+  adresse    String?
+  codePostal String? @map("code_postal")
+  ville      String?
+  pays       String? @default("France")
+  telephone  String?
+  email      String?
+  siret      String?
+  actif      Boolean @default(true)
+
+  @@map("ref_entreprises")
+}
+
 // ─── FICHIERS (METADONNEES BLOB) ────────────────────────────────
 
 model Fichier {
