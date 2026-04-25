@@ -58,11 +58,16 @@ export default function AdminReferentielsPage() {
 
   const groups = ["Matériels", "Maquettes"];
 
+  const allKnownTypes = Object.keys(typeInfo);
+  const apiTypes = types ?? [];
+  const extraTypes = apiTypes.filter((t) => !typeInfo[t]);
+  const allTypes = [...allKnownTypes, ...extraTypes];
+
   const typesGrouped = groups.map((group) => ({
     group,
-    items: (types ?? [])
+    items: allTypes
       .filter((t) => (typeInfo[t]?.group ?? "Matériels") === group)
-      .map((t) => ({ type: t, ...typeInfo[t] })),
+      .map((t) => ({ type: t, ...(typeInfo[t] ?? { label: t, description: "", group: "Matériels" }) })),
   }));
 
   return (
