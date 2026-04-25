@@ -271,10 +271,11 @@ async function seedEntreprises() {
 
 async function seedRolesAndAgents() {
   const roles = [
-    { code: 'MAGASINIER', label: 'Magasinier', description: 'Gestion du magasin et des stocks' },
-    { code: 'REFERENT_LOGISTIQUE_DQI', label: 'Référent Logistique DQI', description: 'Référent logistique de la DQI' },
-    { code: 'REFERENT_MAQUETTE', label: 'Référent Maquette', description: 'Référent des maquettes' },
-    { code: 'ADMIN_MATERIELS', label: 'Administrateur Matériels', description: 'Administrateur des matériels' },
+    { code: 'ADMIN', label: 'Administrateur', description: 'Accès complet à l\'application' },
+    { code: 'GESTIONNAIRE_MAGASIN', label: 'Gestionnaire magasin', description: 'Gestion du magasin et des stocks' },
+    { code: 'REFERENT_LOGISTIQUE', label: 'Référent logistique', description: 'Référent logistique des envois et réceptions' },
+    { code: 'REFERENT_MAQUETTE', label: 'Référent maquette', description: 'Référent des maquettes END' },
+    { code: 'REFERENT_MATERIEL', label: 'Référent matériel', description: 'Référent des matériels END' },
   ];
 
   const createdRoles: Record<string, { id: number }> = {};
@@ -287,22 +288,39 @@ async function seedRolesAndAgents() {
     createdRoles[role.code] = r;
   }
 
+  // Admin principal
   const adminAgent = await prisma.agent.upsert({
+    where: { email: 'julien.bock57@gmail.com' },
+    update: { nom: 'Bock', prenom: 'Julien' },
+    create: { email: 'julien.bock57@gmail.com', nom: 'Bock', prenom: 'Julien', actif: true },
+  });
+
+  // Assigner le rôle ADMIN
+  if (createdRoles['ADMIN']) {
+    await prisma.agentRole.upsert({
+      where: { agentId_roleId: { agentId: adminAgent.id, roleId: createdRoles['ADMIN'].id } },
+      update: {},
+      create: { agentId: adminAgent.id, roleId: createdRoles['ADMIN'].id },
+    });
+  }
+
+  // Agent de test pour le dev
+  const devAgent = await prisma.agent.upsert({
     where: { email: 'admin@ogade.test' },
-    update: { nom: 'Admin', prenom: 'Test' },
-    create: { email: 'admin@ogade.test', nom: 'Admin', prenom: 'Test', actif: true },
+    update: { nom: 'Admin', prenom: 'Dev' },
+    create: { email: 'admin@ogade.test', nom: 'Admin', prenom: 'Dev', actif: true },
   });
 
   for (const roleCode of Object.keys(createdRoles)) {
     await prisma.agentRole.upsert({
-      where: { agentId_roleId: { agentId: adminAgent.id, roleId: createdRoles[roleCode].id } },
+      where: { agentId_roleId: { agentId: devAgent.id, roleId: createdRoles[roleCode].id } },
       update: {},
-      create: { agentId: adminAgent.id, roleId: createdRoles[roleCode].id },
+      create: { agentId: devAgent.id, roleId: createdRoles[roleCode].id },
     });
   }
 
-  console.log('Roles & admin agent seeded');
-  return adminAgent;
+  console.log('Roles & agents seeded');
+  return devAgent;
 }
 
 async function seedMateriels(adminId: number) {

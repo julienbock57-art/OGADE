@@ -1,8 +1,9 @@
 export const RoleCode = {
-  MAGASINIER: "MAGASINIER",
-  REFERENT_LOGISTIQUE_DQI: "REFERENT_LOGISTIQUE_DQI",
+  ADMIN: "ADMIN",
+  GESTIONNAIRE_MAGASIN: "GESTIONNAIRE_MAGASIN",
+  REFERENT_LOGISTIQUE: "REFERENT_LOGISTIQUE",
   REFERENT_MAQUETTE: "REFERENT_MAQUETTE",
-  ADMIN_MATERIELS: "ADMIN_MATERIELS",
+  REFERENT_MATERIEL: "REFERENT_MATERIEL",
 } as const;
 
 export type RoleCode = (typeof RoleCode)[keyof typeof RoleCode];
@@ -17,8 +18,9 @@ export type Role = {
 export type AgentRole = {
   agentId: number;
   roleId: number;
+  role?: Role;
   grantedAt: string | Date;
-  grantedBy?: string | null;
+  grantedBy?: number | null;
 };
 
 export type Agent = {

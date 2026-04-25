@@ -1,5 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 import MainLayout from "@/layouts/MainLayout";
+import LoginPage from "@/pages/LoginPage";
 import HomePage from "@/pages/HomePage";
 import MaterielsListPage from "@/pages/MaterielsListPage";
 import MaterielDetailPage from "@/pages/MaterielDetailPage";
@@ -15,11 +17,39 @@ import AdminReferentielsPage from "@/pages/AdminReferentielsPage";
 import AdminReferentielTypePage from "@/pages/AdminReferentielTypePage";
 import AdminSitesPage from "@/pages/AdminSitesPage";
 import AdminEntreprisesPage from "@/pages/AdminEntreprisesPage";
+import AdminAgentsPage from "@/pages/AdminAgentsPage";
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, loading, msalEnabled } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edf-blue mx-auto" />
+          <p className="text-sm text-gray-500 mt-3">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user && msalEnabled) {
+    return <LoginPage />;
+  }
+
+  return <>{children}</>;
+}
 
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<MainLayout />}>
+      <Route
+        element={
+          <RequireAuth>
+            <MainLayout />
+          </RequireAuth>
+        }
+      >
         <Route path="/" element={<HomePage />} />
         <Route path="/materiels" element={<MaterielsListPage />} />
         <Route path="/materiels/nouveau" element={<MaterielFormPage />} />
@@ -43,7 +73,9 @@ export function AppRoutes() {
         <Route path="/admin/referentiels/:type" element={<AdminReferentielTypePage />} />
         <Route path="/admin/sites" element={<AdminSitesPage />} />
         <Route path="/admin/entreprises" element={<AdminEntreprisesPage />} />
+        <Route path="/admin/agents" element={<AdminAgentsPage />} />
       </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
