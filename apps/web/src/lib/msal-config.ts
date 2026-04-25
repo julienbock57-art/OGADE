@@ -3,12 +3,16 @@ import { Configuration, LogLevel } from "@azure/msal-browser";
 const clientId = import.meta.env.VITE_AZURE_AD_CLIENT_ID ?? "";
 const tenantId = import.meta.env.VITE_AZURE_AD_TENANT_ID ?? "";
 
-export const msalEnabled = !!(clientId && tenantId);
+export const msalEnabled = !!clientId;
 
-// "consumers" for personal accounts, tenant GUID for organizational
-const authority = tenantId === "consumers"
-  ? "https://login.microsoftonline.com/consumers"
-  : `https://login.microsoftonline.com/${tenantId}`;
+// Multi-tenant + personal: use "common" authority
+// Single-tenant: use specific tenant GUID
+// Personal only: use "consumers"
+const authority = !tenantId || tenantId === "common"
+  ? "https://login.microsoftonline.com/common"
+  : tenantId === "consumers"
+    ? "https://login.microsoftonline.com/consumers"
+    : `https://login.microsoftonline.com/${tenantId}`;
 
 export const msalConfig: Configuration = {
   auth: {
@@ -31,7 +35,6 @@ export const msalConfig: Configuration = {
   },
 };
 
-// For personal accounts, use openid/profile/email scopes
 export const loginRequest = {
   scopes: ["openid", "profile", "email"],
 };

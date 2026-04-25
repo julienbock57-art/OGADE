@@ -10,7 +10,7 @@ export interface MicrosoftTokenPayload {
   family_name?: string;
 }
 
-// Microsoft personal accounts always use this tenant ID in tokens
+// Microsoft personal accounts use this fixed tenant ID in tokens
 const MS_CONSUMERS_TENANT = '9188040d-6c67-4c5b-b112-36a304b66dad';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class MicrosoftTokenService {
   }
 
   get isConfigured(): boolean {
-    return !!(this.tenantId && this.clientId);
+    return !!this.clientId;
   }
 
   private getJwks(tenant: string) {
@@ -40,38 +40,23 @@ export class MicrosoftTokenService {
     return this.jwksMap.get(tenant)!;
   }
 
-  private get allowedIssuers(): string[] {
-    const issuers = [
-      `https://login.microsoftonline.com/${this.tenantId}/v2.0`,
-    ];
-    // Also accept the personal accounts issuer
-    if (this.tenantId === 'consumers' || this.tenantId !== MS_CONSUMERS_TENANT) {
-      issuers.push(
-        `https://login.microsoftonline.com/${MS_CONSUMERS_TENANT}/v2.0`,
-      );
-    }
-    return issuers;
-  }
-
-  private get jwksTenants(): string[] {
-    const tenants = [this.tenantId];
-    if (this.tenantId === 'consumers') {
-      tenants.push(MS_CONSUMERS_TENANT);
-    }
-    return tenants;
-  }
-
   async verify(token: string): Promise<MicrosoftTokenPayload | null> {
     if (!this.isConfigured) {
       this.logger.warn('Azure AD not configured — skipping token verification');
       return null;
     }
 
-    // Try verification against each possible JWKS endpoint
-    for (const tenant of this.jwksTenants) {
+    // For multi-tenant + personal accounts, try "common" JWKS first,
+    // then the specific tenant, then the consumers tenant
+    const tenantsToTry = ['common'];
+    if (this.tenantId && this.tenantId !== 'common' && this.tenantId !== 'consumers') {
+      tenantsToTry.push(this.tenantId);
+    }
+    tenantsToTry.push(MS_CONSUMERS_TENANT);
+
+    for (const tenant of tenantsToTry) {
       try {
         const { payload } = await jwtVerify(token, this.getJwks(tenant), {
-          issuer: this.allowedIssuers,
           audience: this.clientId,
         });
 
@@ -85,7 +70,7 @@ export class MicrosoftTokenService {
           family_name: payload.family_name as string | undefined,
         };
       } catch {
-        // try next tenant
+        // try next
       }
     }
 
