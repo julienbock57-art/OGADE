@@ -11,6 +11,10 @@ import DemandesEnvoiListPage from "@/pages/DemandesEnvoiListPage";
 import DemandeEnvoiDetailPage from "@/pages/DemandeEnvoiDetailPage";
 import DemandeEnvoiFormPage from "@/pages/DemandeEnvoiFormPage";
 import AgentsListPage from "@/pages/AgentsListPage";
+import AdminReferentielsPage from "@/pages/AdminReferentielsPage";
+import AdminReferentielTypePage from "@/pages/AdminReferentielTypePage";
+import AdminSitesPage from "@/pages/AdminSitesPage";
+import AdminEntreprisesPage from "@/pages/AdminEntreprisesPage";
 
 export function AppRoutes() {
   return (
@@ -35,6 +39,10 @@ export function AppRoutes() {
           element={<DemandeEnvoiDetailPage />}
         />
         <Route path="/agents" element={<AgentsListPage />} />
+        <Route path="/admin/referentiels" element={<AdminReferentielsPage />} />
+        <Route path="/admin/referentiels/:type" element={<AdminReferentielTypePage />} />
+        <Route path="/admin/sites" element={<AdminSitesPage />} />
+        <Route path="/admin/entreprises" element={<AdminEntreprisesPage />} />
       </Route>
     </Routes>
   );
