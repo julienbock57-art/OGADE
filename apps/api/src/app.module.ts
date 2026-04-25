@@ -7,6 +7,9 @@ import { AgentsModule } from './agents/agents.module';
 import { DemandesEnvoiModule } from './demandes-envoi/demandes-envoi.module';
 import { FichiersModule } from './fichiers/fichiers.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
+import { ReferentielsModule } from './referentiels/referentiels.module';
+import { SitesModule } from './sites/sites.module';
+import { EntreprisesModule } from './entreprises/entreprises.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -19,6 +22,9 @@ import { HealthController } from './health.controller';
     DemandesEnvoiModule,
     FichiersModule,
     QrcodeModule,
+    ReferentielsModule,
+    SitesModule,
+    EntreprisesModule,
   ],
   controllers: [HealthController],
 })
