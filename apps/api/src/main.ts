@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { AppModule } from './app.module';
+import { SpaFallbackFilter } from './spa-fallback.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -43,6 +44,8 @@ async function bootstrap() {
   if (existsSync(webDistPath)) {
     app.useStaticAssets(webDistPath);
   }
+
+  app.useGlobalFilters(new SpaFallbackFilter());
 
   const port = process.env.PORT || process.env.API_PORT || 3000;
   await app.listen(port, '0.0.0.0');
