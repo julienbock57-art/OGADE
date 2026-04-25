@@ -9,21 +9,18 @@ import {
   type CreateMaterielInput,
   type UpdateMaterielInput,
   type Materiel,
-  EtatMateriel,
 } from "@ogade/shared";
 import { api } from "@/lib/api";
-
-const etatOptions = [
-  { value: EtatMateriel.DISPONIBLE, label: "Disponible" },
-  { value: EtatMateriel.EN_SERVICE, label: "En service" },
-  { value: EtatMateriel.EN_REPARATION, label: "En réparation" },
-  { value: EtatMateriel.REBUT, label: "Rebut" },
-  { value: EtatMateriel.PRETE, label: "Prêté" },
-  { value: EtatMateriel.ENVOYEE, label: "Envoyé" },
-];
+import {
+  useReferentiel,
+  useSites,
+  useEntreprises,
+} from "@/hooks/use-referentiels";
 
 const inputClass =
   "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors";
+const selectClass =
+  "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat pr-8";
 const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
 const errorClass = "text-xs text-red-600 mt-1";
 
@@ -31,6 +28,35 @@ function SectionHeader({ title }: { title: string }) {
   return (
     <div className="border-b border-gray-200 pb-2 mb-4">
       <h2 className="text-base font-semibold text-edf-blue">{title}</h2>
+    </div>
+  );
+}
+
+function RefSelect({
+  label,
+  registration,
+  options,
+  placeholder,
+  error,
+}: {
+  label: string;
+  registration: ReturnType<ReturnType<typeof useForm>["register"]>;
+  options: { code: string; label: string }[];
+  placeholder?: string;
+  error?: string;
+}) {
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+      <select {...registration} className={selectClass}>
+        <option value="">{placeholder ?? `Sélectionner ${label.toLowerCase()}...`}</option>
+        {options.map((o) => (
+          <option key={o.code} value={o.code}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      {error && <p className={errorClass}>{error}</p>}
     </div>
   );
 }
@@ -47,6 +73,21 @@ export default function MaterielFormPage() {
     enabled: isEdit,
   });
 
+  const { data: etats } = useReferentiel("ETAT_MATERIEL");
+  const { data: typesEnd } = useReferentiel("TYPE_END");
+  const { data: typesMat } = useReferentiel("TYPE_MATERIEL");
+  const { data: typesTraducteur } = useReferentiel("TYPE_TRADUCTEUR");
+  const { data: groupes } = useReferentiel("GROUPE");
+  const { data: completudes } = useReferentiel("COMPLETUDE");
+  const { data: motifsPret } = useReferentiel("MOTIF_PRET");
+  const { data: sites } = useSites();
+  const { data: fournisseurs } = useEntreprises("FOURNISSEUR");
+  const { data: entreprises } = useEntreprises("ENTREPRISE");
+
+  const siteOptions = (sites ?? []).map((s) => ({ code: s.code, label: `${s.label}${s.ville ? ` — ${s.ville}` : ""}` }));
+  const fournisseurOptions = (fournisseurs ?? []).map((e) => ({ code: e.code, label: e.label }));
+  const entrepriseOptions = (entreprises ?? []).map((e) => ({ code: e.code, label: e.label }));
+
   const {
     register,
     handleSubmit,
@@ -61,10 +102,10 @@ export default function MaterielFormPage() {
       reset({
         reference: existing.reference,
         libelle: existing.libelle,
-        typeMateriel: existing.typeMateriel ?? undefined,
+        typeMateriel: existing.typeMateriel ?? "",
         numeroSerie: existing.numeroSerie ?? undefined,
         localisation: existing.localisation ?? undefined,
-        site: existing.site ?? undefined,
+        site: existing.site ?? "",
         description: existing.description ?? undefined,
         dateEtalonnage: existing.dateEtalonnage
           ? new Date(existing.dateEtalonnage)
@@ -74,22 +115,22 @@ export default function MaterielFormPage() {
           : undefined,
         etat: existing.etat,
         modele: existing.modele ?? undefined,
-        typeTraducteur: existing.typeTraducteur ?? undefined,
-        typeEND: existing.typeEND ?? undefined,
-        groupe: existing.groupe ?? undefined,
-        fournisseur: existing.fournisseur ?? undefined,
+        typeTraducteur: existing.typeTraducteur ?? "",
+        typeEND: existing.typeEND ?? "",
+        groupe: existing.groupe ?? "",
+        fournisseur: existing.fournisseur ?? "",
         validiteEtalonnage: existing.validiteEtalonnage ?? undefined,
         soumisVerification: existing.soumisVerification ?? false,
         enPret: existing.enPret ?? false,
-        motifPret: existing.motifPret ?? undefined,
+        motifPret: existing.motifPret ?? "",
         dateRetourPret: existing.dateRetourPret
           ? new Date(existing.dateRetourPret)
           : undefined,
-        completude: existing.completude ?? undefined,
+        completude: existing.completude ?? "",
         informationVerifiee: existing.informationVerifiee ?? false,
         produitsChimiques: existing.produitsChimiques ?? false,
         commentaires: existing.commentaires ?? undefined,
-        entreprise: existing.entreprise ?? undefined,
+        entreprise: existing.entreprise ?? "",
       });
     }
   }, [existing, reset]);
@@ -113,10 +154,13 @@ export default function MaterielFormPage() {
   });
 
   const onSubmit = (data: CreateMaterielInput & { etat?: string }) => {
+    const cleaned = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== "" && v !== undefined),
+    );
     if (isEdit) {
-      updateMutation.mutate(data as UpdateMaterielInput);
+      updateMutation.mutate(cleaned as UpdateMaterielInput);
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(cleaned as CreateMaterielInput);
     }
   };
 
@@ -156,7 +200,7 @@ export default function MaterielFormPage() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* ─── Identification ────────────────────────────── */}
+        {/* Identification */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Identification" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -179,57 +223,62 @@ export default function MaterielFormPage() {
               <input type="text" {...register("modele")} className={inputClass} />
             </div>
             {isEdit && (
-              <div>
-                <label className={labelClass}>État</label>
-                <select {...register("etat")} className={inputClass}>
-                  {etatOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
+              <RefSelect
+                label="État"
+                registration={register("etat")}
+                options={etats ?? []}
+                placeholder="Sélectionner l'état..."
+              />
             )}
           </div>
         </div>
 
-        {/* ─── Classification ────────────────────────────── */}
+        {/* Classification */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Classification" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-            <div>
-              <label className={labelClass}>Type de matériel</label>
-              <input type="text" {...register("typeMateriel")} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Type END</label>
-              <input type="text" {...register("typeEND")} className={inputClass} placeholder="UT, RT, ET, PT, MT..." />
-            </div>
-            <div>
-              <label className={labelClass}>Type de traducteur</label>
-              <input type="text" {...register("typeTraducteur")} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Groupe</label>
-              <input type="text" {...register("groupe")} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Fournisseur</label>
-              <input type="text" {...register("fournisseur")} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Entreprise</label>
-              <input type="text" {...register("entreprise")} className={inputClass} />
-            </div>
+            <RefSelect
+              label="Type END"
+              registration={register("typeEND")}
+              options={typesEnd ?? []}
+            />
+            <RefSelect
+              label="Type de matériel"
+              registration={register("typeMateriel")}
+              options={typesMat ?? []}
+            />
+            <RefSelect
+              label="Type de traducteur"
+              registration={register("typeTraducteur")}
+              options={typesTraducteur ?? []}
+            />
+            <RefSelect
+              label="Groupe"
+              registration={register("groupe")}
+              options={groupes ?? []}
+            />
+            <RefSelect
+              label="Fournisseur"
+              registration={register("fournisseur")}
+              options={fournisseurOptions}
+            />
+            <RefSelect
+              label="Entreprise"
+              registration={register("entreprise")}
+              options={entrepriseOptions}
+            />
           </div>
         </div>
 
-        {/* ─── Localisation ──────────────────────────────── */}
+        {/* Localisation */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Localisation" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div>
-              <label className={labelClass}>Site</label>
-              <input type="text" {...register("site")} className={inputClass} />
-            </div>
+            <RefSelect
+              label="Site"
+              registration={register("site")}
+              options={siteOptions}
+            />
             <div>
               <label className={labelClass}>Localisation</label>
               <input type="text" {...register("localisation")} className={inputClass} placeholder="Bâtiment, salle, rayonnage..." />
@@ -237,7 +286,7 @@ export default function MaterielFormPage() {
           </div>
         </div>
 
-        {/* ─── Étalonnage ────────────────────────────────── */}
+        {/* Étalonnage */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Étalonnage" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
@@ -260,7 +309,7 @@ export default function MaterielFormPage() {
           </div>
         </div>
 
-        {/* ─── Prêt ──────────────────────────────────────── */}
+        {/* Prêt */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Prêt" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -268,10 +317,11 @@ export default function MaterielFormPage() {
               <input type="checkbox" {...register("enPret")} id="enPret" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
               <label htmlFor="enPret" className="text-sm text-gray-700">Matériel actuellement en prêt</label>
             </div>
-            <div>
-              <label className={labelClass}>Motif du prêt</label>
-              <input type="text" {...register("motifPret")} className={inputClass} />
-            </div>
+            <RefSelect
+              label="Motif du prêt"
+              registration={register("motifPret")}
+              options={motifsPret ?? []}
+            />
             <div>
               <label className={labelClass}>Date de retour prêt</label>
               <input type="date" {...register("dateRetourPret")} className={inputClass} />
@@ -279,14 +329,15 @@ export default function MaterielFormPage() {
           </div>
         </div>
 
-        {/* ─── Complétude et vérification ────────────────── */}
+        {/* Complétude et vérification */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Complétude et vérification" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div>
-              <label className={labelClass}>Complétude</label>
-              <input type="text" {...register("completude")} className={inputClass} />
-            </div>
+            <RefSelect
+              label="Complétude"
+              registration={register("completude")}
+              options={completudes ?? []}
+            />
             <div className="flex items-center gap-3 pt-6">
               <input type="checkbox" {...register("informationVerifiee")} id="informationVerifiee" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
               <label htmlFor="informationVerifiee" className="text-sm text-gray-700">Information vérifiée</label>
@@ -298,7 +349,7 @@ export default function MaterielFormPage() {
           </div>
         </div>
 
-        {/* ─── Description et commentaires ───────────────── */}
+        {/* Description */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <SectionHeader title="Description" />
           <div className="space-y-4">
@@ -313,7 +364,7 @@ export default function MaterielFormPage() {
           </div>
         </div>
 
-        {/* ─── Actions ───────────────────────────────────── */}
+        {/* Actions */}
         <div className="flex gap-3 pt-2">
           <button
             type="submit"

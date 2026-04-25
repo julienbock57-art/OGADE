@@ -337,7 +337,7 @@ export default function MaterielsListPage() {
                                 Voir
                               </Link>
                               <Link
-                                to={`/materiels/${row.id}/modifier`}
+                                to={`/materiels/${row.id}/edit`}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-edf-blue transition-colors"
                               >
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
