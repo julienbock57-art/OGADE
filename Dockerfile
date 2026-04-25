@@ -51,4 +51,4 @@ COPY --from=builder /deploy .
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma && exec node apps/api/dist/main.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy --schema=apps/api/prisma/schema.prisma || echo 'Migration failed, starting anyway...'; exec node apps/api/dist/main.js"]
