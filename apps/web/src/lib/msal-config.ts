@@ -5,10 +5,15 @@ const tenantId = import.meta.env.VITE_AZURE_AD_TENANT_ID ?? "";
 
 export const msalEnabled = !!(clientId && tenantId);
 
+// "consumers" for personal accounts, tenant GUID for organizational
+const authority = tenantId === "consumers"
+  ? "https://login.microsoftonline.com/consumers"
+  : `https://login.microsoftonline.com/${tenantId}`;
+
 export const msalConfig: Configuration = {
   auth: {
     clientId,
-    authority: `https://login.microsoftonline.com/${tenantId}`,
+    authority,
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
   },
@@ -26,6 +31,7 @@ export const msalConfig: Configuration = {
   },
 };
 
+// For personal accounts, use openid/profile/email scopes
 export const loginRequest = {
-  scopes: [`${clientId}/.default`],
+  scopes: ["openid", "profile", "email"],
 };
