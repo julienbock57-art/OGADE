@@ -33,6 +33,9 @@ export class MaterielsController {
     @Query('pageSize') pageSize?: string,
     @Query('etat') etat?: string,
     @Query('site') site?: string,
+    @Query('typeEND') typeEND?: string,
+    @Query('typeMateriel') typeMateriel?: string,
+    @Query('groupe') groupe?: string,
     @Query('search') search?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
@@ -40,6 +43,9 @@ export class MaterielsController {
       ...pagination,
       etat,
       site,
+      typeEND,
+      typeMateriel,
+      groupe,
       search,
     });
   }

@@ -11,9 +11,12 @@ export class MaterielsService {
     pageSize: number;
     etat?: string;
     site?: string;
+    typeEND?: string;
+    typeMateriel?: string;
+    groupe?: string;
     search?: string;
   }) {
-    const { page, pageSize, etat, site, search } = params;
+    const { page, pageSize, etat, site, typeEND, typeMateriel, groupe, search } = params;
     const skip = (page - 1) * pageSize;
 
     const where: any = {
@@ -27,11 +30,21 @@ export class MaterielsService {
     if (site) {
       where.AND.push({ site });
     }
+    if (typeEND) {
+      where.AND.push({ typeEND });
+    }
+    if (typeMateriel) {
+      where.AND.push({ typeMateriel });
+    }
+    if (groupe) {
+      where.AND.push({ groupe });
+    }
     if (search) {
       where.AND.push({
         OR: [
           { reference: { contains: search, mode: 'insensitive' } },
           { libelle: { contains: search, mode: 'insensitive' } },
+          { modele: { contains: search, mode: 'insensitive' } },
         ],
       });
     }
