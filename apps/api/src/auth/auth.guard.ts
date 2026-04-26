@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
 import { MicrosoftTokenService } from './microsoft-token.service';
+import { LocalAuthService } from './local-auth.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 
 export interface RequestUser {
@@ -24,6 +25,7 @@ export class AuthGuard implements CanActivate {
     private readonly prisma: PrismaService,
     private readonly reflector: Reflector,
     private readonly msToken: MicrosoftTokenService,
+    private readonly localAuth: LocalAuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,19 +40,28 @@ export class AuthGuard implements CanActivate {
     const emailHeader = request.headers['x-user-email'] as string | undefined;
 
     let email: string | undefined;
+    let agentIdFromToken: number | undefined;
 
-    // Try Bearer token first (Microsoft auth)
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.slice(7);
-      const payload = await this.msToken.verify(token);
-      if (payload?.email) {
-        email = payload.email.toLowerCase();
-      } else if (this.msToken.isConfigured) {
-        throw new UnauthorizedException('Token invalide ou expiré');
+
+      // Try local JWT first (fast, no network call)
+      const localPayload = await this.localAuth.verifyToken(token);
+      if (localPayload) {
+        email = localPayload.email.toLowerCase();
+        agentIdFromToken = localPayload.agentId;
+      } else {
+        // Try Microsoft token
+        const msPayload = await this.msToken.verify(token);
+        if (msPayload?.email) {
+          email = msPayload.email.toLowerCase();
+        } else if (this.msToken.isConfigured) {
+          throw new UnauthorizedException('Token invalide ou expiré');
+        }
       }
     }
 
-    // Fallback to x-user-email header if Azure AD not configured (dev mode)
+    // Fallback to x-user-email header if no auth configured (dev mode)
     if (!email && !this.msToken.isConfigured && emailHeader) {
       email = emailHeader.toLowerCase();
     }
@@ -61,7 +72,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const agent = await this.prisma.agent.findUnique({
-        where: { email },
+        where: agentIdFromToken ? { id: agentIdFromToken } : { email },
         include: { roles: { include: { role: true } } },
       });
 

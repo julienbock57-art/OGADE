@@ -29,6 +29,7 @@ export type Agent = {
   email: string;
   nom: string;
   prenom: string;
+  passwordHash?: string | null;
   actif: boolean;
   createdAt: string | Date;
   updatedAt: string | Date;

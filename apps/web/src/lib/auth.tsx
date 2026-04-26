@@ -12,7 +12,8 @@ import {
   type AccountInfo,
   type AuthenticationResult,
 } from "@azure/msal-browser";
-import { fetchAuthConfig, buildMsalConfig, loginRequest } from "./msal-config";
+import { fetchAuthConfig, buildMsalConfig, loginRequest, type AuthConfig } from "./msal-config";
+import { api } from "./api";
 
 type User = {
   email: string;
@@ -24,8 +25,9 @@ type User = {
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
-  msalEnabled: boolean;
-  login: () => Promise<void>;
+  authConfig: AuthConfig | null;
+  loginMicrosoft: () => Promise<void>;
+  loginLocal: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
 };
@@ -33,8 +35,9 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
-  msalEnabled: false,
-  login: async () => {},
+  authConfig: null,
+  loginMicrosoft: async () => {},
+  loginLocal: async () => {},
   logout: async () => {},
   getAccessToken: async () => null,
 });
@@ -46,64 +49,97 @@ const DEV_USER: User = {
   roles: ["ADMIN"],
 };
 
+const LOCAL_TOKEN_KEY = "ogade_token";
+
 let msalInstance: PublicClientApplication | null = null;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [msalReady, setMsalReady] = useState(false);
-  const [authEnabled, setAuthEnabled] = useState(false);
+  const [config, setConfig] = useState<AuthConfig | null>(null);
+
+  const isAuthRequired = config?.microsoftAuth || config?.localAuth;
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchAuthConfig().then(async (config) => {
+    fetchAuthConfig().then(async (cfg) => {
       if (cancelled) return;
+      setConfig(cfg);
 
-      if (!config.microsoftAuth || !config.clientId) {
+      const hasAuth = cfg.microsoftAuth || cfg.localAuth;
+      if (!hasAuth) {
         setUser(DEV_USER);
         setLoading(false);
         return;
       }
 
-      setAuthEnabled(true);
-
-      const msalConfig = buildMsalConfig(config.clientId, config.tenantId);
-      const pca = new PublicClientApplication(msalConfig);
-      msalInstance = pca;
-
-      await pca.initialize();
-      if (cancelled) return;
-      setMsalReady(true);
-
-      pca.addEventCallback((event) => {
-        if (
-          event.eventType === EventType.LOGIN_SUCCESS &&
-          (event.payload as AuthenticationResult)?.account
-        ) {
-          const account = (event.payload as AuthenticationResult).account;
-          pca.setActiveAccount(account);
-          setUserFromAccount(account);
-        }
-      });
-
-      try {
-        const response = await pca.handleRedirectPromise();
-        if (cancelled) return;
-
-        if (response?.account) {
-          pca.setActiveAccount(response.account);
-          setUserFromAccount(response.account);
-        } else {
-          const accounts = pca.getAllAccounts();
-          if (accounts.length > 0) {
-            pca.setActiveAccount(accounts[0]);
-            setUserFromAccount(accounts[0]);
+      // Check for existing local JWT
+      const savedToken = localStorage.getItem(LOCAL_TOKEN_KEY);
+      if (savedToken) {
+        try {
+          const res = await fetch("/api/v1/auth/me", {
+            headers: { Authorization: `Bearer ${savedToken}` },
+          });
+          if (res.ok) {
+            const agent = await res.json();
+            if (cancelled) return;
+            setUser({
+              email: agent.email,
+              nom: agent.nom,
+              prenom: agent.prenom,
+              roles: agent.roles?.map((r: { role: { code: string } }) => r.role.code) ?? [],
+            });
+            setLoading(false);
+            return;
           }
+        } catch {
+          // token invalid, continue
         }
-      } catch {
-        // redirect handling failed
+        localStorage.removeItem(LOCAL_TOKEN_KEY);
       }
+
+      // Initialize MSAL if configured
+      if (cfg.microsoftAuth && cfg.clientId) {
+        const msalConfig = buildMsalConfig(cfg.clientId, cfg.tenantId);
+        const pca = new PublicClientApplication(msalConfig);
+        msalInstance = pca;
+
+        await pca.initialize();
+        if (cancelled) return;
+        setMsalReady(true);
+
+        pca.addEventCallback((event) => {
+          if (
+            event.eventType === EventType.LOGIN_SUCCESS &&
+            (event.payload as AuthenticationResult)?.account
+          ) {
+            const account = (event.payload as AuthenticationResult).account;
+            pca.setActiveAccount(account);
+            setUserFromAccount(account);
+          }
+        });
+
+        try {
+          const response = await pca.handleRedirectPromise();
+          if (cancelled) return;
+
+          if (response?.account) {
+            pca.setActiveAccount(response.account);
+            setUserFromAccount(response.account);
+          } else {
+            const accounts = pca.getAllAccounts();
+            if (accounts.length > 0) {
+              pca.setActiveAccount(accounts[0]);
+              setUserFromAccount(accounts[0]);
+            }
+          }
+        } catch {
+          // redirect handling failed
+        }
+      }
+
       setLoading(false);
     }).catch(() => {
       setUser(DEV_USER);
@@ -123,25 +159,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const login = useCallback(async () => {
-    if (!authEnabled || !msalReady || !msalInstance) return;
+  const loginMicrosoft = useCallback(async () => {
+    if (!msalReady || !msalInstance) return;
     try {
       await msalInstance.loginRedirect(loginRequest);
     } catch (err) {
       console.error("Login failed", err);
     }
-  }, [authEnabled, msalReady]);
+  }, [msalReady]);
+
+  const loginLocal = useCallback(async (email: string, password: string) => {
+    const res = await api.post<{ token: string; agent: { email: string; nom: string; prenom: string; roles: string[] } }>(
+      "/auth/login",
+      { email, password },
+    );
+    localStorage.setItem(LOCAL_TOKEN_KEY, res.token);
+    setUser({
+      email: res.agent.email,
+      nom: res.agent.nom,
+      prenom: res.agent.prenom,
+      roles: res.agent.roles,
+    });
+  }, []);
 
   const logout = useCallback(async () => {
-    if (!authEnabled || !msalReady || !msalInstance) {
-      setUser(null);
+    localStorage.removeItem(LOCAL_TOKEN_KEY);
+    if (msalReady && msalInstance && msalInstance.getActiveAccount()) {
+      await msalInstance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
       return;
     }
-    await msalInstance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
-  }, [authEnabled, msalReady]);
+    setUser(null);
+  }, [msalReady]);
 
   const getAccessToken = useCallback(async (): Promise<string | null> => {
-    if (!authEnabled || !msalReady || !msalInstance) return null;
+    // Check local JWT first
+    const localToken = localStorage.getItem(LOCAL_TOKEN_KEY);
+    if (localToken) return localToken;
+
+    // Try MSAL
+    if (!msalReady || !msalInstance) return null;
     const account = msalInstance.getActiveAccount();
     if (!account) return null;
     try {
@@ -158,11 +214,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return null;
     }
-  }, [authEnabled, msalReady]);
+  }, [msalReady]);
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, msalEnabled: authEnabled, login, logout, getAccessToken }}
+      value={{
+        user,
+        loading,
+        authConfig: config,
+        loginMicrosoft,
+        loginLocal,
+        logout,
+        getAccessToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

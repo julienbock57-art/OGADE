@@ -2,13 +2,14 @@ import { Configuration, LogLevel } from "@azure/msal-browser";
 
 export interface AuthConfig {
   microsoftAuth: boolean;
+  localAuth: boolean;
   clientId: string | null;
   tenantId: string | null;
 }
 
 export async function fetchAuthConfig(): Promise<AuthConfig> {
   const res = await fetch("/api/v1/auth/config");
-  if (!res.ok) return { microsoftAuth: false, clientId: null, tenantId: null };
+  if (!res.ok) return { microsoftAuth: false, localAuth: false, clientId: null, tenantId: null };
   return res.json();
 }
 

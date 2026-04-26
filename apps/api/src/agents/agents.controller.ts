@@ -21,12 +21,16 @@ import {
 } from '@ogade/shared';
 import { AgentsService } from './agents.service';
 import { CurrentUser, RequestUser } from '../auth/auth.guard';
+import { LocalAuthService } from '../auth/local-auth.service';
 
 @ApiTags('Agents')
 @ApiBearerAuth()
 @Controller('api/v1/agents')
 export class AgentsController {
-  constructor(private readonly agentsService: AgentsService) {}
+  constructor(
+    private readonly agentsService: AgentsService,
+    private readonly localAuth: LocalAuthService,
+  ) {}
 
   @Get()
   async findAll(
@@ -91,5 +95,22 @@ export class AgentsController {
     @Param('roleCode') roleCode: string,
   ) {
     return this.agentsService.removeRole(id, roleCode);
+  }
+
+  @Patch(':id/password')
+  async setPassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { password: string },
+  ) {
+    if (!body.password || body.password.length < 6) {
+      throw new BadRequestException('Le mot de passe doit contenir au moins 6 caractères');
+    }
+    const hash = await this.localAuth.hashPassword(body.password);
+    return this.agentsService.update(id, { passwordHash: hash });
+  }
+
+  @Delete(':id/password')
+  async removePassword(@Param('id', ParseIntPipe) id: number) {
+    return this.agentsService.update(id, { passwordHash: null });
   }
 }
