@@ -14,10 +14,11 @@ export const updateAgentSchema = createAgentSchema.partial().extend({
 
 export const assignRoleSchema = z.object({
   roleCode: z.enum([
-    RoleCode.MAGASINIER,
-    RoleCode.REFERENT_LOGISTIQUE_DQI,
+    RoleCode.ADMIN,
+    RoleCode.GESTIONNAIRE_MAGASIN,
+    RoleCode.REFERENT_LOGISTIQUE,
     RoleCode.REFERENT_MAQUETTE,
-    RoleCode.ADMIN_MATERIELS,
+    RoleCode.REFERENT_MATERIEL,
   ]),
 });
 

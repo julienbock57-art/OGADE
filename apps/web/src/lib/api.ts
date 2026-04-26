@@ -1,7 +1,13 @@
 const API_BASE = "/api/v1";
 
+let tokenGetter: (() => Promise<string | null>) | null = null;
+
+export function setTokenGetter(fn: () => Promise<string | null>) {
+  tokenGetter = fn;
+}
+
 function getUserEmail(): string {
-  return localStorage.getItem("ogade_user_email") ?? "admin@ogade.test";
+  return localStorage.getItem("ogade_user_email") ?? "julien.bock57@gmail.com";
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
@@ -9,9 +15,17 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "x-user-email": getUserEmail(),
     ...(options?.headers as Record<string, string> | undefined),
   };
+
+  // Try to get a Microsoft token
+  const token = tokenGetter ? await tokenGetter() : null;
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  } else {
+    // Dev fallback: use email header
+    headers["x-user-email"] = getUserEmail();
+  }
 
   const response = await fetch(url, {
     ...options,
@@ -31,7 +45,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(message);
   }
 
-  // 204 No Content
   if (response.status === 204) {
     return undefined as T;
   }
