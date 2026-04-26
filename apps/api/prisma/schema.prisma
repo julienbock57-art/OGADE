@@ -16,6 +16,7 @@ model Agent {
   email          String   @unique
   nom            String
   prenom         String
+  passwordHash   String?  @map("password_hash")
   actif          Boolean  @default(true)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")

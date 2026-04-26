@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, UnauthorizedException } from '@nestjs/comm
 import { ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service';
 import { MicrosoftTokenService } from './microsoft-token.service';
+import { LocalAuthService } from './local-auth.service';
 import { CurrentUser, RequestUser } from './auth.guard';
 import { Public } from './public.decorator';
 
@@ -11,6 +12,7 @@ export class AuthController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly msToken: MicrosoftTokenService,
+    private readonly localAuth: LocalAuthService,
   ) {}
 
   @Get('me')
@@ -22,7 +24,9 @@ export class AuthController {
       where: { id: user.agentId },
       include: { roles: { include: { role: true } } },
     });
-    return agent;
+    if (!agent) throw new UnauthorizedException();
+    const { passwordHash: _, ...safe } = agent;
+    return safe;
   }
 
   @Public()
@@ -30,8 +34,48 @@ export class AuthController {
   async config() {
     return {
       microsoftAuth: this.msToken.isConfigured,
+      localAuth: true,
       tenantId: process.env.AZURE_AD_TENANT_ID ?? null,
       clientId: process.env.AZURE_AD_CLIENT_ID ?? null,
+    };
+  }
+
+  @Public()
+  @Post('login')
+  async login(@Body() body: { email: string; password: string }) {
+    if (!body.email || !body.password) {
+      throw new UnauthorizedException('Email et mot de passe requis');
+    }
+
+    const agent = await this.prisma.agent.findUnique({
+      where: { email: body.email.toLowerCase() },
+      include: { roles: { include: { role: true } } },
+    });
+
+    if (!agent || !agent.actif) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
+    }
+
+    if (!agent.passwordHash) {
+      throw new UnauthorizedException('Ce compte n\'a pas de mot de passe. Utilisez la connexion Microsoft.');
+    }
+
+    const valid = await this.localAuth.verifyPassword(body.password, agent.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
+    }
+
+    const token = await this.localAuth.signToken({ agentId: agent.id, email: agent.email });
+
+    return {
+      token,
+      agent: {
+        id: agent.id,
+        email: agent.email,
+        nom: agent.nom,
+        prenom: agent.prenom,
+        roles: agent.roles.map((ar) => ar.role.code),
+      },
     };
   }
 
@@ -58,7 +102,6 @@ export class AuthController {
       );
     }
 
-    // Update Azure AD OID if not set
     if (payload.oid && !agent.azureAdOid) {
       await this.prisma.agent.update({
         where: { id: agent.id },
@@ -66,7 +109,6 @@ export class AuthController {
       });
     }
 
-    // Update name from Azure AD if available
     if (payload.given_name && payload.family_name) {
       await this.prisma.agent.update({
         where: { id: agent.id },

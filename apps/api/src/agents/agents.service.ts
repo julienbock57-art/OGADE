@@ -2,6 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateAgentInput, UpdateAgentInput } from '@ogade/shared';
 
+function stripPassword(agent: Record<string, unknown>) {
+  const { passwordHash, ...rest } = agent;
+  return { ...rest, hasPassword: !!passwordHash };
+}
+
 @Injectable()
 export class AgentsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -21,7 +26,7 @@ export class AgentsService {
     ]);
 
     return {
-      data,
+      data: data.map(stripPassword),
       total,
       page,
       pageSize,
@@ -37,23 +42,25 @@ export class AgentsService {
     if (!agent) {
       throw new NotFoundException(`Agent #${id} not found`);
     }
-    return agent;
+    return stripPassword(agent);
   }
 
   async create(data: CreateAgentInput) {
-    return this.prisma.agent.create({
+    const agent = await this.prisma.agent.create({
       data,
       include: { roles: { include: { role: true } } },
     });
+    return stripPassword(agent);
   }
 
-  async update(id: number, data: UpdateAgentInput) {
+  async update(id: number, data: UpdateAgentInput & { passwordHash?: string | null }) {
     await this.findOne(id);
-    return this.prisma.agent.update({
+    const agent = await this.prisma.agent.update({
       where: { id },
       data,
       include: { roles: { include: { role: true } } },
     });
+    return stripPassword(agent);
   }
 
   async assignRole(agentId: number, roleCode: string, grantedBy?: number) {

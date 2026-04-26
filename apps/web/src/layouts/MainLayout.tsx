@@ -2,6 +2,23 @@ import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 
+function LogoutButton() {
+  const { logout, authConfig } = useAuth();
+  const authRequired = authConfig?.microsoftAuth || authConfig?.localAuth;
+  if (!authRequired) return null;
+  return (
+    <button
+      onClick={logout}
+      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+      title="Déconnexion"
+    >
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+    </button>
+  );
+}
+
 const navItems = [
   {
     label: "Tableau de bord",
@@ -178,6 +195,7 @@ export default function MainLayout() {
               </p>
               <p className="text-xs text-gray-400 truncate">{user?.email ?? ""}</p>
             </div>
+            <LogoutButton />
           </div>
         </div>
       </aside>

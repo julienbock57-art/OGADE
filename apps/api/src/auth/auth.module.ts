@@ -3,12 +3,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.decorator';
 import { MicrosoftTokenService } from './microsoft-token.service';
+import { LocalAuthService } from './local-auth.service';
 import { AuthController } from './auth.controller';
 
 @Module({
   controllers: [AuthController],
   providers: [
     MicrosoftTokenService,
+    LocalAuthService,
     AuthGuard,
     RolesGuard,
     {
@@ -20,6 +22,6 @@ import { AuthController } from './auth.controller';
       useClass: RolesGuard,
     },
   ],
-  exports: [AuthGuard, RolesGuard, MicrosoftTokenService],
+  exports: [AuthGuard, RolesGuard, MicrosoftTokenService, LocalAuthService],
 })
 export class AuthModule {}

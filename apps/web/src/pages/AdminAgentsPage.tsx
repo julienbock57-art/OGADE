@@ -7,6 +7,7 @@ import Badge from "@/components/Badge";
 
 type AgentWithRoles = Omit<Agent, "roles"> & {
   roles: { roleId: number; role?: Role; grantedAt: string }[];
+  hasPassword?: boolean;
 };
 
 type AgentForm = { email: string; nom: string; prenom: string };
@@ -45,6 +46,8 @@ export default function AdminAgentsPage() {
   const [form, setForm] = useState<AgentForm>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [managingRolesId, setManagingRolesId] = useState<number | null>(null);
+  const [passwordAgentId, setPasswordAgentId] = useState<number | null>(null);
+  const [newPassword, setNewPassword] = useState("");
 
   const { data, isLoading } = useQuery<{ data: AgentWithRoles[]; total: number }>({
     queryKey: ["agents"],
@@ -90,6 +93,20 @@ export default function AdminAgentsPage() {
   const removeRoleMut = useMutation({
     mutationFn: ({ id, roleCode }: { id: number; roleCode: string }) =>
       api.delete(`/agents/${id}/roles/${roleCode}`),
+    onSuccess: invalidate,
+  });
+
+  const setPasswordMut = useMutation({
+    mutationFn: ({ id, password }: { id: number; password: string }) =>
+      api.patch(`/agents/${id}/password`, { password }),
+    onSuccess: () => {
+      setPasswordAgentId(null);
+      setNewPassword("");
+    },
+  });
+
+  const removePasswordMut = useMutation({
+    mutationFn: (id: number) => api.delete(`/agents/${id}/password`),
     onSuccess: invalidate,
   });
 
@@ -333,6 +350,49 @@ export default function AdminAgentsPage() {
                           </div>
                         </div>
                       )}
+                      {/* Password panel */}
+                      {passwordAgentId === agent.id && (
+                        <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                          <p className="text-xs font-medium text-gray-500 mb-2">
+                            Définir un mot de passe local :
+                          </p>
+                          <div className="flex gap-2">
+                            <input
+                              type="password"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Nouveau mot de passe (min 6 car.)"
+                              className={inputClass + " flex-1 !py-1.5 text-xs"}
+                            />
+                            <button
+                              onClick={() => {
+                                if (newPassword.length >= 6) {
+                                  setPasswordMut.mutate({ id: agent.id, password: newPassword });
+                                }
+                              }}
+                              disabled={newPassword.length < 6 || setPasswordMut.isPending}
+                              className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-medium hover:bg-amber-700 transition-colors disabled:opacity-50"
+                            >
+                              Enregistrer
+                            </button>
+                          </div>
+                          {setPasswordMut.isError && (
+                            <p className="text-xs text-red-600 mt-1">{(setPasswordMut.error as Error).message}</p>
+                          )}
+                          {agent.hasPassword && (
+                            <button
+                              onClick={() => {
+                                if (confirm("Supprimer le mot de passe local ?")) {
+                                  removePasswordMut.mutate(agent.id);
+                                }
+                              }}
+                              className="mt-2 text-xs text-red-600 hover:text-red-700"
+                            >
+                              Supprimer le mot de passe local
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <button
@@ -368,6 +428,22 @@ export default function AdminAgentsPage() {
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPasswordAgentId(passwordAgentId === agent.id ? null : agent.id);
+                            setNewPassword("");
+                          }}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            passwordAgentId === agent.id
+                              ? "text-amber-600 bg-amber-50"
+                              : "text-gray-400 hover:text-amber-600 hover:bg-amber-50"
+                          }`}
+                          title="Mot de passe"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                           </svg>
                         </button>
                         <button

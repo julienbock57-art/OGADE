@@ -20,7 +20,7 @@ import AdminEntreprisesPage from "@/pages/AdminEntreprisesPage";
 import AdminAgentsPage from "@/pages/AdminAgentsPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { user, loading, msalEnabled } = useAuth();
+  const { user, loading, authConfig } = useAuth();
 
   if (loading) {
     return (
@@ -33,7 +33,8 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user && msalEnabled) {
+  const authRequired = authConfig?.microsoftAuth || authConfig?.localAuth;
+  if (!user && authRequired) {
     return <LoginPage />;
   }
 
