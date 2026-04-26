@@ -1,39 +1,45 @@
 import { Configuration, LogLevel } from "@azure/msal-browser";
 
-const clientId = import.meta.env.VITE_AZURE_AD_CLIENT_ID ?? "";
-const tenantId = import.meta.env.VITE_AZURE_AD_TENANT_ID ?? "";
+export interface AuthConfig {
+  microsoftAuth: boolean;
+  clientId: string | null;
+  tenantId: string | null;
+}
 
-export const msalEnabled = !!clientId;
+export async function fetchAuthConfig(): Promise<AuthConfig> {
+  const res = await fetch("/api/v1/auth/config");
+  if (!res.ok) return { microsoftAuth: false, clientId: null, tenantId: null };
+  return res.json();
+}
 
-// Multi-tenant + personal: use "common" authority
-// Single-tenant: use specific tenant GUID
-// Personal only: use "consumers"
-const authority = !tenantId || tenantId === "common"
-  ? "https://login.microsoftonline.com/common"
-  : tenantId === "consumers"
-    ? "https://login.microsoftonline.com/consumers"
-    : `https://login.microsoftonline.com/${tenantId}`;
+export function buildMsalConfig(clientId: string, tenantId: string | null): Configuration {
+  const authority =
+    !tenantId || tenantId === "common"
+      ? "https://login.microsoftonline.com/common"
+      : tenantId === "consumers"
+        ? "https://login.microsoftonline.com/consumers"
+        : `https://login.microsoftonline.com/${tenantId}`;
 
-export const msalConfig: Configuration = {
-  auth: {
-    clientId,
-    authority,
-    redirectUri: window.location.origin,
-    postLogoutRedirectUri: window.location.origin,
-  },
-  cache: {
-    cacheLocation: "localStorage",
-    storeAuthStateInCookie: false,
-  },
-  system: {
-    loggerOptions: {
-      logLevel: LogLevel.Warning,
-      loggerCallback: (level, message) => {
-        if (level === LogLevel.Error) console.error(message);
+  return {
+    auth: {
+      clientId,
+      authority,
+      redirectUri: window.location.origin,
+      postLogoutRedirectUri: window.location.origin,
+    },
+    cache: {
+      cacheLocation: "localStorage",
+    },
+    system: {
+      loggerOptions: {
+        logLevel: LogLevel.Warning,
+        loggerCallback: (level, message) => {
+          if (level === LogLevel.Error) console.error(message);
+        },
       },
     },
-  },
-};
+  };
+}
 
 export const loginRequest = {
   scopes: ["openid", "profile", "email"],

@@ -12,7 +12,7 @@ import {
   type AccountInfo,
   type AuthenticationResult,
 } from "@azure/msal-browser";
-import { msalConfig, msalEnabled, loginRequest } from "./msal-config";
+import { fetchAuthConfig, buildMsalConfig, loginRequest } from "./msal-config";
 
 type User = {
   email: string;
@@ -48,27 +48,32 @@ const DEV_USER: User = {
 
 let msalInstance: PublicClientApplication | null = null;
 
-function getMsalInstance(): PublicClientApplication {
-  if (!msalInstance) {
-    msalInstance = new PublicClientApplication(msalConfig);
-  }
-  return msalInstance;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [msalReady, setMsalReady] = useState(false);
+  const [authEnabled, setAuthEnabled] = useState(false);
 
   useEffect(() => {
-    if (!msalEnabled) {
-      setUser(DEV_USER);
-      setLoading(false);
-      return;
-    }
+    let cancelled = false;
 
-    const pca = getMsalInstance();
-    pca.initialize().then(() => {
+    fetchAuthConfig().then(async (config) => {
+      if (cancelled) return;
+
+      if (!config.microsoftAuth || !config.clientId) {
+        setUser(DEV_USER);
+        setLoading(false);
+        return;
+      }
+
+      setAuthEnabled(true);
+
+      const msalConfig = buildMsalConfig(config.clientId, config.tenantId);
+      const pca = new PublicClientApplication(msalConfig);
+      msalInstance = pca;
+
+      await pca.initialize();
+      if (cancelled) return;
       setMsalReady(true);
 
       pca.addEventCallback((event) => {
@@ -82,22 +87,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      return pca.handleRedirectPromise();
-    }).then((response) => {
-      if (response?.account) {
-        pca.setActiveAccount(response.account);
-        setUserFromAccount(response.account);
-      } else {
-        const accounts = pca.getAllAccounts();
-        if (accounts.length > 0) {
-          pca.setActiveAccount(accounts[0]);
-          setUserFromAccount(accounts[0]);
+      try {
+        const response = await pca.handleRedirectPromise();
+        if (cancelled) return;
+
+        if (response?.account) {
+          pca.setActiveAccount(response.account);
+          setUserFromAccount(response.account);
+        } else {
+          const accounts = pca.getAllAccounts();
+          if (accounts.length > 0) {
+            pca.setActiveAccount(accounts[0]);
+            setUserFromAccount(accounts[0]);
+          }
         }
+      } catch {
+        // redirect handling failed
       }
       setLoading(false);
     }).catch(() => {
+      setUser(DEV_USER);
       setLoading(false);
     });
+
+    return () => { cancelled = true; };
   }, []);
 
   const setUserFromAccount = (account: AccountInfo) => {
@@ -111,48 +124,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = useCallback(async () => {
-    if (!msalEnabled || !msalReady) return;
-    const pca = getMsalInstance();
+    if (!authEnabled || !msalReady || !msalInstance) return;
     try {
-      await pca.loginRedirect(loginRequest);
+      await msalInstance.loginRedirect(loginRequest);
     } catch (err) {
       console.error("Login failed", err);
     }
-  }, [msalReady]);
+  }, [authEnabled, msalReady]);
 
   const logout = useCallback(async () => {
-    if (!msalEnabled || !msalReady) {
+    if (!authEnabled || !msalReady || !msalInstance) {
       setUser(null);
       return;
     }
-    const pca = getMsalInstance();
-    await pca.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
-  }, [msalReady]);
+    await msalInstance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
+  }, [authEnabled, msalReady]);
 
   const getAccessToken = useCallback(async (): Promise<string | null> => {
-    if (!msalEnabled || !msalReady) return null;
-    const pca = getMsalInstance();
-    const account = pca.getActiveAccount();
+    if (!authEnabled || !msalReady || !msalInstance) return null;
+    const account = msalInstance.getActiveAccount();
     if (!account) return null;
     try {
-      const response = await pca.acquireTokenSilent({
+      const response = await msalInstance.acquireTokenSilent({
         ...loginRequest,
         account,
       });
       return response.idToken;
     } catch {
       try {
-        await pca.acquireTokenRedirect(loginRequest);
+        await msalInstance.acquireTokenRedirect(loginRequest);
       } catch {
         // redirect will happen
       }
       return null;
     }
-  }, [msalReady]);
+  }, [authEnabled, msalReady]);
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, msalEnabled, login, logout, getAccessToken }}
+      value={{ user, loading, msalEnabled: authEnabled, login, logout, getAccessToken }}
     >
       {children}
     </AuthContext.Provider>

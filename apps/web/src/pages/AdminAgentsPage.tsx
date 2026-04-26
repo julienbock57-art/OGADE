@@ -5,8 +5,8 @@ import { api } from "@/lib/api";
 import type { Agent, Role } from "@ogade/shared";
 import Badge from "@/components/Badge";
 
-type AgentWithRoles = Agent & {
-  roles: { role: Role; grantedAt: string }[];
+type AgentWithRoles = Omit<Agent, "roles"> & {
+  roles: { roleId: number; role?: Role; grantedAt: string }[];
 };
 
 type AgentForm = { email: string; nom: string; prenom: string };
@@ -120,7 +120,7 @@ export default function AdminAgentsPage() {
   const mutError = createMut.error || updateMut.error;
 
   const agentHasRole = (agent: AgentWithRoles, roleCode: string) =>
-    agent.roles.some((r) => r.role.code === roleCode);
+    agent.roles.some((r) => r.role?.code === roleCode);
 
   return (
     <div className="max-w-5xl mx-auto pb-10">
@@ -290,9 +290,9 @@ export default function AdminAgentsPage() {
                         )}
                         {agent.roles.map((r) => (
                           <Badge
-                            key={r.role.code}
-                            variant={roleBadgeVariant[r.role.code] ?? "default"}
-                            text={roleLabels[r.role.code] ?? r.role.code}
+                            key={r.role?.code ?? r.roleId}
+                            variant={roleBadgeVariant[r.role?.code ?? ""] ?? "default"}
+                            text={roleLabels[r.role?.code ?? ""] ?? r.role?.code ?? ""}
                           />
                         ))}
                       </div>
