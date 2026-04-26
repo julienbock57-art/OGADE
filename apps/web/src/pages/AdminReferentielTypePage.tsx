@@ -35,7 +35,7 @@ export default function AdminReferentielTypePage() {
   const [editLabel, setEditLabel] = useState("");
   const [editPosition, setEditPosition] = useState(0);
 
-  const { data: items, isLoading } = useQuery<RefItem[]>({
+  const { data: items, isLoading, isError: queryError, error: queryErr } = useQuery<RefItem[]>({
     queryKey: ["referentiels", type],
     queryFn: () => api.get("/referentiels", { type }),
     enabled: !!type,
@@ -109,6 +109,14 @@ export default function AdminReferentielTypePage() {
         </div>
       </div>
 
+      {/* Query error */}
+      {queryError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+          <p className="text-sm text-red-700 font-medium">Erreur de chargement</p>
+          <p className="text-xs text-red-600 mt-1">{(queryErr as Error)?.message}</p>
+        </div>
+      )}
+
       {/* Add form */}
       <form onSubmit={handleCreate} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
         <div className="flex items-end gap-3">
@@ -144,7 +152,9 @@ export default function AdminReferentielTypePage() {
           </button>
         </div>
         {createMut.isError && (
-          <p className="text-xs text-red-600 mt-2">{(createMut.error as Error).message}</p>
+          <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-sm text-red-700">{(createMut.error as Error).message}</p>
+          </div>
         )}
       </form>
 
