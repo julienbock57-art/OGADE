@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Maquette } from "@ogade/shared";
@@ -24,6 +25,71 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
         {label}
       </dt>
       <dd style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{children || "—"}</dd>
+    </div>
+  );
+}
+
+function QrCard({ id, reference }: { id: number; reference: string }) {
+  const [copied, setCopied] = useState(false);
+  const qrUrl = `/api/v1/qrcode/maquette/${id}`;
+
+  const handleDownload = async () => {
+    const res = await fetch(qrUrl);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `QR-${reference}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopy = async () => {
+    try {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url);
+    }
+  };
+
+  return (
+    <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
+      <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
+        QR Code de traçabilité
+      </h2>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "12px 0" }}>
+        <img
+          src={qrUrl}
+          alt={`QR Code ${reference}`}
+          style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "var(--ink-3)" }}>OGADE/{reference}</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="obtn" onClick={handleDownload}>
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 3v10m0 0l-4-4m4 4l4-4" /><path d="M4 16h12" />
+            </svg>
+            Télécharger le QR
+          </button>
+          <button className="obtn" onClick={handleCopy}>
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              {copied
+                ? <path d="M4 10l4 4 8-8" />
+                : <><path d="M6 4h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" /><path d="M10 2h4a2 2 0 0 1 2 2v4" /></>
+              }
+            </svg>
+            {copied ? "Copié !" : "Copier l'image"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -163,16 +229,7 @@ export default function MaquetteDetailPage() {
       )}
 
       {/* QR Code */}
-      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
-        <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
-          QR Code
-        </h2>
-        <img
-          src={`/api/v1/qrcode/maquette/${id}`}
-          alt={`QR code de la maquette ${maquette.reference}`}
-          style={{ width: 160, height: 160 }}
-        />
-      </div>
+      <QrCard id={Number(id)} reference={maquette.reference} />
     </div>
   );
 }
