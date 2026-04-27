@@ -1,0 +1,359 @@
+@startuml OGADE - Modèle de Données Métier
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor<<entity>> #E3F2FD
+  BackgroundColor<<ref>> #FFF3E0
+  BackgroundColor<<join>> #F3E5F5
+  BackgroundColor<<audit>> #E8F5E9
+  BorderColor #455A64
+  ArrowColor #37474F
+  FontSize 11
+}
+
+' ════════════════════════════════════════════
+' AGENTS & RBAC
+' ════════════════════════════════════════════
+
+class Agent <<entity>> {
+  **id** : Int <<PK>>
+  email : String <<UNIQUE>>
+  nom : String
+  prenom : String
+  azureAdOid : String? <<UNIQUE>>
+  passwordHash : String?
+  actif : Boolean = true
+  --
+  createdAt : DateTime
+  updatedAt : DateTime
+}
+
+class Role <<ref>> {
+  **id** : Int <<PK>>
+  code : String <<UNIQUE>>
+  label : String
+  description : String?
+  --
+  Valeurs :
+  ADMIN
+  GESTIONNAIRE_MAGASIN
+  REFERENT_LOGISTIQUE
+  REFERENT_MAQUETTE
+  REFERENT_MATERIEL
+}
+
+class AgentRole <<join>> {
+  **agentId** : Int <<PK, FK → Agent>>
+  **roleId** : Int <<PK, FK → Role>>
+  grantedAt : DateTime
+  grantedBy : Int? <<FK → Agent>>
+}
+
+' ════════════════════════════════════════════
+' MATERIELS END
+' ════════════════════════════════════════════
+
+class Materiel <<entity>> {
+  **id** : Int <<PK>>
+  reference : String <<UNIQUE>>
+  libelle : String
+  numeroSerie : String?
+  modele : String?
+  description : String?
+  commentaires : String?
+  --
+  **site** : String? ── → ref_sites.code
+  **entreprise** : String? ── → ref_entreprises.code
+  **fournisseur** : String? ── → ref_entreprises.code
+  --
+  **etat** : String ── → ETAT_MATERIEL
+  **typeMateriel** : String? ── → TYPE_MATERIEL
+  **typeEND** : String? ── → TYPE_END
+  **typeTraducteur** : String? ── → TYPE_TRADUCTEUR
+  **groupe** : String? ── → GROUPE
+  **completude** : String? ── → COMPLETUDE
+  **motifPret** : String? ── → MOTIF_PRET
+  --
+  localisation : String?
+  enPret : Boolean = false
+  dateRetourPret : DateTime?
+  dateEtalonnage : DateTime?
+  dateProchainEtalonnage : DateTime?
+  validiteEtalonnage : Int?
+  soumisVerification : Boolean = false
+  informationVerifiee : Boolean = false
+  produitsChimiques : Boolean = false
+  --
+  createdById : Int? <<FK → Agent>>
+  updatedById : Int? <<FK → Agent>>
+  deletedAt : DateTime? (soft delete)
+}
+
+' ════════════════════════════════════════════
+' MAQUETTES
+' ════════════════════════════════════════════
+
+class Maquette <<entity>> {
+  **id** : Int <<PK>>
+  reference : String <<UNIQUE>>
+  libelle : String
+  description : String?
+  commentaires : String?
+  --
+  **site** : String? ── → ref_sites.code
+  **entreprise** : String? ── → ref_entreprises.code
+  --
+  **etat** : String ── → ETAT_MAQUETTE
+  **typeMaquette** : String? ── → TYPE_MAQUETTE
+  **composant** : String? ── → COMPOSANT
+  **categorie** : String? ── → CATEGORIE
+  **forme** : String? ── → FORME
+  **typeAssemblage** : String? ── → TYPE_ASSEMBLAGE
+  **matiere** : String? ── → MATIERE
+  **procedures** : String? ── → PROCEDURE
+  **typeControle** : String? ── → TYPE_CONTROLE
+  --
+  maquetteMereId : Int? <<FK → Maquette>>
+  proprietaireId : Int? <<FK → Agent>>
+  emprunteurId : Int? <<FK → Agent>>
+  localisation : String?
+  dateEmprunt : DateTime?
+  dateRetour : DateTime?
+  poleEntite : String?
+  valeurFinanciere : Float?
+  --
+  referenceASN : Boolean = false
+  horsPatrimoine : Boolean = false
+  informationsCertifiees : Boolean = false
+  enTransit : Boolean = false
+  --
+  longueur, largeur, hauteur : Float?
+  dn, epaisseurParoi, poids : Float?
+  quantite : Int?
+  --
+  createdById : Int? <<FK → Agent>>
+  updatedById : Int? <<FK → Agent>>
+  deletedAt : DateTime? (soft delete)
+}
+
+' ════════════════════════════════════════════
+' DEFAUTS
+' ════════════════════════════════════════════
+
+class Defaut <<entity>> {
+  **id** : Int <<PK>>
+  **maquetteId** : Int <<FK → Maquette>>
+  typeDefaut : String
+  position : String?
+  dimension : String?
+  description : String?
+  severite : String = "MINEUR"
+  detecteLe : DateTime
+  detecteParId : Int? <<FK → Agent>>
+  --
+  Sévérités :
+  MINEUR | MAJEUR | CRITIQUE
+}
+
+' ════════════════════════════════════════════
+' DEMANDES D'ENVOI
+' ════════════════════════════════════════════
+
+class DemandeEnvoi <<entity>> {
+  **id** : Int <<PK>>
+  numero : String <<UNIQUE>>
+  type : String
+  statut : String = "BROUILLON"
+  **demandeurId** : Int <<FK → Agent>>
+  destinataire : String
+  **siteDestinataire** : String? ── → ref_sites.code
+  motif : String?
+  dateSouhaitee : DateTime?
+  dateEnvoi : DateTime?
+  dateReception : DateTime?
+  commentaire : String?
+  --
+  **urgence** : String? ── → URGENCE
+  justificationUrgence : String?
+  contact : String?
+  contactTelephone : String?
+  adresseDestination : String?
+  convention : Boolean = false
+  souscriptionAssurance : Boolean = false
+  produitsChimiques : Boolean = false
+  --
+  Types : MATERIEL | MAQUETTE | MUTUALISEE
+  Statuts : BROUILLON → ENVOYEE
+   → EN_TRANSIT → RECUE → CLOTUREE
+   | ANNULEE
+}
+
+class DemandeEnvoiLigne <<join>> {
+  **id** : Int <<PK>>
+  **demandeId** : Int <<FK → DemandeEnvoi>>
+  materielId : Int? <<FK → Materiel>>
+  maquetteId : Int? <<FK → Maquette>>
+  quantite : Int = 1
+  recue : Boolean = false
+  dateReception : DateTime?
+}
+
+' ════════════════════════════════════════════
+' REFERENTIELS (Listes de choix)
+' ════════════════════════════════════════════
+
+class Referentiel <<ref>> {
+  **id** : Int <<PK>>
+  type : String
+  code : String
+  label : String
+  position : Int = 0
+  actif : Boolean = true
+  --
+  <<UNIQUE(type, code)>>
+  ══════════════════════
+  **Matériels (7 types) :**
+  TYPE_END
+  TYPE_MATERIEL
+  TYPE_TRADUCTEUR
+  GROUPE
+  ETAT_MATERIEL
+  COMPLETUDE
+  MOTIF_PRET
+  ──────────────────────
+  **Maquettes (10 types) :**
+  TYPE_MAQUETTE
+  COMPOSANT
+  CATEGORIE
+  FORME
+  TYPE_ASSEMBLAGE
+  MATIERE
+  PROCEDURE
+  TYPE_CONTROLE
+  ETAT_MAQUETTE
+  URGENCE
+}
+
+class Site <<ref>> {
+  **id** : Int <<PK>>
+  code : String <<UNIQUE>>
+  label : String
+  adresse : String?
+  codePostal : String?
+  ville : String?
+  pays : String? = "France"
+  telephone : String?
+  email : String?
+  actif : Boolean = true
+}
+
+class Entreprise <<ref>> {
+  **id** : Int <<PK>>
+  code : String <<UNIQUE>>
+  label : String
+  type : String = "ENTREPRISE"
+  adresse : String?
+  codePostal : String?
+  ville : String?
+  pays : String? = "France"
+  telephone : String?
+  email : String?
+  siret : String?
+  actif : Boolean = true
+}
+
+' ════════════════════════════════════════════
+' AUDIT & FICHIERS
+' ════════════════════════════════════════════
+
+class Evenement <<audit>> {
+  **id** : Int <<PK>>
+  entityType : String
+  entityId : Int
+  eventType : String
+  payload : String? (JSON)
+  acteurId : Int? <<FK → Agent>>
+  occurredAt : DateTime
+}
+
+class Fichier <<audit>> {
+  **id** : Int <<PK>>
+  entityType : String
+  entityId : Int
+  blobKey : String <<UNIQUE>>
+  nomOriginal : String?
+  mimeType : String?
+  tailleOctets : Int?
+  typeFichier : String?
+  uploadedById : Int? <<FK → Agent>>
+  uploadedAt : DateTime
+}
+
+' ════════════════════════════════════════════
+' RELATIONS (FK)
+' ════════════════════════════════════════════
+
+' --- RBAC ---
+Agent "1" -- "*" AgentRole : agentId
+Role "1" -- "*" AgentRole : roleId
+Agent "1" ..> "*" AgentRole : grantedBy
+
+' --- Matériel → Agent ---
+Agent "1" ..> "*" Materiel : createdById
+Agent "1" ..> "*" Materiel : updatedById
+
+' --- Maquette → Agent ---
+Agent "1" ..> "*" Maquette : createdById
+Agent "1" ..> "*" Maquette : updatedById
+Agent "1" ..> "*" Maquette : proprietaireId
+Agent "1" ..> "*" Maquette : emprunteurId
+
+' --- Maquette hiérarchie ---
+Maquette "0..1" -- "*" Maquette : maquetteMereId\n(sous-éléments)
+
+' --- Défauts ---
+Maquette "1" *-- "*" Defaut : maquetteId
+Agent "1" ..> "*" Defaut : detecteParId
+
+' --- Demandes d'envoi ---
+Agent "1" -- "*" DemandeEnvoi : demandeurId
+DemandeEnvoi "1" *-- "*" DemandeEnvoiLigne : demandeId
+DemandeEnvoiLigne "*" --> "0..1" Materiel : materielId
+DemandeEnvoiLigne "*" --> "0..1" Maquette : maquetteId
+
+' --- Audit ---
+Agent "1" ..> "*" Evenement : acteurId
+Agent "1" ..> "*" Fichier : uploadedById
+
+' --- Référentiels → Champs (liens logiques par code, pas FK) ---
+Referentiel .. Materiel : <color:#E65100>type/code → champs\n<color:#E65100>classification\n<color:#E65100>(string codes)
+Referentiel .. Maquette : <color:#E65100>type/code → champs\n<color:#E65100>classification\n<color:#E65100>(string codes)
+Referentiel .. DemandeEnvoi : <color:#E65100>urgence
+Site .. Materiel : <color:#1565C0>code → site
+Site .. Maquette : <color:#1565C0>code → site
+Site .. DemandeEnvoi : <color:#1565C0>code → siteDestinataire
+Entreprise .. Materiel : <color:#2E7D32>code → entreprise,\n<color:#2E7D32>fournisseur
+Entreprise .. Maquette : <color:#2E7D32>code → entreprise
+
+' ════════════════════════════════════════════
+' LEGENDE
+' ════════════════════════════════════════════
+
+legend bottom left
+  |= Couleur |= Type |
+  | <#E3F2FD> | Entité métier (CRUD) |
+  | <#FFF3E0> | Référentiel / Liste de valeurs |
+  | <#F3E5F5> | Table de jointure |
+  | <#E8F5E9> | Audit / Fichiers |
+  |= Ligne |= Signification |
+  | ── (trait plein) | FK relationnelle (contrainte DB) |
+  | .. (pointillé) | Lien logique par code (pas de FK) |
+  | *-- | Composition (cascade delete) |
+endlegend
+
+title OGADE — Modèle de Données Métier\n(Master Data Management)
+
+footer Généré le 27/04/2026 — OGADE v1.0
+
+@enduml
