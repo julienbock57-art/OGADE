@@ -86,25 +86,46 @@ export default function AdminReferentielTypePage() {
     updateMut.mutate({ id: editingId, label: editLabel.trim(), position: editPosition });
   };
 
-  const inputClass = "px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors";
+  const thStyle: React.CSSProperties = {
+    padding: "10px 14px",
+    textAlign: "left",
+    fontSize: 11,
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    color: "var(--ink-3)",
+    background: "var(--bg-panel)",
+    borderBottom: "1px solid var(--line)",
+    position: "sticky",
+    top: 0,
+  };
+
+  const tdStyle: React.CSSProperties = {
+    padding: "11px 14px",
+    fontSize: 13,
+    borderBottom: "1px solid var(--line-2)",
+    color: "var(--ink)",
+  };
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
+    <div style={{ maxWidth: 860, margin: "0 auto", paddingBottom: 40 }}>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
         <Link
           to="/admin/referentiels"
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          style={{ color: "var(--ink-3)", display: "flex", transition: "color 0.12s" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-3)")}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12.5 15.83L6.67 10l5.83-5.83" />
           </svg>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
             {typeLabels[type ?? ""] ?? type}
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2, marginBottom: 0 }}>
             {items ? `${items.length} valeur${items.length > 1 ? "s" : ""}` : "Chargement..."}
           </p>
         </div>
@@ -112,140 +133,153 @@ export default function AdminReferentielTypePage() {
 
       {/* Query error */}
       {queryError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
-          <p className="text-sm text-red-700 font-medium">Erreur de chargement</p>
-          <p className="text-xs text-red-600 mt-1">{(queryErr as Error)?.message}</p>
+        <div style={{ background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 30%, transparent)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--rose)", margin: 0 }}>Erreur de chargement</p>
+          <p style={{ fontSize: 12, color: "var(--rose)", marginTop: 2, marginBottom: 0 }}>{(queryErr as Error)?.message}</p>
         </div>
       )}
 
       {/* Add form */}
-      <form onSubmit={handleCreate} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <label className="block text-xs font-medium text-gray-500 mb-1">Code *</label>
+      <form
+        onSubmit={handleCreate}
+        style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "14px 16px", marginBottom: 12 }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Code *</label>
             <input
               type="text"
               required
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
-              className={inputClass + " w-full"}
+              className="oinput"
               placeholder="Ex: UT"
             />
           </div>
-          <div className="flex-[2]">
-            <label className="block text-xs font-medium text-gray-500 mb-1">Libellé *</label>
+          <div style={{ flex: 2 }}>
+            <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Libellé *</label>
             <input
               type="text"
               required
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
-              className={inputClass + " w-full"}
+              className="oinput"
               placeholder="Ex: Ultrasons"
             />
           </div>
           <button
             type="submit"
             disabled={createMut.isPending}
-            className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50 shadow-sm"
+            className="obtn accent"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 4.17v11.66M4.17 10h11.66" />
             </svg>
             Ajouter
           </button>
         </div>
         {createMut.isError && (
-          <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-sm text-red-700">{(createMut.error as Error).message}</p>
+          <div style={{ marginTop: 10, background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 30%, transparent)", borderRadius: 8, padding: "8px 12px" }}>
+            <p style={{ fontSize: 12, color: "var(--rose)", margin: 0 }}>{(createMut.error as Error).message}</p>
           </div>
         )}
       </form>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
         {isLoading ? (
-          <div className="p-8">
-            <div className="animate-pulse space-y-3">
+          <div style={{ padding: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-10 bg-gray-100 rounded" />
+                <div key={i} style={{ height: 40, background: "var(--bg-sunken)", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
               ))}
             </div>
           </div>
         ) : (
-          <table className="min-w-full">
-            <thead className="bg-gray-50/80 border-b border-gray-100">
+          <table style={{ minWidth: "100%", borderCollapse: "collapse" }}>
+            <thead>
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">
-                  #
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Code
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Libellé
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">
-                  Position
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider w-32">
-                  Actions
-                </th>
+                <th style={{ ...thStyle, width: 48 }}>#</th>
+                <th style={thStyle}>Code</th>
+                <th style={thStyle}>Libellé</th>
+                <th style={{ ...thStyle, width: 90 }}>Position</th>
+                <th style={{ ...thStyle, width: 100, textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {(items ?? []).length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-400">
+                  <td colSpan={5} style={{ ...tdStyle, textAlign: "center", color: "var(--ink-3)", padding: "40px 14px" }}>
                     Aucune valeur pour ce type.
                   </td>
                 </tr>
               )}
               {(items ?? []).map((item, idx) => (
-                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr
+                  key={item.id}
+                  style={{ transition: "background 0.1s" }}
+                  onMouseEnter={(e) => { if (editingId !== item.id) (e.currentTarget as HTMLElement).style.background = "var(--bg-sunken)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; }}
+                >
                   {editingId === item.id ? (
                     <>
-                      <td className="px-4 py-2 text-sm text-gray-400">{idx + 1}</td>
-                      <td className="px-4 py-2 text-sm text-gray-600 font-mono">{item.code}</td>
-                      <td className="px-4 py-2">
+                      <td style={{ ...tdStyle, color: "var(--ink-3)" }}>{idx + 1}</td>
+                      <td style={{ ...tdStyle }}>
+                        <span className="mono" style={{ fontSize: 12, color: "var(--ink-2)" }}>{item.code}</span>
+                      </td>
+                      <td style={{ ...tdStyle }}>
                         <form id={`edit-${item.id}`} onSubmit={handleUpdate}>
                           <input
                             type="text"
                             value={editLabel}
                             onChange={(e) => setEditLabel(e.target.value)}
-                            className={inputClass + " w-full"}
+                            className="oinput"
                             autoFocus
                           />
                         </form>
                       </td>
-                      <td className="px-4 py-2">
+                      <td style={{ ...tdStyle }}>
                         <input
                           type="number"
                           value={editPosition}
                           onChange={(e) => setEditPosition(Number(e.target.value))}
                           form={`edit-${item.id}`}
-                          className={inputClass + " w-20"}
+                          className="oinput"
+                          style={{ width: 72 }}
                         />
                       </td>
-                      <td className="px-4 py-2 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td style={{ ...tdStyle, textAlign: "right" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
                           <button
                             type="submit"
                             form={`edit-${item.id}`}
-                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            style={{
+                              appearance: "none", border: "none", background: "none",
+                              padding: 6, borderRadius: 7, color: "var(--emerald)",
+                              cursor: "default", display: "flex",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--emerald-soft)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
                             title="Enregistrer"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4.17 10.83l3.33 3.34 8.33-6.67" />
                             </svg>
                           </button>
                           <button
                             type="button"
                             onClick={() => setEditingId(null)}
-                            className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
+                            style={{
+                              appearance: "none", border: "none", background: "none",
+                              padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                              cursor: "default", display: "flex",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-sunken)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
                             title="Annuler"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M5 5l10 10M15 5L5 15" />
                             </svg>
                           </button>
                         </div>
@@ -253,19 +287,33 @@ export default function AdminReferentielTypePage() {
                     </>
                   ) : (
                     <>
-                      <td className="px-4 py-3 text-sm text-gray-400">{idx + 1}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600 font-mono">{item.code}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{item.label}</td>
-                      <td className="px-4 py-3 text-sm text-gray-400">{item.position}</td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td style={{ ...tdStyle, color: "var(--ink-3)" }}>{idx + 1}</td>
+                      <td style={{ ...tdStyle }}>
+                        <span className="tag mono">{item.code}</span>
+                      </td>
+                      <td style={{ ...tdStyle, color: "var(--ink)" }}>{item.label}</td>
+                      <td style={{ ...tdStyle, color: "var(--ink-3)" }}>{item.position}</td>
+                      <td style={{ ...tdStyle, textAlign: "right" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
                           <button
                             onClick={() => startEdit(item)}
-                            className="p-1.5 text-gray-400 hover:text-edf-blue hover:bg-edf-blue/5 rounded-lg transition-colors"
+                            style={{
+                              appearance: "none", border: "none", background: "none",
+                              padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                              cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = "var(--accent-ink)";
+                              e.currentTarget.style.background = "var(--accent-soft)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = "var(--ink-3)";
+                              e.currentTarget.style.background = "none";
+                            }}
                             title="Modifier"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M9.17 4.17H4.17A1.67 1.67 0 002.5 5.83v10A1.67 1.67 0 004.17 17.5h10a1.67 1.67 0 001.66-1.67v-5m-1.16-7.83a1.67 1.67 0 012.36 2.36L9.58 12.5H7.5v-2.08l7.67-7.66z" />
                             </svg>
                           </button>
                           <button
@@ -274,11 +322,23 @@ export default function AdminReferentielTypePage() {
                                 deleteMut.mutate(item.id);
                               }
                             }}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            style={{
+                              appearance: "none", border: "none", background: "none",
+                              padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                              cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = "var(--rose)";
+                              e.currentTarget.style.background = "var(--rose-soft)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = "var(--ink-3)";
+                              e.currentTarget.style.background = "none";
+                            }}
                             title="Supprimer"
                           >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M15.83 5.83l-.72 10.12a1.67 1.67 0 01-1.66 1.55H6.55a1.67 1.67 0 01-1.66-1.55L4.17 5.83M8.33 9.17v5m3.34-5v5m.83-8.34V3.33a.83.83 0 00-.83-.83H8.33a.83.83 0 00-.83.83v2.5M3.33 5.83h13.34" />
                             </svg>
                           </button>
                         </div>

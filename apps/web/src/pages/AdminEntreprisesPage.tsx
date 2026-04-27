@@ -8,12 +8,25 @@ type EntrepriseForm = { code: string; label: string; type: string; adresse: stri
 
 const empty: EntrepriseForm = { code: "", label: "", type: "ENTREPRISE", adresse: "", codePostal: "", ville: "", pays: "France", telephone: "", email: "", siret: "" };
 
-const inputClass = "px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors w-full";
-const selectClass = inputClass + " appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat pr-8";
+const thStyle: React.CSSProperties = {
+  padding: "10px 14px",
+  textAlign: "left",
+  fontSize: 11,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  color: "var(--ink-3)",
+  background: "var(--bg-panel)",
+  borderBottom: "1px solid var(--line)",
+  position: "sticky",
+  top: 0,
+};
 
-const typeBadge: Record<string, { bg: string; text: string }> = {
-  ENTREPRISE: { bg: "bg-blue-100", text: "text-blue-700" },
-  FOURNISSEUR: { bg: "bg-amber-100", text: "text-amber-700" },
+const tdStyle: React.CSSProperties = {
+  padding: "11px 14px",
+  fontSize: 13,
+  borderBottom: "1px solid var(--line-2)",
+  color: "var(--ink)",
 };
 
 export default function AdminEntreprisesPage() {
@@ -75,27 +88,33 @@ export default function AdminEntreprisesPage() {
   const mutError = createMut.error || updateMut.error;
 
   return (
-    <div className="max-w-5xl mx-auto pb-10">
+    <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 40 }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link to="/admin/referentiels" className="text-gray-400 hover:text-gray-600 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Link
+            to="/admin/referentiels"
+            style={{ color: "var(--ink-3)", display: "flex", transition: "color 0.12s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-3)")}
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12.5 15.83L6.67 10l5.83-5.83" />
             </svg>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Entreprises et fournisseurs</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>Entreprises et fournisseurs</h1>
+            <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2, marginBottom: 0 }}>
               {entreprises ? `${entreprises.length} enregistrement${entreprises.length > 1 ? "s" : ""}` : "Chargement..."}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/30"
+            className="oselect"
+            style={{ width: "auto", paddingRight: 28 }}
           >
             <option value="">Tous les types</option>
             <option value="ENTREPRISE">Entreprises</option>
@@ -104,10 +123,10 @@ export default function AdminEntreprisesPage() {
           {!showForm && (
             <button
               onClick={() => { setShowForm(true); setEditingId(null); setForm(empty); }}
-              className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors shadow-sm"
+              className="obtn accent"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 4.17v11.66M4.17 10h11.66" />
               </svg>
               Ajouter
             </button>
@@ -117,61 +136,70 @@ export default function AdminEntreprisesPage() {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
-          <h3 className="text-sm font-semibold text-edf-blue mb-4">
+        <form
+          onSubmit={handleSubmit}
+          style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "16px 20px", marginBottom: 14 }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", marginBottom: 14 }}>
             {editingId ? "Modifier" : "Ajouter une entreprise / fournisseur"}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Code *</label>
-              <input type="text" value={form.code} onChange={(e) => set("code", e.target.value)} className={inputClass} placeholder="EDF" disabled={editingId !== null} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Code *</label>
+              <input type="text" value={form.code} onChange={(e) => set("code", e.target.value)} className="oinput" placeholder="EDF" disabled={editingId !== null} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Nom *</label>
-              <input type="text" value={form.label} onChange={(e) => set("label", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Nom *</label>
+              <input type="text" value={form.label} onChange={(e) => set("label", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Type</label>
-              <select value={form.type} onChange={(e) => set("type", e.target.value)} className={selectClass}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Type</label>
+              <select value={form.type} onChange={(e) => set("type", e.target.value)} className="oselect">
                 <option value="ENTREPRISE">Entreprise</option>
                 <option value="FOURNISSEUR">Fournisseur</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Adresse</label>
-              <input type="text" value={form.adresse} onChange={(e) => set("adresse", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Adresse</label>
+              <input type="text" value={form.adresse} onChange={(e) => set("adresse", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Code postal</label>
-              <input type="text" value={form.codePostal} onChange={(e) => set("codePostal", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Code postal</label>
+              <input type="text" value={form.codePostal} onChange={(e) => set("codePostal", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Ville</label>
-              <input type="text" value={form.ville} onChange={(e) => set("ville", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Ville</label>
+              <input type="text" value={form.ville} onChange={(e) => set("ville", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Pays</label>
-              <input type="text" value={form.pays} onChange={(e) => set("pays", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Pays</label>
+              <input type="text" value={form.pays} onChange={(e) => set("pays", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">SIRET</label>
-              <input type="text" value={form.siret} onChange={(e) => set("siret", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>SIRET</label>
+              <input type="text" value={form.siret} onChange={(e) => set("siret", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Téléphone</label>
-              <input type="text" value={form.telephone} onChange={(e) => set("telephone", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Téléphone</label>
+              <input type="text" value={form.telephone} onChange={(e) => set("telephone", e.target.value)} className="oinput" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Email</label>
-              <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={inputClass} />
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>Email</label>
+              <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className="oinput" />
             </div>
           </div>
-          {mutError && <p className="text-xs text-red-600 mt-3">{(mutError as Error).message}</p>}
-          <div className="flex gap-2 mt-4">
-            <button type="submit" disabled={createMut.isPending || updateMut.isPending} className="bg-edf-blue text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50">
+          {mutError && (
+            <p style={{ fontSize: 12, color: "var(--rose)", marginTop: 10, marginBottom: 0 }}>{(mutError as Error).message}</p>
+          )}
+          <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <button
+              type="submit"
+              disabled={createMut.isPending || updateMut.isPending}
+              className="obtn accent"
+            >
               {editingId ? "Enregistrer" : "Ajouter"}
             </button>
-            <button type="button" onClick={cancelForm} className="bg-white text-gray-600 border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+            <button type="button" onClick={cancelForm} className="obtn">
               Annuler
             </button>
           </div>
@@ -179,59 +207,99 @@ export default function AdminEntreprisesPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
         {isLoading ? (
-          <div className="p-8"><div className="animate-pulse space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}</div></div>
+          <div style={{ padding: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} style={{ height: 44, background: "var(--bg-sunken)", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-50/80 border-b border-gray-100">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ minWidth: "100%", borderCollapse: "collapse" }}>
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ville</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">SIRET</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider w-20">Actions</th>
+                  <th style={thStyle}>Code</th>
+                  <th style={thStyle}>Nom</th>
+                  <th style={{ ...thStyle, width: 120 }}>Type</th>
+                  <th style={thStyle}>Ville</th>
+                  <th style={thStyle}>SIRET</th>
+                  <th style={{ ...thStyle, width: 64, textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-12 text-center text-sm text-gray-400">Aucune entreprise.</td></tr>
+                  <tr>
+                    <td colSpan={6} style={{ ...tdStyle, textAlign: "center", color: "var(--ink-3)", padding: "40px 14px" }}>
+                      Aucune entreprise.
+                    </td>
+                  </tr>
                 )}
-                {filtered.map((ent) => {
-                  const badge = typeBadge[ent.type] ?? typeBadge.ENTREPRISE;
-                  return (
-                    <tr key={ent.id} className={`hover:bg-gray-50/50 transition-colors ${editingId === ent.id ? "bg-edf-blue/5" : ""}`}>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-600">{ent.code}</td>
-                      <td className="px-4 py-3">
-                        <div className="text-sm font-medium text-gray-900">{ent.label}</div>
-                        {ent.adresse && <div className="text-xs text-gray-400">{ent.adresse}</div>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
-                          {ent.type === "FOURNISSEUR" ? "Fournisseur" : "Entreprise"}
+                {filtered.map((ent) => (
+                  <tr
+                    key={ent.id}
+                    style={{ background: editingId === ent.id ? "var(--accent-soft)" : undefined, transition: "background 0.1s" }}
+                    onMouseEnter={(e) => { if (editingId !== ent.id) (e.currentTarget as HTMLElement).style.background = "var(--bg-sunken)"; }}
+                    onMouseLeave={(e) => { if (editingId !== ent.id) (e.currentTarget as HTMLElement).style.background = ""; }}
+                  >
+                    <td style={tdStyle}>
+                      <span className="tag mono">{ent.code}</span>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ fontWeight: 500, color: "var(--ink)" }}>{ent.label}</div>
+                      {ent.adresse && <div style={{ fontSize: 11.5, color: "var(--ink-3)" }}>{ent.adresse}</div>}
+                    </td>
+                    <td style={tdStyle}>
+                      {ent.type === "FOURNISSEUR" ? (
+                        <span className="pill c-amber">
+                          <span className="dot" />
+                          Fournisseur
                         </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {ent.ville ?? "—"}
-                        {ent.pays && ent.pays !== "France" && <span className="text-xs text-gray-400 ml-1">({ent.pays})</span>}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500 font-mono">{ent.siret || "—"}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => startEdit(ent)}
-                          className="p-1.5 text-gray-400 hover:text-edf-blue hover:bg-edf-blue/5 rounded-lg transition-colors"
-                          title="Modifier"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      ) : (
+                        <span className="pill c-sky">
+                          <span className="dot" />
+                          Entreprise
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ ...tdStyle, color: "var(--ink-2)" }}>
+                      {ent.ville ?? <span style={{ color: "var(--ink-4)" }}>—</span>}
+                      {ent.pays && ent.pays !== "France" && (
+                        <span style={{ fontSize: 11, color: "var(--ink-4)", marginLeft: 4 }}>({ent.pays})</span>
+                      )}
+                    </td>
+                    <td style={tdStyle}>
+                      <span className="mono" style={{ fontSize: 12, color: ent.siret ? "var(--ink-2)" : "var(--ink-4)" }}>
+                        {ent.siret || "—"}
+                      </span>
+                    </td>
+                    <td style={{ ...tdStyle, textAlign: "right" }}>
+                      <button
+                        onClick={() => startEdit(ent)}
+                        style={{
+                          appearance: "none", border: "none", background: "none",
+                          padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                          cursor: "default", display: "inline-flex", transition: "color 0.12s, background 0.12s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = "var(--accent-ink)";
+                          e.currentTarget.style.background = "var(--accent-soft)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = "var(--ink-3)";
+                          e.currentTarget.style.background = "none";
+                        }}
+                        title="Modifier"
+                      >
+                        <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9.17 4.17H4.17A1.67 1.67 0 002.5 5.83v10A1.67 1.67 0 004.17 17.5h10a1.67 1.67 0 001.66-1.67v-5m-1.16-7.83a1.67 1.67 0 012.36 2.36L9.58 12.5H7.5v-2.08l7.67-7.66z" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

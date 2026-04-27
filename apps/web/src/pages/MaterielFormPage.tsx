@@ -19,17 +19,23 @@ import {
 
 type Agent = { id: number; nom: string; prenom: string; email: string };
 
-const inputClass =
-  "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors";
-const selectClass =
-  "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_12px_center] bg-no-repeat pr-8";
-const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
-const errorClass = "text-xs text-red-600 mt-1";
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: 12, fontWeight: 500,
+  color: "var(--ink-2)", marginBottom: 5,
+};
+const errorStyle: React.CSSProperties = { fontSize: 11, color: "var(--rose)", marginTop: 4 };
 
-function SectionHeader({ title }: { title: string }) {
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border-b border-gray-200 pb-2 mb-4">
-      <h2 className="text-base font-semibold text-edf-blue">{title}</h2>
+    <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
+      <h2 style={{
+        fontSize: 11, fontWeight: 600, textTransform: "uppercase",
+        letterSpacing: "0.06em", color: "var(--ink-3)",
+        margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)",
+      }}>
+        {title}
+      </h2>
+      {children}
     </div>
   );
 }
@@ -49,8 +55,8 @@ function RefSelect({
 }) {
   return (
     <div>
-      <label className={labelClass}>{label}</label>
-      <select {...registration} className={selectClass}>
+      <label style={labelStyle}>{label}</label>
+      <select {...registration} className="oselect">
         <option value="">{placeholder ?? `Sélectionner ${label.toLowerCase()}...`}</option>
         {options.map((o) => (
           <option key={o.code} value={o.code}>
@@ -58,7 +64,7 @@ function RefSelect({
           </option>
         ))}
       </select>
-      {error && <p className={errorClass}>{error}</p>}
+      {error && <p style={errorStyle}>{error}</p>}
     </div>
   );
 }
@@ -188,67 +194,79 @@ export default function MaterielFormPage() {
 
   if (isEdit && loadingExisting) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edf-blue" />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 0" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: "50%",
+          border: "2.5px solid var(--accent-soft)",
+          borderTopColor: "var(--accent)",
+          animation: "spin 0.7s linear infinite",
+        }} />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
-      <div className="flex items-center gap-3 mb-6">
+    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <button
           onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          style={{ color: "var(--ink-3)", background: "none", border: 0, padding: 4, cursor: "pointer", display: "flex", alignItems: "center" }}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-2xl font-bold text-gray-800">
-          {isEdit ? "Modifier le matériel" : "Nouveau matériel END"}
-        </h1>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
+            {isEdit ? "Modifier le matériel" : "Nouveau matériel END"}
+          </h1>
+        </div>
       </div>
 
       {mutationError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-start gap-2">
-          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <div style={{
+          marginBottom: 20, padding: "12px 16px",
+          background: "var(--rose-soft)",
+          border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+          color: "var(--rose)", borderRadius: 10, fontSize: 13,
+          display: "flex", alignItems: "flex-start", gap: 8,
+        }}>
+          <svg width="16" height="16" style={{ flexShrink: 0, marginTop: 1 }} fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
           {mutationError.message}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Identification */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Identification" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        <SectionCard title="Identification">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
             <div>
-              <label className={labelClass}>Référence *</label>
-              <input type="text" {...register("reference")} className={inputClass} placeholder="Ex: MAT-2026-001" />
-              {errors.reference && <p className={errorClass}>{errors.reference.message}</p>}
+              <label style={labelStyle}>Référence *</label>
+              <input type="text" {...register("reference")} className="oinput" placeholder="Ex: MAT-2026-001" />
+              {errors.reference && <p style={errorStyle}>{errors.reference.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>Libellé *</label>
-              <input type="text" {...register("libelle")} className={inputClass} placeholder="Nom du matériel" />
-              {errors.libelle && <p className={errorClass}>{errors.libelle.message}</p>}
+              <label style={labelStyle}>Libellé *</label>
+              <input type="text" {...register("libelle")} className="oinput" placeholder="Nom du matériel" />
+              {errors.libelle && <p style={errorStyle}>{errors.libelle.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>Numéro de série</label>
-              <input type="text" {...register("numeroSerie")} className={inputClass} />
+              <label style={labelStyle}>Numéro de série</label>
+              <input type="text" {...register("numeroSerie")} className="oinput" />
             </div>
             <div>
-              <label className={labelClass}>Modèle</label>
-              <input type="text" {...register("modele")} className={inputClass} />
+              <label style={labelStyle}>Modèle</label>
+              <input type="text" {...register("modele")} className="oinput" />
             </div>
             <div>
-              <label className={labelClass}>N° FIEC</label>
-              <input type="text" {...register("numeroFIEC")} className={inputClass} placeholder="Numéro FIEC" />
+              <label style={labelStyle}>N° FIEC</label>
+              <input type="text" {...register("numeroFIEC")} className="oinput" placeholder="Numéro FIEC" />
             </div>
             <div>
-              <label className={labelClass}>Propriétaire</label>
-              <input type="text" {...register("proprietaire")} className={inputClass} placeholder="Nom du propriétaire" />
+              <label style={labelStyle}>Propriétaire</label>
+              <input type="text" {...register("proprietaire")} className="oinput" placeholder="Nom du propriétaire" />
             </div>
             {isEdit && (
               <RefSelect
@@ -259,52 +277,23 @@ export default function MaterielFormPage() {
               />
             )}
           </div>
-        </div>
+        </SectionCard>
 
         {/* Classification */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Classification" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-            <RefSelect
-              label="Type END"
-              registration={register("typeEND")}
-              options={typesEnd ?? []}
-            />
-            <RefSelect
-              label="Type de matériel"
-              registration={register("typeMateriel")}
-              options={typesMat ?? []}
-            />
-            <RefSelect
-              label="Type de traducteur"
-              registration={register("typeTraducteur")}
-              options={typesTraducteur ?? []}
-            />
-            <RefSelect
-              label="Groupe"
-              registration={register("groupe")}
-              options={groupes ?? []}
-            />
-            <RefSelect
-              label="Fournisseur"
-              registration={register("fournisseur")}
-              options={fournisseurOptions}
-            />
-            <RefSelect
-              label="Entreprise"
-              registration={register("entreprise")}
-              options={entrepriseOptions}
-            />
-            <RefSelect
-              label="Lot / Chaîne"
-              registration={register("lotChaine")}
-              options={lotsChaines ?? []}
-            />
+        <SectionCard title="Classification">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
+            <RefSelect label="Type END" registration={register("typeEND")} options={typesEnd ?? []} />
+            <RefSelect label="Type de matériel" registration={register("typeMateriel")} options={typesMat ?? []} />
+            <RefSelect label="Type de traducteur" registration={register("typeTraducteur")} options={typesTraducteur ?? []} />
+            <RefSelect label="Groupe" registration={register("groupe")} options={groupes ?? []} />
+            <RefSelect label="Fournisseur" registration={register("fournisseur")} options={fournisseurOptions} />
+            <RefSelect label="Entreprise" registration={register("entreprise")} options={entrepriseOptions} />
+            <RefSelect label="Lot / Chaîne" registration={register("lotChaine")} options={lotsChaines ?? []} />
             <div>
-              <label className={labelClass}>Responsable</label>
+              <label style={labelStyle}>Responsable</label>
               <select
                 {...register("responsableId", { setValueAs: (v: string) => v ? Number(v) : undefined })}
-                className={selectClass}
+                className="oselect"
               >
                 <option value="">Sélectionner un responsable...</option>
                 {agentOptions.map((o) => (
@@ -313,135 +302,114 @@ export default function MaterielFormPage() {
               </select>
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Localisation */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Localisation" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <RefSelect
-              label="Site"
-              registration={register("site")}
-              options={siteOptions}
-            />
+        <SectionCard title="Localisation">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
+            <RefSelect label="Site" registration={register("site")} options={siteOptions} />
             <div>
-              <label className={labelClass}>Localisation</label>
-              <input type="text" {...register("localisation")} className={inputClass} placeholder="Bâtiment, salle, rayonnage..." />
+              <label style={labelStyle}>Localisation</label>
+              <input type="text" {...register("localisation")} className="oinput" placeholder="Bâtiment, salle, rayonnage..." />
             </div>
             <div>
-              <label className={labelClass}>Compléments localisation</label>
-              <input type="text" {...register("complementsLocalisation")} className={inputClass} placeholder="Détails supplémentaires" />
+              <label style={labelStyle}>Compléments localisation</label>
+              <input type="text" {...register("complementsLocalisation")} className="oinput" placeholder="Détails supplémentaires" />
             </div>
             <div>
-              <label className={labelClass}>En transit</label>
-              <select {...register("enTransit")} className={selectClass}>
+              <label style={labelStyle}>En transit</label>
+              <select {...register("enTransit")} className="oselect">
                 <option value="NON">Non</option>
                 <option value="OUI">Oui</option>
               </select>
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Étalonnage */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Étalonnage" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+        <SectionCard title="Étalonnage">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
             <div>
-              <label className={labelClass}>Date dernier étalonnage</label>
-              <input type="date" {...register("dateEtalonnage")} className={inputClass} />
+              <label style={labelStyle}>Date dernier étalonnage</label>
+              <input type="date" {...register("dateEtalonnage")} className="oinput" />
             </div>
             <div>
-              <label className={labelClass}>Date prochain étalonnage</label>
-              <input type="date" {...register("dateProchainEtalonnage")} className={inputClass} />
+              <label style={labelStyle}>Date prochain étalonnage</label>
+              <input type="date" {...register("dateProchainEtalonnage")} className="oinput" />
             </div>
             <div>
-              <label className={labelClass}>Validité (mois)</label>
-              <input type="number" {...register("validiteEtalonnage", { valueAsNumber: true })} className={inputClass} placeholder="12" />
+              <label style={labelStyle}>Validité (mois)</label>
+              <input type="number" {...register("validiteEtalonnage", { valueAsNumber: true })} className="oinput" placeholder="12" />
             </div>
-            <div className="flex items-center gap-3 pt-6">
-              <input type="checkbox" {...register("soumisVerification")} id="soumisVerification" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="soumisVerification" className="text-sm text-gray-700">Soumis à vérification périodique</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 20 }}>
+              <input type="checkbox" {...register("soumisVerification")} id="soumisVerification"
+                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
+              <label htmlFor="soumisVerification" style={{ fontSize: 13, color: "var(--ink)" }}>Soumis à vérification périodique</label>
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Prêt */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Prêt" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <div className="flex items-center gap-3">
-              <input type="checkbox" {...register("enPret")} id="enPret" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="enPret" className="text-sm text-gray-700">Matériel actuellement en prêt</label>
+        <SectionCard title="Prêt">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="checkbox" {...register("enPret")} id="enPret"
+                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
+              <label htmlFor="enPret" style={{ fontSize: 13, color: "var(--ink)" }}>Matériel actuellement en prêt</label>
             </div>
-            <RefSelect
-              label="Motif du prêt"
-              registration={register("motifPret")}
-              options={motifsPret ?? []}
-            />
+            <RefSelect label="Motif du prêt" registration={register("motifPret")} options={motifsPret ?? []} />
             <div>
-              <label className={labelClass}>Date de retour prêt</label>
-              <input type="date" {...register("dateRetourPret")} className={inputClass} />
+              <label style={labelStyle}>Date de retour prêt</label>
+              <input type="date" {...register("dateRetourPret")} className="oinput" />
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Complétude et vérification */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Complétude et vérification" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <RefSelect
-              label="Complétude"
-              registration={register("completude")}
-              options={completudes ?? []}
-            />
-            <div className="flex items-center gap-3 pt-6">
-              <input type="checkbox" {...register("informationVerifiee")} id="informationVerifiee" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="informationVerifiee" className="text-sm text-gray-700">Information vérifiée</label>
+        <SectionCard title="Complétude et vérification">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
+            <RefSelect label="Complétude" registration={register("completude")} options={completudes ?? []} />
+            <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 20 }}>
+              <input type="checkbox" {...register("informationVerifiee")} id="informationVerifiee"
+                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
+              <label htmlFor="informationVerifiee" style={{ fontSize: 13, color: "var(--ink)" }}>Information vérifiée</label>
             </div>
-            <div className="flex items-center gap-3">
-              <input type="checkbox" {...register("produitsChimiques")} id="produitsChimiques" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="produitsChimiques" className="text-sm text-gray-700">Contient des produits chimiques</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="checkbox" {...register("produitsChimiques")} id="produitsChimiques"
+                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
+              <label htmlFor="produitsChimiques" style={{ fontSize: 13, color: "var(--ink)" }}>Contient des produits chimiques</label>
             </div>
-            <div className="md:col-span-2">
-              <label className={labelClass}>Commentaire complétude</label>
-              <textarea rows={2} {...register("commentairesCompletude")} className={inputClass} placeholder="Détails sur la complétude..." />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>Commentaire complétude</label>
+              <textarea rows={2} {...register("commentairesCompletude")} className="otextarea" placeholder="Détails sur la complétude..." />
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Description & commentaires */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Description & commentaires" />
-          <div className="space-y-4">
+        <SectionCard title="Description & commentaires">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
-              <label className={labelClass}>Description</label>
-              <textarea rows={3} {...register("description")} className={inputClass} placeholder="Description détaillée du matériel..." />
+              <label style={labelStyle}>Description</label>
+              <textarea rows={3} {...register("description")} className="otextarea" placeholder="Description détaillée du matériel..." />
             </div>
             <div>
-              <label className={labelClass}>Commentaire état</label>
-              <textarea rows={2} {...register("commentaireEtat")} className={inputClass} placeholder="Remarques sur l'état du matériel..." />
+              <label style={labelStyle}>Commentaire état</label>
+              <textarea rows={2} {...register("commentaireEtat")} className="otextarea" placeholder="Remarques sur l'état du matériel..." />
             </div>
             <div>
-              <label className={labelClass}>Commentaires généraux</label>
-              <textarea rows={2} {...register("commentaires")} className={inputClass} />
+              <label style={labelStyle}>Commentaires généraux</label>
+              <textarea rows={2} {...register("commentaires")} className="otextarea" />
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Actions */}
-        <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-edf-blue text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50 shadow-sm"
-          >
+        <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
+          <button type="submit" disabled={isSubmitting} className="obtn accent">
             {isSubmitting ? "Enregistrement..." : isEdit ? "Enregistrer les modifications" : "Créer le matériel"}
           </button>
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="bg-white text-gray-700 border border-gray-300 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
+          <button type="button" onClick={() => navigate(-1)} className="obtn">
             Annuler
           </button>
         </div>

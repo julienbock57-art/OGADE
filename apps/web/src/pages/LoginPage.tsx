@@ -25,19 +25,37 @@ export default function LoginPage() {
   const showLocal = authConfig?.localAuth;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-edf-blue rounded-2xl mb-4">
-            <span className="text-white font-bold text-2xl">O</span>
+    <div style={{
+      minHeight: "100vh",
+      background: "var(--bg)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 16,
+    }}>
+      <div style={{ maxWidth: 400, width: "100%" }}>
+        {/* Branding */}
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            width: 52, height: 52, borderRadius: 14,
+            background: "linear-gradient(135deg, var(--accent) 0%, oklch(0.55 0.20 320) 100%)",
+            marginBottom: 14,
+            boxShadow: "0 1px 0 rgba(255,255,255,.2) inset, 0 2px 8px oklch(0.50 0.20 275 / .3)",
+          }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 22, letterSpacing: "-0.01em" }}>O</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 tracking-wide">OGADE</h1>
-          <p className="text-sm text-gray-500 mt-1">Gestion des Actifs END</p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0, letterSpacing: "-0.01em" }}>OGADE</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4 }}>Gestion des Actifs END</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Connexion</h2>
-          <p className="text-sm text-gray-500 mb-6">
+        {/* Card */}
+        <div style={{
+          background: "var(--bg-panel)",
+          border: "1px solid var(--line)",
+          borderRadius: 14,
+          padding: "28px 28px 24px",
+        }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", margin: "0 0 6px" }}>Connexion</h2>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", margin: "0 0 22px" }}>
             Connectez-vous pour accéder à l'application.
           </p>
 
@@ -45,9 +63,18 @@ export default function LoginPage() {
             <button
               onClick={loginMicrosoft}
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-3 bg-[#2F2F2F] text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-[#1a1a1a] transition-colors disabled:opacity-50"
+              style={{
+                width: "100%",
+                display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
+                background: "#2F2F2F", color: "white",
+                border: "1px solid #2F2F2F",
+                padding: "9px 16px", borderRadius: 8,
+                fontWeight: 500, fontSize: 13,
+                cursor: "pointer", opacity: loading ? 0.5 : 1,
+                transition: "background 0.12s",
+              }}
             >
-              <svg className="w-5 h-5" viewBox="0 0 21 21" fill="none">
+              <svg width="18" height="18" viewBox="0 0 21 21" fill="none">
                 <rect x="1" y="1" width="9" height="9" fill="#F25022" />
                 <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
                 <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
@@ -58,55 +85,64 @@ export default function LoginPage() {
           )}
 
           {showMicrosoft && showLocal && (
-            <div className="flex items-center gap-3 my-5">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400 font-medium">OU</span>
-              <div className="flex-1 h-px bg-gray-200" />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0" }}>
+              <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
+              <span style={{ fontSize: 11, color: "var(--ink-3)", fontWeight: 500, letterSpacing: "0.04em" }}>OU</span>
+              <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
             </div>
           )}
 
           {showLocal && (
-            <form onSubmit={handleLocalLogin} className="space-y-4">
+            <form onSubmit={handleLocalLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--ink-2)", marginBottom: 5 }}>
+                  Email
+                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors"
+                  className="oinput"
                   placeholder="nom@exemple.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--ink-2)", marginBottom: 5 }}>
+                  Mot de passe
+                </label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors"
+                  className="oinput"
                   placeholder="Mot de passe"
                 />
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                <div style={{
+                  background: "var(--rose-soft)",
+                  border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+                  borderRadius: 8, padding: "10px 14px",
+                }}>
+                  <p style={{ fontSize: 13, color: "var(--rose)", margin: 0 }}>{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={submitting || !email || !password}
-                className="w-full bg-edf-blue text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50"
+                className="obtn accent"
+                style={{ width: "100%", justifyContent: "center", padding: "9px 16px" }}
               >
                 {submitting ? "Connexion..." : "Se connecter"}
               </button>
             </form>
           )}
 
-          <p className="text-xs text-gray-400 mt-5 text-center">
+          <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 20, textAlign: "center" }}>
             Seuls les comptes autorisés par un administrateur peuvent accéder à l'application.
           </p>
         </div>

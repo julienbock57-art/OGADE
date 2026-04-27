@@ -1,8 +1,14 @@
+@import './ogade-design.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: "Open Sans", sans-serif;
-  @apply bg-gray-50;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--ui-fs);
 }

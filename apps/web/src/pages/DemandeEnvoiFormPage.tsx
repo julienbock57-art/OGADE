@@ -22,14 +22,24 @@ const urgenceOptions = [
   { value: "URGENTE", label: "Urgente" },
 ];
 
-const inputClass =
-  "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors";
-const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: 12, fontWeight: 500,
+  color: "var(--ink-2)", marginBottom: 5,
+};
 
-function SectionHeader({ title }: { title: string }) {
+function SectionCard({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="border-b border-gray-200 pb-2 mb-4">
-      <h2 className="text-base font-semibold text-edf-blue">{title}</h2>
+    <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginBottom: 16, paddingBottom: 10, borderBottom: "1px solid var(--line-2)",
+      }}>
+        <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: 0 }}>
+          {title}
+        </h2>
+        {action}
+      </div>
+      {children}
     </div>
   );
 }
@@ -76,181 +86,189 @@ export default function DemandeEnvoiFormPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
-      <div className="flex items-center gap-3 mb-6">
+    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <button
           onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          style={{ color: "var(--ink-3)", background: "none", border: 0, padding: 4, cursor: "pointer", display: "flex", alignItems: "center" }}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
           Nouvelle demande d'envoi
         </h1>
       </div>
 
       {createMutation.error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-start gap-2">
-          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <div style={{
+          marginBottom: 20, padding: "12px 16px",
+          background: "var(--rose-soft)",
+          border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+          color: "var(--rose)", borderRadius: 10, fontSize: 13,
+          display: "flex", alignItems: "flex-start", gap: 8,
+        }}>
+          <svg width="16" height="16" style={{ flexShrink: 0, marginTop: 1 }} fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
           {createMutation.error.message}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* ─── Informations générales ────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Informations générales" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {/* Informations générales */}
+        <SectionCard title="Informations générales">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
             <div>
-              <label className={labelClass}>Type de demande *</label>
-              <select {...register("type")} className={inputClass}>
+              <label style={labelStyle}>Type de demande *</label>
+              <select {...register("type")} className="oselect">
                 {typeOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              {errors.type && <p className="text-xs text-red-600 mt-1">{errors.type.message}</p>}
+              {errors.type && <p style={{ fontSize: 11, color: "var(--rose)", marginTop: 4 }}>{errors.type.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>Date d'envoi souhaitée</label>
-              <input type="date" {...register("dateSouhaitee")} className={inputClass} />
+              <label style={labelStyle}>Date d'envoi souhaitée</label>
+              <input type="date" {...register("dateSouhaitee")} className="oinput" />
             </div>
             <div>
-              <label className={labelClass}>Motif de l'envoi</label>
-              <input type="text" {...register("motif")} className={inputClass} placeholder="Essai, contrôle, réparation..." />
+              <label style={labelStyle}>Motif de l'envoi</label>
+              <input type="text" {...register("motif")} className="oinput" placeholder="Essai, contrôle, réparation..." />
             </div>
             <div>
-              <label className={labelClass}>Urgence</label>
-              <select {...register("urgence")} className={inputClass}>
+              <label style={labelStyle}>Urgence</label>
+              <select {...register("urgence")} className="oselect">
                 {urgenceOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             </div>
             {urgenceValue && urgenceValue !== "NORMALE" && (
-              <div className="md:col-span-2">
-                <label className={labelClass}>Justification de l'urgence</label>
-                <textarea rows={2} {...register("justificationUrgence")} className={inputClass} placeholder="Expliquez la raison de l'urgence..." />
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Justification de l'urgence</label>
+                <textarea rows={2} {...register("justificationUrgence")} className="otextarea" placeholder="Expliquez la raison de l'urgence..." />
               </div>
             )}
           </div>
-        </div>
+        </SectionCard>
 
-        {/* ─── Destinataire ──────────────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Destinataire" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        {/* Destinataire */}
+        <SectionCard title="Destinataire">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
             <div>
-              <label className={labelClass}>Nom / Entreprise *</label>
-              <input type="text" {...register("destinataire")} className={inputClass} placeholder="Nom du destinataire" />
-              {errors.destinataire && <p className="text-xs text-red-600 mt-1">{errors.destinataire.message}</p>}
+              <label style={labelStyle}>Nom / Entreprise *</label>
+              <input type="text" {...register("destinataire")} className="oinput" placeholder="Nom du destinataire" />
+              {errors.destinataire && <p style={{ fontSize: 11, color: "var(--rose)", marginTop: 4 }}>{errors.destinataire.message}</p>}
             </div>
             <div>
-              <label className={labelClass}>Site destinataire</label>
-              <input type="text" {...register("siteDestinataire")} className={inputClass} />
+              <label style={labelStyle}>Site destinataire</label>
+              <input type="text" {...register("siteDestinataire")} className="oinput" />
             </div>
-            <div className="md:col-span-2">
-              <label className={labelClass}>Adresse de destination</label>
-              <textarea rows={2} {...register("adresseDestination")} className={inputClass} placeholder="Adresse complète..." />
-            </div>
-            <div>
-              <label className={labelClass}>Contact</label>
-              <input type="text" {...register("contact")} className={inputClass} placeholder="Nom de la personne de contact" />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>Adresse de destination</label>
+              <textarea rows={2} {...register("adresseDestination")} className="otextarea" placeholder="Adresse complète..." />
             </div>
             <div>
-              <label className={labelClass}>Téléphone du contact</label>
-              <input type="tel" {...register("contactTelephone")} className={inputClass} placeholder="06 XX XX XX XX" />
+              <label style={labelStyle}>Contact</label>
+              <input type="text" {...register("contact")} className="oinput" placeholder="Nom de la personne de contact" />
+            </div>
+            <div>
+              <label style={labelStyle}>Téléphone du contact</label>
+              <input type="tel" {...register("contactTelephone")} className="oinput" placeholder="06 XX XX XX XX" />
             </div>
           </div>
-        </div>
+        </SectionCard>
 
-        {/* ─── Options d'envoi ───────────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Options d'envoi" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-            <div className="flex items-center gap-3">
-              <input type="checkbox" {...register("convention")} id="convention" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="convention" className="text-sm text-gray-700">Convention existante</label>
-            </div>
-            <div className="flex items-center gap-3">
-              <input type="checkbox" {...register("souscriptionAssurance")} id="souscriptionAssurance" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="souscriptionAssurance" className="text-sm text-gray-700">Souscription d'une assurance</label>
-            </div>
-            <div className="flex items-center gap-3">
-              <input type="checkbox" {...register("produitsChimiques")} id="produitsChimiques" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
-              <label htmlFor="produitsChimiques" className="text-sm text-gray-700">Contient des produits chimiques</label>
-            </div>
+        {/* Options d'envoi */}
+        <SectionCard title="Options d'envoi">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px" }}>
+            {[
+              { id: "convention", name: "convention" as const, label: "Convention existante" },
+              { id: "souscriptionAssurance", name: "souscriptionAssurance" as const, label: "Souscription d'une assurance" },
+              { id: "produitsChimiques", name: "produitsChimiques" as const, label: "Contient des produits chimiques" },
+            ].map(({ id, name, label }) => (
+              <div key={id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input type="checkbox" {...register(name)} id={id}
+                  style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
+                <label htmlFor={id} style={{ fontSize: 13, color: "var(--ink)" }}>{label}</label>
+              </div>
+            ))}
           </div>
-        </div>
+        </SectionCard>
 
-        {/* ─── Lignes d'envoi ────────────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
-            <h2 className="text-base font-semibold text-edf-blue">Éléments à envoyer</h2>
+        {/* Éléments à envoyer */}
+        <SectionCard
+          title="Éléments à envoyer"
+          action={
             <button
               type="button"
               onClick={() => append({ quantite: 1 })}
-              className="inline-flex items-center gap-1 text-sm text-edf-blue hover:text-edf-blue/80 font-medium transition-colors"
+              className="obtn"
+              style={{ fontSize: 12, padding: "4px 10px" }}
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
               Ajouter une ligne
             </button>
-          </div>
-
-          <div className="space-y-3">
+          }
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex gap-3 items-end p-4 bg-gray-50 rounded-lg border border-gray-100"
+                style={{
+                  display: "flex", gap: 12, alignItems: "flex-end",
+                  padding: "14px 16px",
+                  background: "var(--bg-sunken)",
+                  border: "1px solid var(--line-2)",
+                  borderRadius: 10,
+                }}
               >
-                <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                    ID Matériel
-                  </label>
+                <div style={{ flex: 1 }}>
+                  <label style={{ ...labelStyle, fontSize: 11 }}>ID Matériel</label>
                   <input
                     type="number"
                     {...register(`lignes.${index}.materielId`, { valueAsNumber: true })}
                     placeholder="Laisser vide si maquette"
-                    className={inputClass}
+                    className="oinput"
                   />
                 </div>
-                <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                    ID Maquette
-                  </label>
+                <div style={{ flex: 1 }}>
+                  <label style={{ ...labelStyle, fontSize: 11 }}>ID Maquette</label>
                   <input
                     type="number"
                     {...register(`lignes.${index}.maquetteId`, { valueAsNumber: true })}
                     placeholder="Laisser vide si matériel"
-                    className={inputClass}
+                    className="oinput"
                   />
                 </div>
-                <div className="w-24">
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                    Qté
-                  </label>
+                <div style={{ width: 90 }}>
+                  <label style={{ ...labelStyle, fontSize: 11 }}>Qté</label>
                   <input
                     type="number"
                     {...register(`lignes.${index}.quantite`, { valueAsNumber: true })}
                     defaultValue={1}
                     min={1}
-                    className={inputClass}
+                    className="oinput"
                   />
                 </div>
                 {fields.length > 1 && (
                   <button
                     type="button"
                     onClick={() => remove(index)}
-                    className="text-red-400 hover:text-red-600 pb-2.5 transition-colors"
+                    style={{
+                      background: "none", border: 0, padding: "6px",
+                      color: "var(--rose)", cursor: "pointer",
+                      borderRadius: 6, display: "flex", alignItems: "center",
+                      marginBottom: 2,
+                    }}
                     title="Supprimer cette ligne"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 )}
@@ -258,39 +276,30 @@ export default function DemandeEnvoiFormPage() {
             ))}
           </div>
           {errors.lignes && (
-            <p className="text-xs text-red-600 mt-2">
+            <p style={{ fontSize: 11, color: "var(--rose)", marginTop: 8 }}>
               {typeof errors.lignes === "object" && "message" in errors.lignes
                 ? (errors.lignes as { message?: string }).message
                 : "Vérifiez les lignes : chaque ligne doit contenir un matériel OU une maquette"}
             </p>
           )}
-        </div>
+        </SectionCard>
 
-        {/* ─── Commentaire ───────────────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Commentaire" />
+        {/* Commentaire */}
+        <SectionCard title="Commentaire">
           <textarea
             rows={3}
             {...register("commentaire")}
-            className={inputClass}
+            className="otextarea"
             placeholder="Informations complémentaires..."
           />
-        </div>
+        </SectionCard>
 
-        {/* ─── Actions ───────────────────────────────────── */}
-        <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-edf-blue text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50 shadow-sm"
-          >
+        {/* Actions */}
+        <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
+          <button type="submit" disabled={isSubmitting} className="obtn accent">
             {isSubmitting ? "Création en cours..." : "Créer la demande d'envoi"}
           </button>
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="bg-white text-gray-700 border border-gray-300 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
+          <button type="button" onClick={() => navigate(-1)} className="obtn">
             Annuler
           </button>
         </div>

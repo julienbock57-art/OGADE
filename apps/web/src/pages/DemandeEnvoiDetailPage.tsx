@@ -2,24 +2,14 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { DemandeEnvoi } from "@ogade/shared";
 import { api } from "@/lib/api";
-import Badge from "@/components/Badge";
 
-const statutBadgeVariant: Record<string, string> = {
-  BROUILLON: "default",
-  ENVOYEE: "info",
-  EN_TRANSIT: "warning",
-  RECUE: "success",
-  CLOTUREE: "purple",
-  ANNULEE: "danger",
-};
-
-const statutLabel: Record<string, string> = {
-  BROUILLON: "Brouillon",
-  ENVOYEE: "Envoyée",
-  EN_TRANSIT: "En transit",
-  RECUE: "Reçue",
-  CLOTUREE: "Clôturée",
-  ANNULEE: "Annulée",
+const statutPill: Record<string, { cls: string; label: string }> = {
+  BROUILLON:  { cls: "pill c-neutral", label: "Brouillon" },
+  ENVOYEE:    { cls: "pill c-sky",     label: "Envoyée" },
+  EN_TRANSIT: { cls: "pill c-amber",   label: "En transit" },
+  RECUE:      { cls: "pill c-emerald", label: "Reçue" },
+  CLOTUREE:   { cls: "pill c-violet",  label: "Clôturée" },
+  ANNULEE:    { cls: "pill c-rose",    label: "Annulée" },
 };
 
 const typeLabel: Record<string, string> = {
@@ -29,7 +19,7 @@ const typeLabel: Record<string, string> = {
 };
 
 function formatDate(value?: string | Date | null): string {
-  if (!value) return "-";
+  if (!value) return "—";
   return new Date(value).toLocaleDateString("fr-FR");
 }
 
@@ -46,6 +36,17 @@ interface DemandeEnvoiWithLignes extends DemandeEnvoi {
   }[];
 }
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+        {label}
+      </dt>
+      <dd style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{children || "—"}</dd>
+    </div>
+  );
+}
+
 export default function DemandeEnvoiDetailPage() {
   const { id } = useParams<{ id: string }>();
 
@@ -59,102 +60,111 @@ export default function DemandeEnvoiDetailPage() {
     enabled: !!id,
   });
 
-  if (isLoading) return <p className="text-sm text-gray-500">Chargement...</p>;
-  if (isError || !demande)
+  if (isLoading) {
     return (
-      <p className="text-sm text-red-600">
-        Erreur lors du chargement de la demande.
-      </p>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "32px 0", color: "var(--ink-3)", fontSize: 13 }}>
+        <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+        Chargement...
+      </div>
     );
+  }
+  if (isError || !demande) {
+    return <p style={{ fontSize: 13, color: "var(--rose)" }}>Erreur lors du chargement de la demande.</p>;
+  }
 
-  const fields: { label: string; value: React.ReactNode }[] = [
-    { label: "Numéro", value: demande.numero },
-    { label: "Type", value: typeLabel[demande.type] ?? demande.type },
-    {
-      label: "Statut",
-      value: (
-        <Badge
-          variant={statutBadgeVariant[demande.statut] ?? "default"}
-          text={statutLabel[demande.statut] ?? demande.statut}
-        />
-      ),
-    },
-    { label: "Destinataire", value: demande.destinataire },
-    { label: "Site destinataire", value: demande.siteDestinataire ?? "-" },
-    { label: "Motif", value: demande.motif ?? "-" },
-    { label: "Date souhaitée", value: formatDate(demande.dateSouhaitee) },
-    { label: "Date d'envoi", value: formatDate(demande.dateEnvoi) },
-    { label: "Date de réception", value: formatDate(demande.dateReception) },
-    { label: "Commentaire", value: demande.commentaire ?? "-" },
-    { label: "Créé le", value: formatDate(demande.createdAt) },
-  ];
+  const pill = statutPill[demande.statut] ?? { cls: "pill c-neutral", label: demande.statut };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Demande : {demande.numero}
-        </h1>
+    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
+              Demande : {demande.numero}
+            </h1>
+            <span className={pill.cls}><span className="dot" />{pill.label}</span>
+          </div>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", margin: 0 }}>
+            {typeLabel[demande.type] ?? demande.type}
+          </p>
+        </div>
         <Link
           to="/demandes-envoi"
-          className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          className="obtn"
+          style={{ textDecoration: "none" }}
         >
           Retour à la liste
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {fields.map((field) => (
-            <div key={field.label}>
-              <dt className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                {field.label}
-              </dt>
-              <dd className="text-sm text-gray-900">{field.value}</dd>
+      {/* Info card */}
+      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
+        <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
+          Informations
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 32px" }}>
+          <Field label="Numéro">{demande.numero}</Field>
+          <Field label="Type">{typeLabel[demande.type] ?? demande.type}</Field>
+          <Field label="Statut">
+            <span className={pill.cls}><span className="dot" />{pill.label}</span>
+          </Field>
+          <Field label="Destinataire">{demande.destinataire}</Field>
+          <Field label="Site destinataire">{demande.siteDestinataire ?? "—"}</Field>
+          <Field label="Motif">{demande.motif ?? "—"}</Field>
+          <Field label="Date souhaitée">{formatDate(demande.dateSouhaitee)}</Field>
+          <Field label="Date d'envoi">{formatDate(demande.dateEnvoi)}</Field>
+          <Field label="Date de réception">{formatDate(demande.dateReception)}</Field>
+          <Field label="Créé le">{formatDate(demande.createdAt)}</Field>
+          {demande.commentaire && (
+            <div style={{ gridColumn: "1 / -1" }}>
+              <Field label="Commentaire">
+                <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{demande.commentaire}</p>
+              </Field>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
+      {/* Lignes */}
       {demande.lignes && demande.lignes.length > 0 && (
-        <div className="mt-6 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Lignes ({demande.lignes.length})
+        <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
+          <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
+            Éléments ({demande.lignes.length})
           </h2>
-          <table className="w-full text-sm">
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">
-                  Élément
-                </th>
-                <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">
-                  Référence
-                </th>
-                <th className="text-center py-2 text-xs font-medium text-gray-500 uppercase">
-                  Quantité
-                </th>
-                <th className="text-center py-2 text-xs font-medium text-gray-500 uppercase">
-                  Reçue
-                </th>
+              <tr>
+                {["Élément", "Référence", "Libellé", "Quantité", "Reçue"].map((h) => (
+                  <th key={h} style={{
+                    textAlign: "left", padding: "8px 12px",
+                    fontSize: 11, fontWeight: 600, textTransform: "uppercase",
+                    letterSpacing: "0.04em", color: "var(--ink-3)",
+                    borderBottom: "1px solid var(--line)",
+                  }}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {demande.lignes.map((ligne) => (
-                <tr key={ligne.id} className="border-b border-gray-100">
-                  <td className="py-2">
+                <tr key={ligne.id} style={{ borderBottom: "1px solid var(--line-2)" }}>
+                  <td style={{ padding: "10px 12px", color: "var(--ink-2)" }}>
                     {ligne.materiel ? "Matériel" : "Maquette"}
                   </td>
-                  <td className="py-2">
-                    {ligne.materiel?.reference ??
-                      ligne.maquette?.reference ??
-                      "-"}
+                  <td style={{ padding: "10px 12px", fontWeight: 500 }}>
+                    {ligne.materiel?.reference ?? ligne.maquette?.reference ?? "—"}
                   </td>
-                  <td className="py-2 text-center">{ligne.quantite}</td>
-                  <td className="py-2 text-center">
+                  <td style={{ padding: "10px 12px", color: "var(--ink-2)" }}>
+                    {ligne.materiel?.libelle ?? ligne.maquette?.libelle ?? "—"}
+                  </td>
+                  <td style={{ padding: "10px 12px", textAlign: "center" }}>{ligne.quantite}</td>
+                  <td style={{ padding: "10px 12px", textAlign: "center" }}>
                     {ligne.recue ? (
-                      <span className="text-green-600 font-medium">Oui</span>
+                      <span className="pill c-emerald"><span className="dot" />Oui</span>
                     ) : (
-                      <span className="text-gray-400">Non</span>
+                      <span style={{ color: "var(--ink-3)", fontSize: 13 }}>Non</span>
                     )}
                   </td>
                 </tr>
