@@ -113,4 +113,10 @@ export class AgentsController {
   async removePassword(@Param('id', ParseIntPipe) id: number) {
     return this.agentsService.update(id, { passwordHash: null });
   }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.agentsService.remove(id);
+  }
 }
