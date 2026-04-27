@@ -23,17 +23,30 @@ const typeInfo: Record<string, { label: string; description: string; group: stri
   URGENCE: { label: "Urgences", description: "Normal, Urgent...", group: "Maquettes" },
 };
 
-function GroupIcon({ group }: { group: string }) {
-  if (group === "Matériels") {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.42 15.17l-5.88-3.39a.562.562 0 010-.974l5.88-3.39a.562.562 0 01.562 0l5.88 3.39a.562.562 0 010 .974l-5.88 3.39a.562.562 0 01-.562 0z" />
-      </svg>
-    );
-  }
+function MaterielsIcon() {
   return (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.52 12.64l-4.9-2.83a.47.47 0 010-.81l4.9-2.83a.47.47 0 01.47 0l4.9 2.83a.47.47 0 010 .81l-4.9 2.83a.47.47 0 01-.47 0z" />
+    </svg>
+  );
+}
+
+function MaquettesIcon() {
+  return (
+    <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16.67 5.83L10 2.5 3.33 5.83m13.34 0L10 9.17m6.67-3.34v8.34L10 17.5m0-8.33L3.33 5.83M10 9.17v8.33M3.33 5.83v8.34L10 17.5" />
+    </svg>
+  );
+}
+
+function GroupIcon({ group }: { group: string }) {
+  return group === "Matériels" ? <MaterielsIcon /> : <MaquettesIcon />;
+}
+
+function ChevronIcon() {
+  return (
+    <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7.5 5l5 5-5 5" />
     </svg>
   );
 }
@@ -71,65 +84,108 @@ export default function AdminReferentielsPage() {
   }));
 
   return (
-    <div className="max-w-6xl mx-auto pb-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Administration des référentiels</h1>
-        <p className="text-sm text-gray-500 mt-1">
+    <div style={{ maxWidth: 1080, margin: "0 auto", paddingBottom: 40 }}>
+      {/* Page header */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
+          Administration des référentiels
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4, marginBottom: 0 }}>
           Gérez les listes de valeurs utilisées dans les formulaires de l'application.
         </p>
       </div>
 
       {/* Entités avec adresses */}
-      <div className="mb-8">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", marginBottom: 12 }}>
           Entités
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
           <Link
             to="/admin/sites"
-            className="group bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-edf-blue/20 transition-all"
+            style={{
+              display: "block",
+              background: "var(--bg-panel)",
+              border: "1px solid var(--line)",
+              borderRadius: 12,
+              padding: "16px 18px",
+              textDecoration: "none",
+              transition: "border-color 0.15s, background 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)";
+              (e.currentTarget as HTMLElement).style.background = "var(--accent-soft)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+            }}
           >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 9,
+                background: "var(--emerald-soft)", color: "var(--emerald)",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14.71 13.88L11.18 17.42a1.67 1.67 0 01-2.36 0L5.29 13.88a6.67 6.67 0 119.42 0z" />
+                  <path d="M12.5 9.17a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-800 group-hover:text-edf-blue transition-colors">
-                    Sites
-                  </h3>
-                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Sites</span>
+                  <span style={{ fontSize: 11, color: "var(--ink-3)", background: "var(--bg-sunken)", padding: "1px 8px", borderRadius: 999, border: "1px solid var(--line)" }}>
                     {sites?.length ?? 0}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Sites EDF / CNPE avec adresses</p>
+                <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 3, marginBottom: 0 }}>
+                  Sites EDF / CNPE avec adresses
+                </p>
               </div>
             </div>
           </Link>
 
           <Link
             to="/admin/entreprises"
-            className="group bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-edf-blue/20 transition-all"
+            style={{
+              display: "block",
+              background: "var(--bg-panel)",
+              border: "1px solid var(--line)",
+              borderRadius: 12,
+              padding: "16px 18px",
+              textDecoration: "none",
+              transition: "border-color 0.15s, background 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)";
+              (e.currentTarget as HTMLElement).style.background = "var(--accent-soft)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+            }}
           >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 9,
+                background: "var(--accent-soft)", color: "var(--accent-ink)",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15.83 17.5V4.17A1.67 1.67 0 0014.17 2.5H5.83A1.67 1.67 0 004.17 4.17V17.5m11.66 0H2.5m13.33 0H17.5M7.5 5.83h.83m-.83 3.34h.83m3.34-3.34h.83m-.83 3.34h.83M7.5 14.17h5v3.33h-5z" />
                 </svg>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-800 group-hover:text-edf-blue transition-colors">
-                    Entreprises
-                  </h3>
-                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Entreprises</span>
+                  <span style={{ fontSize: 11, color: "var(--ink-3)", background: "var(--bg-sunken)", padding: "1px 8px", borderRadius: 999, border: "1px solid var(--line)" }}>
                     {entreprises?.length ?? 0}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Entreprises et fournisseurs</p>
+                <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 3, marginBottom: 0 }}>
+                  Entreprises et fournisseurs
+                </p>
               </div>
             </div>
           </Link>
@@ -138,30 +194,52 @@ export default function AdminReferentielsPage() {
 
       {/* Listes de référence par groupe */}
       {typesGrouped.map(({ group, items }) => (
-        <div key={group} className="mb-8">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <div key={group} style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", marginBottom: 12 }}>
             {group}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
             {items.map((item) => (
               <Link
                 key={item.type}
                 to={`/admin/referentiels/${item.type}`}
-                className="group bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-edf-blue/20 transition-all"
+                style={{
+                  display: "block",
+                  background: "var(--bg-panel)",
+                  border: "1px solid var(--line)",
+                  borderRadius: 12,
+                  padding: "14px 16px",
+                  textDecoration: "none",
+                  transition: "border-color 0.15s, background 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)";
+                  (e.currentTarget as HTMLElement).style.background = "var(--accent-soft)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+                  (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+                }}
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-50 text-gray-500 group-hover:bg-edf-blue/10 group-hover:text-edf-blue flex items-center justify-center flex-shrink-0 transition-colors">
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 8,
+                    background: "var(--bg-sunken)", color: "var(--ink-3)",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
                     <GroupIcon group={group} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-800 group-hover:text-edf-blue transition-colors">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>
                       {item.label ?? item.type}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1">{item.description ?? ""}</p>
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "var(--ink-3)", marginTop: 1 }}>
+                      {item.description ?? ""}
+                    </div>
                   </div>
-                  <svg className="w-4 h-4 text-gray-300 group-hover:text-edf-blue transition-colors mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <div style={{ color: "var(--ink-4)", flexShrink: 0 }}>
+                    <ChevronIcon />
+                  </div>
                 </div>
               </Link>
             ))}

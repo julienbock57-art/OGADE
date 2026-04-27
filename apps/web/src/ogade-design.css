@@ -283,3 +283,6 @@
 
 /* Utility */
 .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-feature-settings: 'zero', 'ss02'; }
+
+/* Spinner */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

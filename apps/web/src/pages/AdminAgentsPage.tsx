@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { Agent, Role } from "@ogade/shared";
-import Badge from "@/components/Badge";
 
 type AgentWithRoles = Omit<Agent, "roles"> & {
   roles: { roleId: number; role?: Role; grantedAt: string }[];
@@ -13,12 +12,12 @@ type AgentWithRoles = Omit<Agent, "roles"> & {
 type AgentForm = { email: string; nom: string; prenom: string };
 const emptyForm: AgentForm = { email: "", nom: "", prenom: "" };
 
-const roleBadgeVariant: Record<string, string> = {
-  ADMIN: "danger",
-  GESTIONNAIRE_MAGASIN: "info",
-  REFERENT_LOGISTIQUE: "warning",
-  REFERENT_MAQUETTE: "purple",
-  REFERENT_MATERIEL: "success",
+const rolePillClass: Record<string, string> = {
+  ADMIN: "c-rose",
+  GESTIONNAIRE_MAGASIN: "c-sky",
+  REFERENT_LOGISTIQUE: "c-amber",
+  REFERENT_MAQUETTE: "c-violet",
+  REFERENT_MATERIEL: "c-emerald",
 };
 
 const roleLabels: Record<string, string> = {
@@ -37,8 +36,26 @@ const ALL_ROLES = [
   "REFERENT_MATERIEL",
 ];
 
-const inputClass =
-  "px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors w-full";
+const thStyle: React.CSSProperties = {
+  padding: "10px 14px",
+  textAlign: "left",
+  fontSize: 11,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  color: "var(--ink-3)",
+  background: "var(--bg-panel)",
+  borderBottom: "1px solid var(--line)",
+  position: "sticky",
+  top: 0,
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "11px 14px",
+  fontSize: 13,
+  borderBottom: "1px solid var(--line-2)",
+  color: "var(--ink)",
+};
 
 export default function AdminAgentsPage() {
   const queryClient = useQueryClient();
@@ -145,21 +162,23 @@ export default function AdminAgentsPage() {
     agent.roles.some((r) => r.role?.code === roleCode);
 
   return (
-    <div className="max-w-5xl mx-auto pb-10">
+    <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 40 }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Link
             to="/admin/referentiels"
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            style={{ color: "var(--ink-3)", display: "flex", transition: "color 0.12s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-3)")}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg width="20" height="20" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12.5 15.83L6.67 10l5.83-5.83" />
             </svg>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Agents autorisés</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>Agents autorisés</h1>
+            <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2, marginBottom: 0 }}>
               {data ? `${data.total} agent${data.total > 1 ? "s" : ""}` : "Chargement..."}
             </p>
           </div>
@@ -171,10 +190,10 @@ export default function AdminAgentsPage() {
               setEditingId(null);
               setForm(emptyForm);
             }}
-            className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors shadow-sm"
+            className="obtn accent"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 4.17v11.66M4.17 10h11.66" />
             </svg>
             Ajouter un agent
           </button>
@@ -185,64 +204,60 @@ export default function AdminAgentsPage() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4"
+          style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "16px 20px", marginBottom: 14 }}
         >
-          <h3 className="text-sm font-semibold text-edf-blue mb-4">
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", marginBottom: 14 }}>
             {editingId ? "Modifier l'agent" : "Ajouter un agent autorisé"}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>
                 Email Microsoft *
               </label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => set("email", e.target.value)}
-                className={inputClass}
+                className="oinput"
                 placeholder="prenom.nom@edf.fr"
                 disabled={editingId !== null}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>
                 Prénom *
               </label>
               <input
                 type="text"
                 value={form.prenom}
                 onChange={(e) => set("prenom", e.target.value)}
-                className={inputClass}
+                className="oinput"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--ink-3)", marginBottom: 4 }}>
                 Nom *
               </label>
               <input
                 type="text"
                 value={form.nom}
                 onChange={(e) => set("nom", e.target.value)}
-                className={inputClass}
+                className="oinput"
               />
             </div>
           </div>
           {mutError && (
-            <p className="text-xs text-red-600 mt-3">{(mutError as Error).message}</p>
+            <p style={{ fontSize: 12, color: "var(--rose)", marginTop: 10, marginBottom: 0 }}>{(mutError as Error).message}</p>
           )}
-          <div className="flex gap-2 mt-4">
+          <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button
               type="submit"
               disabled={createMut.isPending || updateMut.isPending}
-              className="bg-edf-blue text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50"
+              className="obtn accent"
             >
               {editingId ? "Enregistrer" : "Ajouter"}
             </button>
-            <button
-              type="button"
-              onClick={cancelForm}
-              className="bg-white text-gray-600 border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
-            >
+            <button type="button" onClick={cancelForm} className="obtn">
               Annuler
             </button>
           </div>
@@ -250,87 +265,89 @@ export default function AdminAgentsPage() {
       )}
 
       {deleteMut.isError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
-          <p className="text-sm text-red-700">{(deleteMut.error as Error).message}</p>
+        <div style={{ background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 30%, transparent)", borderRadius: 10, padding: "12px 16px", marginBottom: 14 }}>
+          <p style={{ fontSize: 13, color: "var(--rose)", margin: 0 }}>{(deleteMut.error as Error).message}</p>
         </div>
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
         {isLoading ? (
-          <div className="p-8">
-            <div className="animate-pulse space-y-3">
+          <div style={{ padding: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 bg-gray-100 rounded" />
+                <div key={i} style={{ height: 44, background: "var(--bg-sunken)", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
               ))}
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="bg-gray-50/80 border-b border-gray-100">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ minWidth: "100%", borderCollapse: "collapse" }}>
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Agent
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Rôles
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-20">
-                    Statut
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">
-                    Actions
-                  </th>
+                  <th style={thStyle}>Agent</th>
+                  <th style={thStyle}>Email</th>
+                  <th style={thStyle}>Rôles</th>
+                  <th style={{ ...thStyle, width: 80 }}>Statut</th>
+                  <th style={{ ...thStyle, width: 120, textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {agents.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-400">
+                    <td colSpan={5} style={{ ...tdStyle, textAlign: "center", color: "var(--ink-3)", padding: "40px 14px" }}>
                       Aucun agent enregistré.
                     </td>
                   </tr>
                 )}
                 {agents.map((agent) => (
-                  <tr key={agent.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-edf-blue/10 text-edf-blue rounded-full flex items-center justify-center text-xs font-semibold">
-                          {agent.prenom[0]}
-                          {agent.nom[0]}
+                  <tr key={agent.id} style={{ transition: "background 0.1s" }}
+                    onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "var(--bg-sunken)"}
+                    onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.background = ""}
+                  >
+                    <td style={tdStyle}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{
+                          width: 32, height: 32,
+                          background: "var(--accent-soft)", color: "var(--accent-ink)",
+                          borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11, fontWeight: 600, flexShrink: 0,
+                        }}>
+                          {agent.prenom[0]}{agent.nom[0]}
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {agent.prenom} {agent.nom}
-                          </div>
+                        <div style={{ fontWeight: 500, color: "var(--ink)" }}>
+                          {agent.prenom} {agent.nom}
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{agent.email}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
+                    <td style={{ ...tdStyle, color: "var(--ink-2)" }}>{agent.email}</td>
+                    <td style={tdStyle}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {agent.roles.length === 0 && (
-                          <span className="text-xs text-gray-400 italic">Aucun rôle</span>
+                          <span style={{ fontSize: 12, color: "var(--ink-4)", fontStyle: "italic" }}>Aucun rôle</span>
                         )}
                         {agent.roles.map((r) => (
-                          <Badge
+                          <span
                             key={r.role?.code ?? r.roleId}
-                            variant={roleBadgeVariant[r.role?.code ?? ""] ?? "default"}
-                            text={roleLabels[r.role?.code ?? ""] ?? r.role?.code ?? ""}
-                          />
+                            className={`pill ${rolePillClass[r.role?.code ?? ""] ?? "c-neutral"}`}
+                          >
+                            <span className="dot" />
+                            {roleLabels[r.role?.code ?? ""] ?? r.role?.code ?? ""}
+                          </span>
                         ))}
                       </div>
+
                       {/* Role management panel */}
                       {managingRolesId === agent.id && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                          <p className="text-xs font-medium text-gray-500 mb-2">
-                            Gérer les rôles :
+                        <div style={{
+                          marginTop: 10, padding: "10px 12px",
+                          background: "var(--bg-sunken)", borderRadius: 9,
+                          border: "1px solid var(--line)",
+                        }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", marginBottom: 8, marginTop: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Gérer les rôles
                           </p>
-                          <div className="flex flex-wrap gap-2">
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                             {ALL_ROLES.map((roleCode) => {
                               const has = agentHasRole(agent, roleCode);
                               return (
@@ -343,15 +360,36 @@ export default function AdminAgentsPage() {
                                       assignRoleMut.mutate({ id: agent.id, roleCode });
                                     }
                                   }}
-                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                                    has
-                                      ? "bg-edf-blue text-white"
-                                      : "bg-white text-gray-500 border border-gray-200 hover:border-edf-blue hover:text-edf-blue"
-                                  }`}
+                                  style={{
+                                    appearance: "none",
+                                    display: "inline-flex", alignItems: "center", gap: 4,
+                                    padding: "4px 10px", borderRadius: 999,
+                                    fontSize: 11.5, fontWeight: 500,
+                                    cursor: "default", transition: "all 0.12s",
+                                    background: has ? "var(--accent)" : "var(--bg-panel)",
+                                    color: has ? "white" : "var(--ink-2)",
+                                    border: has ? "1px solid var(--accent)" : "1px solid var(--line)",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!has) {
+                                      e.currentTarget.style.borderColor = "var(--accent-line)";
+                                      e.currentTarget.style.color = "var(--accent-ink)";
+                                    } else {
+                                      e.currentTarget.style.background = "var(--accent-ink)";
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (!has) {
+                                      e.currentTarget.style.borderColor = "var(--line)";
+                                      e.currentTarget.style.color = "var(--ink-2)";
+                                    } else {
+                                      e.currentTarget.style.background = "var(--accent)";
+                                    }
+                                  }}
                                 >
                                   {has && (
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    <svg width="12" height="12" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M4.17 10.83l3.33 3.34 8.33-6.67" />
                                     </svg>
                                   )}
                                   {roleLabels[roleCode] ?? roleCode}
@@ -361,19 +399,25 @@ export default function AdminAgentsPage() {
                           </div>
                         </div>
                       )}
+
                       {/* Password panel */}
                       {passwordAgentId === agent.id && (
-                        <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                          <p className="text-xs font-medium text-gray-500 mb-2">
-                            Définir un mot de passe local :
+                        <div style={{
+                          marginTop: 10, padding: "10px 12px",
+                          background: "var(--amber-soft)", borderRadius: 9,
+                          border: "1px solid color-mix(in oklch, var(--amber) 30%, transparent)",
+                        }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", marginBottom: 8, marginTop: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Mot de passe local
                           </p>
-                          <div className="flex gap-2">
+                          <div style={{ display: "flex", gap: 8 }}>
                             <input
                               type="password"
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
                               placeholder="Nouveau mot de passe (min 6 car.)"
-                              className={inputClass + " flex-1 !py-1.5 text-xs"}
+                              className="oinput"
+                              style={{ flex: 1, padding: "6px 10px", fontSize: 12 }}
                             />
                             <button
                               onClick={() => {
@@ -382,13 +426,21 @@ export default function AdminAgentsPage() {
                                 }
                               }}
                               disabled={newPassword.length < 6 || setPasswordMut.isPending}
-                              className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-medium hover:bg-amber-700 transition-colors disabled:opacity-50"
+                              style={{
+                                appearance: "none",
+                                padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 500,
+                                background: "var(--amber)", color: "white",
+                                border: "1px solid var(--amber)", cursor: "default",
+                                opacity: newPassword.length < 6 || setPasswordMut.isPending ? 0.45 : 1,
+                              }}
                             >
                               Enregistrer
                             </button>
                           </div>
                           {setPasswordMut.isError && (
-                            <p className="text-xs text-red-600 mt-1">{(setPasswordMut.error as Error).message}</p>
+                            <p style={{ fontSize: 12, color: "var(--rose)", marginTop: 6, marginBottom: 0 }}>
+                              {(setPasswordMut.error as Error).message}
+                            </p>
                           )}
                           {agent.hasPassword && (
                             <button
@@ -397,7 +449,13 @@ export default function AdminAgentsPage() {
                                   removePasswordMut.mutate(agent.id);
                                 }
                               }}
-                              className="mt-2 text-xs text-red-600 hover:text-red-700"
+                              style={{
+                                appearance: "none", background: "none", border: "none",
+                                marginTop: 8, fontSize: 12, color: "var(--rose)", cursor: "default",
+                                padding: 0,
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
                             >
                               Supprimer le mot de passe local
                             </button>
@@ -405,78 +463,126 @@ export default function AdminAgentsPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td style={tdStyle}>
                       <button
-                        onClick={() =>
-                          toggleActiveMut.mutate({
-                            id: agent.id,
-                            actif: !agent.actif,
-                          })
-                        }
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium transition-colors ${
-                          agent.actif
-                            ? "bg-green-100 text-green-700 hover:bg-green-200"
-                            : "bg-red-100 text-red-700 hover:bg-red-200"
-                        }`}
+                        onClick={() => toggleActiveMut.mutate({ id: agent.id, actif: !agent.actif })}
+                        className={`pill ${agent.actif ? "c-emerald" : "c-rose"}`}
+                        style={{ border: "none", cursor: "default", appearance: "none", fontFamily: "inherit", fontSize: "inherit" }}
                       >
+                        <span className="dot" />
                         {agent.actif ? "Actif" : "Inactif"}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
+                    <td style={{ ...tdStyle, textAlign: "right" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+                        {/* Manage roles */}
                         <button
-                          onClick={() =>
-                            setManagingRolesId(
-                              managingRolesId === agent.id ? null : agent.id,
-                            )
-                          }
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            managingRolesId === agent.id
-                              ? "text-edf-blue bg-edf-blue/10"
-                              : "text-gray-400 hover:text-edf-blue hover:bg-edf-blue/5"
-                          }`}
+                          onClick={() => setManagingRolesId(managingRolesId === agent.id ? null : agent.id)}
+                          style={{
+                            appearance: "none", border: "none",
+                            background: managingRolesId === agent.id ? "var(--accent-soft)" : "none",
+                            padding: 6, borderRadius: 7,
+                            color: managingRolesId === agent.id ? "var(--accent-ink)" : "var(--ink-3)",
+                            cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (managingRolesId !== agent.id) {
+                              e.currentTarget.style.color = "var(--accent-ink)";
+                              e.currentTarget.style.background = "var(--accent-soft)";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (managingRolesId !== agent.id) {
+                              e.currentTarget.style.color = "var(--ink-3)";
+                              e.currentTarget.style.background = "none";
+                            }
+                          }}
                           title="Gérer les rôles"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M7.5 10l1.67 1.67 3.33-5.56m4.68-3.35a9.96 9.96 0 01-7.18 2.54A10.02 10.02 0 012.5 7.5c0 4.66 3.19 8.58 7.5 9.69 4.31-1.11 7.5-5.03 7.5-9.69 0-.87-.11-1.71-.32-2.52z" />
                           </svg>
                         </button>
+
+                        {/* Password */}
                         <button
                           onClick={() => {
                             setPasswordAgentId(passwordAgentId === agent.id ? null : agent.id);
                             setNewPassword("");
                           }}
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            passwordAgentId === agent.id
-                              ? "text-amber-600 bg-amber-50"
-                              : "text-gray-400 hover:text-amber-600 hover:bg-amber-50"
-                          }`}
+                          style={{
+                            appearance: "none", border: "none",
+                            background: passwordAgentId === agent.id ? "var(--amber-soft)" : "none",
+                            padding: 6, borderRadius: 7,
+                            color: passwordAgentId === agent.id ? "var(--amber)" : "var(--ink-3)",
+                            cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (passwordAgentId !== agent.id) {
+                              e.currentTarget.style.color = "var(--amber)";
+                              e.currentTarget.style.background = "var(--amber-soft)";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (passwordAgentId !== agent.id) {
+                              e.currentTarget.style.color = "var(--ink-3)";
+                              e.currentTarget.style.background = "none";
+                            }
+                          }}
                           title="Mot de passe"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                          <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12.5 5.83a1.67 1.67 0 011.67 1.67m3.33 0a5 5 0 01-6.45 4.79L9.17 14.17H7.5V15.83H5.83V17.5H3.33a.83.83 0 01-.83-.83v-2.15a.83.83 0 01.24-.59l4.97-4.97A5 5 0 1117.5 7.5z" />
                           </svg>
                         </button>
+
+                        {/* Edit */}
                         <button
                           onClick={() => startEdit(agent)}
-                          className="p-1.5 text-gray-400 hover:text-edf-blue hover:bg-edf-blue/5 rounded-lg transition-colors"
+                          style={{
+                            appearance: "none", border: "none", background: "none",
+                            padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                            cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "var(--accent-ink)";
+                            e.currentTarget.style.background = "var(--accent-soft)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "var(--ink-3)";
+                            e.currentTarget.style.background = "none";
+                          }}
                           title="Modifier"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9.17 4.17H4.17A1.67 1.67 0 002.5 5.83v10A1.67 1.67 0 004.17 17.5h10a1.67 1.67 0 001.66-1.67v-5m-1.16-7.83a1.67 1.67 0 012.36 2.36L9.58 12.5H7.5v-2.08l7.67-7.66z" />
                           </svg>
                         </button>
+
+                        {/* Delete */}
                         <button
                           onClick={() => {
                             if (confirm(`Supprimer l'agent "${agent.prenom} ${agent.nom}" ? Cette action est irréversible.`)) {
                               deleteMut.mutate(agent.id);
                             }
                           }}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          style={{
+                            appearance: "none", border: "none", background: "none",
+                            padding: 6, borderRadius: 7, color: "var(--ink-3)",
+                            cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "var(--rose)";
+                            e.currentTarget.style.background = "var(--rose-soft)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "var(--ink-3)";
+                            e.currentTarget.style.background = "none";
+                          }}
                           title="Supprimer"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M15.83 5.83l-.72 10.12a1.67 1.67 0 01-1.66 1.55H6.55a1.67 1.67 0 01-1.66-1.55L4.17 5.83M8.33 9.17v5m3.34-5v5m.83-8.34V3.33a.83.83 0 00-.83-.83H8.33a.83.83 0 00-.83.83v2.5M3.33 5.83h13.34" />
                           </svg>
                         </button>
                       </div>

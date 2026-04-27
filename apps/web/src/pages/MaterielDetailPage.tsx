@@ -2,18 +2,17 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Materiel } from "@ogade/shared";
 import { api } from "@/lib/api";
-import Badge from "@/components/Badge";
 import {
   useReferentiel,
   useSites,
   useEntreprises,
 } from "@/hooks/use-referentiels";
 
-const etatBadge: Record<string, { variant: string; label: string }> = {
-  CORRECT: { variant: "success", label: "Correct" },
-  LEGER_DEFAUT: { variant: "warning", label: "Léger défaut" },
-  HS: { variant: "danger", label: "HS" },
-  PERDU: { variant: "default", label: "Perdu" },
+const etatPill: Record<string, { cls: string; label: string }> = {
+  CORRECT:     { cls: "pill c-emerald", label: "Correct" },
+  LEGER_DEFAUT:{ cls: "pill c-amber",   label: "Léger défaut" },
+  HS:          { cls: "pill c-rose",    label: "HS" },
+  PERDU:       { cls: "pill c-neutral", label: "Perdu" },
 };
 
 function formatDate(value?: string | Date | null): string {
@@ -28,39 +27,51 @@ function formatDate(value?: string | Date | null): string {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
+      <dt style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
         {label}
       </dt>
-      <dd className="text-sm text-gray-900">{children || "—"}</dd>
+      <dd style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{children || "—"}</dd>
     </div>
   );
 }
 
 function BoolField({ label, value }: { label: string; value?: boolean }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className={`w-4 h-4 rounded flex items-center justify-center ${value ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-300"}`}>
-        {value ? (
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{
+        width: 16, height: 16, borderRadius: 4,
+        background: value ? "var(--accent)" : "var(--bg-sunken)",
+        border: `1.5px solid ${value ? "var(--accent)" : "var(--line)"}`,
+        display: "grid", placeItems: "center", color: "white", flexShrink: 0,
+      }}>
+        {value && (
+          <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         )}
       </div>
-      <span className="text-sm text-gray-700">{label}</span>
+      <span style={{ fontSize: 13, color: "var(--ink)" }}>{label}</span>
     </div>
   );
 }
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div className="border-b border-gray-200 pb-2 mb-4">
-        <h2 className="text-base font-semibold text-edf-blue">{title}</h2>
-      </div>
+    <div style={{
+      background: "var(--bg-panel)",
+      border: "1px solid var(--line)",
+      borderRadius: 12,
+      padding: "20px 24px",
+    }}>
+      <h2 style={{
+        fontSize: 11, fontWeight: 600, textTransform: "uppercase",
+        letterSpacing: "0.06em", color: "var(--ink-3)",
+        margin: "0 0 16px",
+        paddingBottom: 10,
+        borderBottom: "1px solid var(--line-2)",
+      }}>
+        {title}
+      </h2>
       {children}
     </div>
   );
@@ -100,18 +111,26 @@ export default function MaterielDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-edf-blue" />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 0" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: "50%",
+          border: "2.5px solid var(--accent-soft)",
+          borderTopColor: "var(--accent)",
+          animation: "spin 0.7s linear infinite",
+        }} />
       </div>
     );
   }
 
   if (isError || !materiel) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-red-50 border border-red-100 rounded-xl p-8 text-center">
-          <p className="text-sm text-red-600">Erreur lors du chargement du matériel.</p>
-          <button onClick={() => navigate(-1)} className="mt-3 text-xs text-red-500 hover:underline">
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{
+          background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+          borderRadius: 12, padding: "32px", textAlign: "center",
+        }}>
+          <p style={{ fontSize: 13, color: "var(--rose)" }}>Erreur lors du chargement du matériel.</p>
+          <button onClick={() => navigate(-1)} style={{ marginTop: 8, fontSize: 12, color: "var(--rose)", background: "none", border: 0, textDecoration: "underline", cursor: "pointer" }}>
             Retour
           </button>
         </div>
@@ -119,50 +138,52 @@ export default function MaterielDetailPage() {
     );
   }
 
-  const badge = etatBadge[materiel.etat] ?? { variant: "default", label: materiel.etat };
+  const pill = etatPill[materiel.etat] ?? { cls: "pill c-neutral", label: materiel.etat };
 
   return (
-    <div className="max-w-4xl mx-auto pb-10">
+    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button
             onClick={() => navigate(-1)}
-            className="text-gray-400 hover:text-gray-600 transition-colors mt-1"
+            style={{ color: "var(--ink-3)", background: "none", border: 0, padding: 4, cursor: "pointer", display: "flex", alignItems: "center" }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{materiel.reference}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{materiel.libelle}</p>
+            <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>{materiel.reference}</h1>
+            <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2 }}>{materiel.libelle}</p>
           </div>
-          <Badge variant={badge.variant} text={badge.label} />
+          <span className={pill.cls}><span className="dot" />{pill.label}</span>
         </div>
-        <div className="flex gap-2">
+        <div style={{ display: "flex", gap: 8 }}>
           <Link
             to={`/materiels/${id}/edit`}
-            className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors shadow-sm"
+            className="obtn accent"
+            style={{ textDecoration: "none" }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
             Modifier
           </Link>
           <Link
             to="/materiels"
-            className="inline-flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="obtn"
+            style={{ textDecoration: "none" }}
           >
             Liste
           </Link>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Identification */}
         <SectionCard title="Identification">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
             <Field label="Référence">{materiel.reference}</Field>
             <Field label="Libellé">{materiel.libelle}</Field>
             <Field label="Numéro de série">{materiel.numeroSerie}</Field>
@@ -170,11 +191,11 @@ export default function MaterielDetailPage() {
             <Field label="N° FIEC">{materiel.numeroFIEC}</Field>
             <Field label="Propriétaire">{materiel.proprietaire}</Field>
             <Field label="État">
-              <Badge variant={badge.variant} text={badge.label} />
+              <span className={pill.cls}><span className="dot" />{pill.label}</span>
             </Field>
             {materiel.commentaireEtat && (
               <Field label="Commentaire état">
-                <p className="whitespace-pre-wrap text-gray-600">{materiel.commentaireEtat}</p>
+                <p style={{ whiteSpace: "pre-wrap", color: "var(--ink-2)", margin: 0 }}>{materiel.commentaireEtat}</p>
               </Field>
             )}
           </div>
@@ -182,7 +203,7 @@ export default function MaterielDetailPage() {
 
         {/* Classification */}
         <SectionCard title="Classification">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
             <Field label="Type END">{typeEndLabel}</Field>
             <Field label="Type de matériel">{typeMatLabel}</Field>
             <Field label="Type de traducteur">{typeTraducteurLabel}</Field>
@@ -193,7 +214,7 @@ export default function MaterielDetailPage() {
                 <span>
                   {fournisseurObj.label}
                   {fournisseurObj.ville && (
-                    <span className="text-xs text-gray-400 ml-1">— {fournisseurObj.ville}</span>
+                    <span style={{ fontSize: 11, color: "var(--ink-3)", marginLeft: 4 }}>— {fournisseurObj.ville}</span>
                   )}
                 </span>
               ) : (
@@ -205,7 +226,7 @@ export default function MaterielDetailPage() {
                 <span>
                   {entrepriseObj.label}
                   {entrepriseObj.ville && (
-                    <span className="text-xs text-gray-400 ml-1">— {entrepriseObj.ville}</span>
+                    <span style={{ fontSize: 11, color: "var(--ink-3)", marginLeft: 4 }}>— {entrepriseObj.ville}</span>
                   )}
                 </span>
               ) : (
@@ -214,8 +235,13 @@ export default function MaterielDetailPage() {
             </Field>
             <Field label="Responsable">
               {materiel.responsable ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-edf-blue/10 text-edf-blue flex items-center justify-center text-[10px] font-semibold">
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <span style={{
+                    width: 22, height: 22, borderRadius: "50%",
+                    background: "var(--accent-soft)", color: "var(--accent-ink)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 10, fontWeight: 600,
+                  }}>
                     {materiel.responsable.prenom?.[0]}{materiel.responsable.nom?.[0]}
                   </span>
                   {materiel.responsable.prenom} {materiel.responsable.nom}
@@ -227,13 +253,13 @@ export default function MaterielDetailPage() {
 
         {/* Localisation */}
         <SectionCard title="Localisation">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
             <Field label="Site">
               {siteObj ? (
                 <div>
                   <div>{siteObj.label}</div>
                   {(siteObj.adresse || siteObj.ville) && (
-                    <div className="text-xs text-gray-400 mt-0.5">
+                    <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 2 }}>
                       {[siteObj.adresse, siteObj.codePostal, siteObj.ville].filter(Boolean).join(", ")}
                     </div>
                   )}
@@ -250,13 +276,9 @@ export default function MaterielDetailPage() {
 
         {/* Étalonnage */}
         <SectionCard title="Étalonnage">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-            <Field label="Date dernier étalonnage">
-              {formatDate(materiel.dateEtalonnage)}
-            </Field>
-            <Field label="Date prochain étalonnage">
-              {formatDate(materiel.dateProchainEtalonnage)}
-            </Field>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
+            <Field label="Date dernier étalonnage">{formatDate(materiel.dateEtalonnage)}</Field>
+            <Field label="Date prochain étalonnage">{formatDate(materiel.dateProchainEtalonnage)}</Field>
             <Field label="Validité">
               {materiel.validiteEtalonnage ? `${materiel.validiteEtalonnage} mois` : "—"}
             </Field>
@@ -266,7 +288,7 @@ export default function MaterielDetailPage() {
 
         {/* Prêt */}
         <SectionCard title="Prêt">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
             <BoolField label="En prêt" value={materiel.enPret} />
             <Field label="Motif du prêt">{motifPretLabel}</Field>
             <Field label="Date de retour">{formatDate(materiel.dateRetourPret)}</Field>
@@ -275,15 +297,15 @@ export default function MaterielDetailPage() {
 
         {/* Complétude et vérification */}
         <SectionCard title="Complétude et vérification">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 32px" }}>
             <Field label="Complétude">{completudeLabel}</Field>
             <BoolField label="Information vérifiée" value={materiel.informationVerifiee} />
             <BoolField label="Produits chimiques" value={materiel.produitsChimiques} />
           </div>
           {materiel.commentairesCompletude && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line-2)" }}>
               <Field label="Commentaire complétude">
-                <p className="whitespace-pre-wrap text-gray-600">{materiel.commentairesCompletude}</p>
+                <p style={{ whiteSpace: "pre-wrap", color: "var(--ink-2)", margin: 0 }}>{materiel.commentairesCompletude}</p>
               </Field>
             </div>
           )}
@@ -292,15 +314,15 @@ export default function MaterielDetailPage() {
         {/* Description */}
         {(materiel.description || materiel.commentaires) && (
           <SectionCard title="Description">
-            <div className="space-y-4">
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {materiel.description && (
                 <Field label="Description">
-                  <p className="whitespace-pre-wrap">{materiel.description}</p>
+                  <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{materiel.description}</p>
                 </Field>
               )}
               {materiel.commentaires && (
                 <Field label="Commentaires">
-                  <p className="whitespace-pre-wrap">{materiel.commentaires}</p>
+                  <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{materiel.commentaires}</p>
                 </Field>
               )}
             </div>
@@ -308,19 +330,19 @@ export default function MaterielDetailPage() {
         )}
 
         {/* QR Code + Métadonnées */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <SectionCard title="QR Code">
-            <div className="flex justify-center">
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <img
                 src={`/api/v1/qrcode/materiel/${id}`}
                 alt={`QR code du matériel ${materiel.reference}`}
-                className="w-48 h-48"
+                style={{ width: 160, height: 160 }}
               />
             </div>
           </SectionCard>
 
           <SectionCard title="Métadonnées">
-            <div className="space-y-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <Field label="Créé le">{formatDate(materiel.createdAt)}</Field>
               <Field label="Dernière modification">{formatDate(materiel.updatedAt)}</Field>
             </div>

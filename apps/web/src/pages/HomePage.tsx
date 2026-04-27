@@ -25,59 +25,233 @@ function useStats() {
   return { materiels, maquettes, demandes };
 }
 
+// Icon components using the design system paths
+function IconWrench({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3l-3 3 1 1-7 7-3 3 2 2 3-3 7-7 1 1 3-3z" />
+    </svg>
+  );
+}
+
+function IconBox({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6l7-3 7 3v8l-7 3-7-3V6z" />
+      <path d="M3 6l7 3 7-3" />
+      <path d="M10 9v8" />
+    </svg>
+  );
+}
+
+function IconTruck({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 5h10v9H2z" />
+      <path d="M12 8h4l2 3v3h-6" />
+      <path d="M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+      <path d="M14 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+    </svg>
+  );
+}
+
+function IconCheck({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 10l4 4 8-8" />
+    </svg>
+  );
+}
+
+function IconPlus({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 4v12M4 10h12" />
+    </svg>
+  );
+}
+
+function IconUser({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+      <path d="M4 17a6 6 0 0 1 12 0" />
+    </svg>
+  );
+}
+
+function IconChevRight({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 5l5 5-5 5" />
+    </svg>
+  );
+}
+
+// KPI card using the design system .kpi class
 function KpiCard({
   title,
   value,
   subtitle,
-  color,
+  accentColor,
   icon,
   to,
 }: {
   title: string;
   value: number | string;
   subtitle: string;
-  color: string;
+  accentColor: string;
   icon: React.ReactNode;
   to: string;
 }) {
   return (
     <Link
       to={to}
-      className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow group"
+      className="kpi"
+      style={{ "--kpi-accent": accentColor, textDecoration: "none", color: "inherit" } as React.CSSProperties}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className={`text-3xl font-bold mt-1 ${color}`}>{value}</p>
-          <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="kpi-label">{title}</div>
+          <div className="kpi-value" style={{ color: accentColor }}>{value}</div>
         </div>
-        <div className={`p-3 rounded-xl ${color.replace("text-", "bg-")}/10 group-hover:scale-105 transition-transform`}>
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 9,
+            background: `color-mix(in oklch, ${accentColor} 12%, transparent)`,
+            display: "grid",
+            placeItems: "center",
+            color: accentColor,
+            flexShrink: 0,
+          }}
+        >
           {icon}
         </div>
       </div>
+      <div className="kpi-sub">{subtitle}</div>
     </Link>
   );
 }
 
-function StatusBar({
+// Status bar row inside breakdown panels
+function StatusRow({
   label,
   count,
   total,
-  color,
+  fillColor,
 }: {
   label: string;
   count: number;
   total: number;
-  color: string;
+  fillColor: string;
 }) {
   const pct = total > 0 ? (count / total) * 100 : 0;
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-gray-500 w-28 truncate">{label}</span>
-      <div className="flex-1 bg-gray-100 rounded-full h-2">
-        <div className={`h-2 rounded-full ${color}`} style={{ width: `${pct}%` }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <span
+        style={{
+          fontSize: 12,
+          color: "var(--ink-3)",
+          width: 108,
+          flexShrink: 0,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          flex: 1,
+          height: 4,
+          borderRadius: 2,
+          background: "var(--line)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            borderRadius: 2,
+            background: fillColor,
+            width: `${pct}%`,
+            transition: "width 0.4s ease",
+          }}
+        />
       </div>
-      <span className="text-xs font-semibold text-gray-700 w-8 text-right">{count}</span>
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: "var(--ink-2)",
+          width: 24,
+          textAlign: "right",
+          fontVariantNumeric: "tabular-nums",
+          flexShrink: 0,
+        }}
+      >
+        {count}
+      </span>
+    </div>
+  );
+}
+
+// Skeleton loader for KPI cards
+function KpiSkeleton() {
+  return (
+    <div
+      className="kpi"
+      style={{ gap: 10 }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              height: 10,
+              borderRadius: 4,
+              background: "var(--line)",
+              width: "60%",
+              marginBottom: 10,
+              animation: "pulse 1.5s ease-in-out infinite",
+            }}
+          />
+          <div
+            style={{
+              height: 26,
+              borderRadius: 4,
+              background: "var(--line)",
+              width: "40%",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 9,
+            background: "var(--line)",
+            flexShrink: 0,
+          }}
+        />
+      </div>
+      <div
+        style={{
+          height: 10,
+          borderRadius: 4,
+          background: "var(--line-2)",
+          width: "70%",
+        }}
+      />
     </div>
   );
 }
@@ -114,177 +288,492 @@ export default function HomePage() {
 
   const isLoading = materiels.isLoading || maquettes.isLoading || demandes.isLoading;
 
+  const availabilityPct = matTotal > 0 ? Math.round((matDispo / matTotal) * 100) : null;
+
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Welcome */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Bonjour, {user?.prenom ?? "Utilisateur"}
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Tableau de bord OGADE — Vue d'ensemble des actifs END de la DQI
-        </p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+
+      {/* Page header */}
+      <div className="page-head">
+        <div>
+          <h1 className="page-title">
+            Bonjour, {user?.prenom ?? "Utilisateur"}
+          </h1>
+          <p className="page-sub">
+            Tableau de bord — Vue d'ensemble des actifs END de la DQI
+          </p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Link to="/materiels/nouveau" className="obtn accent" style={{ textDecoration: "none" }}>
+            <IconPlus size={14} />
+            Nouveau matériel
+          </Link>
+        </div>
       </div>
 
-      {/* KPIs */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-24 mb-3" />
-              <div className="h-8 bg-gray-200 rounded w-16 mb-2" />
-              <div className="h-3 bg-gray-200 rounded w-32" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <KpiCard
-            title="Matériels END"
-            value={matTotal}
-            subtitle={`${matDispo} disponibles`}
-            color="text-blue-600"
-            to="/materiels"
-            icon={
-              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.42 15.17l-5.88-3.39a.562.562 0 010-.974l5.88-3.39a.562.562 0 01.562 0l5.88 3.39a.562.562 0 010 .974l-5.88 3.39a.562.562 0 01-.562 0z" />
-              </svg>
-            }
-          />
-          <KpiCard
-            title="Maquettes"
-            value={maqTotal}
-            subtitle={`${maqStock} en stock`}
-            color="text-indigo-600"
-            to="/maquettes"
-            icon={
-              <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            }
-          />
-          <KpiCard
-            title="Demandes d'envoi"
-            value={demTotal}
-            subtitle={`${demTransit} en transit`}
-            color="text-amber-600"
-            to="/demandes-envoi"
-            icon={
-              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-              </svg>
-            }
-          />
-          <KpiCard
-            title="Taux disponibilité"
-            value={matTotal > 0 ? `${Math.round((matDispo / matTotal) * 100)}%` : "—"}
-            subtitle="Matériels disponibles"
-            color="text-emerald-600"
-            to="/materiels"
-            icon={
-              <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          />
-        </div>
-      )}
+      {/* KPI grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 14,
+          padding: "18px 24px",
+        }}
+      >
+        {isLoading ? (
+          <>
+            <KpiSkeleton />
+            <KpiSkeleton />
+            <KpiSkeleton />
+            <KpiSkeleton />
+          </>
+        ) : (
+          <>
+            <KpiCard
+              title="Matériels END"
+              value={matTotal}
+              subtitle={`${matDispo} disponibles`}
+              accentColor="var(--accent)"
+              to="/materiels"
+              icon={<IconWrench size={18} />}
+            />
+            <KpiCard
+              title="Maquettes"
+              value={maqTotal}
+              subtitle={`${maqStock} en stock`}
+              accentColor="var(--violet)"
+              to="/maquettes"
+              icon={<IconBox size={18} />}
+            />
+            <KpiCard
+              title="Demandes d'envoi"
+              value={demTotal}
+              subtitle={`${demTransit} en transit`}
+              accentColor="var(--amber)"
+              to="/demandes-envoi"
+              icon={<IconTruck size={18} />}
+            />
+            <KpiCard
+              title="Taux disponibilité"
+              value={availabilityPct !== null ? `${availabilityPct}%` : "—"}
+              subtitle="Matériels disponibles"
+              accentColor="var(--emerald)"
+              to="/materiels"
+              icon={<IconCheck size={18} />}
+            />
+          </>
+        )}
+      </div>
 
-      {/* Detail panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      {/* Breakdown panels */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 14,
+          padding: "0 24px 18px",
+        }}
+      >
         {/* Matériels breakdown */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-800">Répartition Matériels</h2>
-            <Link to="/materiels" className="text-xs text-edf-blue hover:underline">Voir tout</Link>
+        <div
+          style={{
+            background: "var(--bg-panel)",
+            border: "1px solid var(--line)",
+            borderRadius: 12,
+            padding: "16px 18px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                color: "var(--ink-3)",
+              }}
+            >
+              Répartition Matériels
+            </span>
+            <Link
+              to="/materiels"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 12,
+                color: "var(--accent-ink)",
+                textDecoration: "none",
+                fontWeight: 500,
+              }}
+            >
+              Voir tout <IconChevRight size={13} />
+            </Link>
           </div>
-          <div className="space-y-3">
-            <StatusBar label="Disponible" count={matDispo} total={matTotal} color="bg-emerald-500" />
-            <StatusBar label="En service" count={matEnService} total={matTotal} color="bg-blue-500" />
-            <StatusBar label="Prêté" count={matPrete} total={matTotal} color="bg-amber-500" />
-            <StatusBar label="En réparation" count={matReparation} total={matTotal} color="bg-red-500" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <StatusRow label="Disponible" count={matDispo} total={matTotal} fillColor="var(--emerald)" />
+            <StatusRow label="En service" count={matEnService} total={matTotal} fillColor="var(--accent)" />
+            <StatusRow label="Prêté" count={matPrete} total={matTotal} fillColor="var(--amber)" />
+            <StatusRow label="En réparation" count={matReparation} total={matTotal} fillColor="var(--rose)" />
           </div>
+          {!isLoading && matTotal > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+              <span className="pill c-emerald">
+                <span className="dot" />
+                {matDispo} disponibles
+              </span>
+              {matReparation > 0 && (
+                <span className="pill c-rose">
+                  <span className="dot" />
+                  {matReparation} en réparation
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Maquettes breakdown */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-800">Répartition Maquettes</h2>
-            <Link to="/maquettes" className="text-xs text-edf-blue hover:underline">Voir tout</Link>
+        <div
+          style={{
+            background: "var(--bg-panel)",
+            border: "1px solid var(--line)",
+            borderRadius: 12,
+            padding: "16px 18px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                color: "var(--ink-3)",
+              }}
+            >
+              Répartition Maquettes
+            </span>
+            <Link
+              to="/maquettes"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 12,
+                color: "var(--accent-ink)",
+                textDecoration: "none",
+                fontWeight: 500,
+              }}
+            >
+              Voir tout <IconChevRight size={13} />
+            </Link>
           </div>
-          <div className="space-y-3">
-            <StatusBar label="En stock" count={maqStock} total={maqTotal} color="bg-emerald-500" />
-            <StatusBar label="Empruntée" count={maqEmpruntee} total={maqTotal} color="bg-amber-500" />
-            <StatusBar label="En contrôle" count={maqControle} total={maqTotal} color="bg-blue-500" />
-            <StatusBar label="Envoyée" count={maqEnvoyee} total={maqTotal} color="bg-purple-500" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <StatusRow label="En stock" count={maqStock} total={maqTotal} fillColor="var(--emerald)" />
+            <StatusRow label="Empruntée" count={maqEmpruntee} total={maqTotal} fillColor="var(--amber)" />
+            <StatusRow label="En contrôle" count={maqControle} total={maqTotal} fillColor="var(--sky)" />
+            <StatusRow label="Envoyée" count={maqEnvoyee} total={maqTotal} fillColor="var(--violet)" />
           </div>
+          {!isLoading && maqTotal > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+              <span className="pill c-emerald">
+                <span className="dot" />
+                {maqStock} en stock
+              </span>
+              {maqEmpruntee > 0 && (
+                <span className="pill c-amber">
+                  <span className="dot" />
+                  {maqEmpruntee} empruntées
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Demandes breakdown */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-800">Suivi Demandes</h2>
-            <Link to="/demandes-envoi" className="text-xs text-edf-blue hover:underline">Voir tout</Link>
+        <div
+          style={{
+            background: "var(--bg-panel)",
+            border: "1px solid var(--line)",
+            borderRadius: 12,
+            padding: "16px 18px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                color: "var(--ink-3)",
+              }}
+            >
+              Suivi Demandes
+            </span>
+            <Link
+              to="/demandes-envoi"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 12,
+                color: "var(--accent-ink)",
+                textDecoration: "none",
+                fontWeight: 500,
+              }}
+            >
+              Voir tout <IconChevRight size={13} />
+            </Link>
           </div>
-          <div className="space-y-3">
-            <StatusBar label="Brouillon" count={demBrouillon} total={demTotal} color="bg-gray-400" />
-            <StatusBar label="Envoyée" count={demEnvoyee} total={demTotal} color="bg-blue-500" />
-            <StatusBar label="En transit" count={demTransit} total={demTotal} color="bg-amber-500" />
-            <StatusBar label="Reçue" count={demRecue} total={demTotal} color="bg-emerald-500" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <StatusRow label="Brouillon" count={demBrouillon} total={demTotal} fillColor="var(--ink-4)" />
+            <StatusRow label="Envoyée" count={demEnvoyee} total={demTotal} fillColor="var(--sky)" />
+            <StatusRow label="En transit" count={demTransit} total={demTotal} fillColor="var(--amber)" />
+            <StatusRow label="Reçue" count={demRecue} total={demTotal} fillColor="var(--emerald)" />
           </div>
+          {!isLoading && demTotal > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+              {demTransit > 0 && (
+                <span className="pill c-amber">
+                  <span className="dot" />
+                  {demTransit} en transit
+                </span>
+              )}
+              {demRecue > 0 && (
+                <span className="pill c-emerald">
+                  <span className="dot" />
+                  {demRecue} reçues
+                </span>
+              )}
+              {demTransit === 0 && demRecue === 0 && (
+                <span className="pill c-neutral">
+                  <span className="dot" />
+                  {demBrouillon} brouillons
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Quick actions */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 className="text-sm font-semibold text-gray-800 mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Link
-            to="/materiels/nouveau"
-            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-edf-blue/30 hover:bg-edf-blue/5 transition-colors group"
+      <div style={{ padding: "0 24px 24px" }}>
+        <div
+          style={{
+            background: "var(--bg-panel)",
+            border: "1px solid var(--line)",
+            borderRadius: 12,
+            padding: "16px 18px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              color: "var(--ink-3)",
+              marginBottom: 14,
+            }}
           >
-            <div className="p-2 bg-blue-50 rounded-lg text-blue-600 group-hover:bg-blue-100 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-sm text-gray-700 font-medium">Nouveau matériel</span>
-          </Link>
-          <Link
-            to="/maquettes/nouveau"
-            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-edf-blue/30 hover:bg-edf-blue/5 transition-colors group"
+            Actions rapides
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 10,
+            }}
           >
-            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600 group-hover:bg-indigo-100 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-sm text-gray-700 font-medium">Nouvelle maquette</span>
-          </Link>
-          <Link
-            to="/demandes-envoi/nouveau"
-            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-edf-blue/30 hover:bg-edf-blue/5 transition-colors group"
-          >
-            <div className="p-2 bg-amber-50 rounded-lg text-amber-600 group-hover:bg-amber-100 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-sm text-gray-700 font-medium">Demande d'envoi</span>
-          </Link>
-          <Link
-            to="/agents"
-            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-edf-blue/30 hover:bg-edf-blue/5 transition-colors group"
-          >
-            <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 group-hover:bg-emerald-100 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-              </svg>
-            </div>
-            <span className="text-sm text-gray-700 font-medium">Gérer les agents</span>
-          </Link>
+            {/* New material */}
+            <Link
+              to="/materiels/nouveau"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                borderRadius: 9,
+                border: "1px solid var(--line)",
+                background: "var(--bg-panel)",
+                textDecoration: "none",
+                color: "var(--ink)",
+                transition: "background 0.12s, border-color 0.12s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--accent-soft)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 7,
+                  background: "var(--accent-soft)",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "var(--accent-ink)",
+                  flexShrink: 0,
+                }}
+              >
+                <IconPlus size={15} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Nouveau matériel</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 1 }}>Ajouter un équipement</div>
+              </div>
+            </Link>
+
+            {/* New maquette */}
+            <Link
+              to="/maquettes/nouveau"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                borderRadius: 9,
+                border: "1px solid var(--line)",
+                background: "var(--bg-panel)",
+                textDecoration: "none",
+                color: "var(--ink)",
+                transition: "background 0.12s, border-color 0.12s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--violet-soft)";
+                (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in oklch, var(--violet) 25%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 7,
+                  background: "var(--violet-soft)",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "var(--violet)",
+                  flexShrink: 0,
+                }}
+              >
+                <IconPlus size={15} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Nouvelle maquette</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 1 }}>Créer un modèle</div>
+              </div>
+            </Link>
+
+            {/* New demande */}
+            <Link
+              to="/demandes-envoi/nouveau"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                borderRadius: 9,
+                border: "1px solid var(--line)",
+                background: "var(--bg-panel)",
+                textDecoration: "none",
+                color: "var(--ink)",
+                transition: "background 0.12s, border-color 0.12s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--amber-soft)";
+                (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in oklch, var(--amber) 30%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 7,
+                  background: "var(--amber-soft)",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "oklch(0.50 0.17 60)",
+                  flexShrink: 0,
+                }}
+              >
+                <IconTruck size={15} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Demande d'envoi</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 1 }}>Créer un envoi</div>
+              </div>
+            </Link>
+
+            {/* Manage agents */}
+            <Link
+              to="/agents"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                borderRadius: 9,
+                border: "1px solid var(--line)",
+                background: "var(--bg-panel)",
+                textDecoration: "none",
+                color: "var(--ink)",
+                transition: "background 0.12s, border-color 0.12s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--emerald-soft)";
+                (e.currentTarget as HTMLElement).style.borderColor = "color-mix(in oklch, var(--emerald) 25%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 7,
+                  background: "var(--emerald-soft)",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "var(--emerald)",
+                  flexShrink: 0,
+                }}
+              >
+                <IconUser size={15} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Gérer les agents</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 1 }}>Utilisateurs et rôles</div>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
+
     </div>
   );
 }

@@ -10,72 +10,138 @@ import MaterielDrawer from "@/components/MaterielDrawer";
 
 type Stats = { total: number; echus: number; prochains: number; enPret: number; hs: number; incomplets: number };
 
-const etatConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  CORRECT: { label: "Correct", color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
-  LEGER_DEFAUT: { label: "Léger défaut", color: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200" },
-  HS: { label: "HS", color: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
-  PERDU: { label: "Perdu", color: "text-gray-500", bg: "bg-gray-100", border: "border-gray-200" },
-};
-
-const completudeConfig: Record<string, { label: string; color: string; bg: string }> = {
-  COMPLET: { label: "Complet", color: "text-emerald-700", bg: "bg-emerald-50" },
-  INCOMPLET: { label: "Incomplet", color: "text-amber-700", bg: "bg-amber-50" },
-};
-
-function Pill({ label, color, bg, border }: { label: string; color: string; bg: string; border?: string }) {
+// ─── LOCAL ICON ────────────────────────────────────────────────────────────────
+function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
+  const paths: Record<string, string> = {
+    search: "M11 11l4 4M7 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z",
+    filter: "M3 5h14M6 10h8M9 15h2",
+    plus:   "M10 4v12M4 10h12",
+    pin:    "M10 18s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11z M10 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+    edit:   "M12 4l4 4-8 8H4v-4l8-8z",
+    x:      "M5 5l10 10M15 5L5 15",
+  };
+  const d = paths[name] ?? "";
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${color} ${bg} ${border ? `border ${border}` : ""}`}>
-      <span className={`w-1.5 h-1.5 rounded-full bg-current`} />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={stroke}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {d.split(" M").map((p, i) => (
+        <path key={i} d={i === 0 ? p : "M" + p} />
+      ))}
+    </svg>
+  );
+}
+
+// ─── ETAT CONFIG ───────────────────────────────────────────────────────────────
+const etatPillClass: Record<string, string> = {
+  CORRECT:      "c-emerald",
+  LEGER_DEFAUT: "c-amber",
+  HS:           "c-rose",
+  PERDU:        "c-neutral",
+};
+const etatLabel: Record<string, string> = {
+  CORRECT:      "Correct",
+  LEGER_DEFAUT: "Léger défaut",
+  HS:           "HS",
+  PERDU:        "Perdu",
+};
+
+const completudePillClass: Record<string, string> = {
+  COMPLET:   "c-emerald",
+  INCOMPLET: "c-amber",
+};
+const completudeLabel: Record<string, string> = {
+  COMPLET:   "Complet",
+  INCOMPLET: "Incomplet",
+};
+
+// ─── PILL ──────────────────────────────────────────────────────────────────────
+function Pill({ label, variant }: { label: string; variant: string }) {
+  return (
+    <span className={`pill ${variant}`}>
+      <span className="dot" />
       {label}
     </span>
   );
 }
 
+// ─── VALIDITY BAR ──────────────────────────────────────────────────────────────
 function ValidityBar({ m }: { m: Materiel }) {
   if (!m.soumisVerification) {
-    return <span className="text-[11px] text-gray-400">Non soumis</span>;
+    return <span style={{ fontSize: 11, color: "var(--ink-4)" }}>Non soumis</span>;
   }
   if (!m.dateProchainEtalonnage) {
-    return <span className="text-[11px] text-gray-400">Non renseigné</span>;
+    return <span style={{ fontSize: 11, color: "var(--ink-4)" }}>Non renseigné</span>;
   }
+
   const echeance = new Date(m.dateProchainEtalonnage);
   const now = new Date();
   const jours = Math.round((echeance.getTime() - now.getTime()) / 86400000);
   const totalDays = (m.validiteEtalonnage ?? 12) * 30;
   const pct = Math.max(0, Math.min(100, 100 - (jours / totalDays) * 100));
 
-  let cls = "text-emerald-600";
-  let fill = "bg-emerald-500";
-  let label = `${jours} j`;
-  if (jours < 0) { cls = "text-red-600 font-semibold"; fill = "bg-red-500"; label = `${-jours} j retard`; }
-  else if (jours <= 30) { cls = "text-amber-600"; fill = "bg-amber-500"; }
+  let restCls = "validity-rest ok";
+  let fill = "var(--emerald)";
+  let label = `dans ${jours} j`;
+  if (jours < 0) {
+    restCls = "validity-rest late";
+    fill = "var(--rose)";
+    label = `${-jours} j retard`;
+  } else if (jours <= 30) {
+    restCls = "validity-rest warn";
+    fill = "oklch(0.72 0.17 75)";
+  }
 
   const fmt = echeance.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
   return (
-    <div className="min-w-[120px] flex flex-col gap-1">
-      <div className="flex justify-between items-baseline text-[11px]">
-        <span className="font-medium text-gray-700">{fmt}</span>
-        <span className={cls}>{label}</span>
+    <div className="validity">
+      <div className="validity-top">
+        <span className="validity-date">{fmt}</span>
+        <span className={restCls}>{label}</span>
       </div>
-      <div className="h-1 rounded-full bg-gray-200 overflow-hidden">
-        <div className={`h-full rounded-full ${fill}`} style={{ width: `${pct}%` }} />
+      <div className="validity-bar">
+        <div style={{ width: `${pct}%`, background: fill }} />
       </div>
     </div>
   );
 }
 
+// ─── KPI CARD ──────────────────────────────────────────────────────────────────
 function KpiCard({ label, value, sub, accent }: { label: string; value: number; sub: string; accent: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 relative overflow-hidden">
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${accent}`} />
-      <div className="text-[11px] font-medium text-gray-500 mb-1">{label}</div>
-      <div className="text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
-      <div className="text-[11px] text-gray-400 mt-1">{sub}</div>
+    <div className="kpi" style={{ "--kpi-accent": accent } as React.CSSProperties}>
+      <div className="kpi-label">{label}</div>
+      <div className="kpi-value">{value}</div>
+      <div className="kpi-sub">{sub}</div>
     </div>
   );
 }
 
+// ─── FILTER CHIP ───────────────────────────────────────────────────────────────
+function FilterChip({ label, value, onClear }: { label: string; value: string; onClear: () => void }) {
+  return (
+    <span className="chip">
+      <span style={{ opacity: 0.7, fontSize: 11 }}>{label}:</span>
+      {" "}{value}
+      <button
+        onClick={onClear}
+        style={{ display: "inline-flex", alignItems: "center", background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", opacity: 0.7, marginLeft: 2 }}
+      >
+        <Icon name="x" size={11} stroke={2} />
+      </button>
+    </span>
+  );
+}
+
+// ─── PAGE ──────────────────────────────────────────────────────────────────────
 export default function MaterielsListPage() {
   const [search, setSearch] = useState("");
   const [filterEtat, setFilterEtat] = useState("");
@@ -132,231 +198,319 @@ export default function MaterielsListPage() {
   const selectedMat = selectedId ? rows.find((r) => r.id === selectedId) : null;
 
   return (
-    <div className="max-w-[1400px] mx-auto">
-      {/* Header */}
-      <div className="flex items-end justify-between mb-5">
+    <div>
+      {/* ── Page header ── */}
+      <div style={{ padding: "22px 24px 18px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Gestion du matériel END</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Inventaire, étalonnage et traçabilité</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: "var(--ink)", lineHeight: 1.2 }}>
+            Gestion du matériel END
+          </h1>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 4, marginBottom: 0 }}>
+            Inventaire, étalonnage et traçabilité
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div>
           <Link
             to="/materiels/nouveau"
-            className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors shadow-sm"
+            className="obtn accent"
+            style={{ textDecoration: "none" }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+            <Icon name="plus" size={14} />
             Ajouter matériel
           </Link>
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* ── KPI cards ── */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
-          <KpiCard label="Matériels actifs" value={stats.total} sub="inventaire complet" accent="bg-edf-blue" />
-          <KpiCard label="Étalonnages échus" value={stats.echus} sub="à régulariser" accent="bg-red-500" />
-          <KpiCard label="Échéance < 30 j" value={stats.prochains} sub="à planifier" accent="bg-amber-500" />
-          <KpiCard label="En prêt / mission" value={stats.enPret} sub="hors magasin" accent="bg-sky-500" />
-          <KpiCard label="HS · Incomplets" value={stats.hs + stats.incomplets} sub={`${stats.hs} HS · ${stats.incomplets} incomplets`} accent="bg-violet-500" />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, padding: "0 24px 18px" }}>
+          <KpiCard label="Matériels actifs"  value={stats.total}                      sub="inventaire complet"                               accent="var(--accent)" />
+          <KpiCard label="Étalonnages échus" value={stats.echus}                      sub="à régulariser"                                   accent="var(--rose)" />
+          <KpiCard label="Échéance < 30 j"   value={stats.prochains}                  sub="à planifier"                                     accent="var(--amber)" />
+          <KpiCard label="En prêt / mission" value={stats.enPret}                     sub="hors magasin"                                    accent="var(--sky)" />
+          <KpiCard label="HS · Incomplets"   value={stats.hs + stats.incomplets}      sub={`${stats.hs} HS · ${stats.incomplets} incomplets`} accent="var(--violet)" />
         </div>
       )}
 
-      {/* Search + Filters toolbar */}
-      <div className="bg-white border border-gray-200 rounded-xl mb-4 shadow-sm">
-        <div className="p-3 flex items-center gap-3">
-          {/* Search */}
-          <div className="flex-1 max-w-xl flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus-within:border-edf-blue/40 focus-within:bg-white focus-within:ring-2 focus-within:ring-edf-blue/10 transition-all">
-            <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input
-              type="text"
-              placeholder="Recherche — ID, type, modèle, fournisseur, FIEC…"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="flex-1 bg-transparent border-0 outline-none text-sm text-gray-900 placeholder:text-gray-400"
-            />
-          </div>
-
-          {/* Filter button */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
-              showFilters || activeFilterCount > 0
-                ? "bg-edf-blue/10 text-edf-blue border-edf-blue/20"
-                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6}><path d="M3 5h14M6 10h8M9 15h2" /></svg>
-            Filtres
-            {activeFilterCount > 0 && (
-              <span className="bg-edf-blue text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-semibold">{activeFilterCount}</span>
-            )}
-          </button>
-
-          <div className="text-xs text-gray-400">
-            {data ? `${data.total} résultat${data.total > 1 ? "s" : ""}` : ""}
-          </div>
+      {/* ── Toolbar ── */}
+      <div style={{ position: "sticky", top: 0, zIndex: 10, background: "var(--bg-panel)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 10 }}>
+        {/* Search */}
+        <div className="search-bar">
+          <Icon name="search" size={14} />
+          <input
+            type="text"
+            placeholder="Recherche — ID, type, modèle, fournisseur, FIEC…"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          />
         </div>
 
-        {/* Filter panel */}
-        {showFilters && (
-          <div className="border-t border-gray-100 p-3">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <select value={filterEtat} onChange={(e) => { setFilterEtat(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">État — Tous</option>
-                {(etats ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-              <select value={filterTypeEnd} onChange={(e) => { setFilterTypeEnd(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">Type END — Tous</option>
-                {(typesEnd ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-              <select value={filterTypeMat} onChange={(e) => { setFilterTypeMat(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">Type matériel — Tous</option>
-                {(typesMat ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-              <select value={filterGroupe} onChange={(e) => { setFilterGroupe(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">Groupe — Tous</option>
-                {(groupes ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-              <select value={filterSite} onChange={(e) => { setFilterSite(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">Site — Tous</option>
-                {siteOptions.map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-              <select value={filterCompletude} onChange={(e) => { setFilterCompletude(e.target.value); setPage(1); }} className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/20">
-                <option value="">Complétude — Tous</option>
-                {(completudes ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
-              </select>
-            </div>
-            {activeFilterCount > 0 && (
-              <button onClick={clearFilters} className="mt-2 text-xs text-gray-500 hover:text-red-600 transition-colors">
-                Effacer tous les filtres
-              </button>
-            )}
-          </div>
-        )}
+        {/* Filter button */}
+        <button
+          className={`obtn${showFilters || activeFilterCount > 0 ? " accent" : ""}`}
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <Icon name="filter" size={14} />
+          Filtres
+          {activeFilterCount > 0 && (
+            <span style={{ background: "white", color: "var(--accent)", borderRadius: 999, padding: "0 6px", fontSize: 11, fontWeight: 600 }}>
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+
+        {/* Scope segment */}
+        <div className="seg">
+          <button className="on">Tous</button>
+        </div>
+
+        {/* Spacer */}
+        <span style={{ flex: 1 }} />
+
+        {/* Result count */}
+        <span style={{ fontSize: 12, color: "var(--ink-4)", whiteSpace: "nowrap" }}>
+          {data ? `${data.total} résultat${data.total > 1 ? "s" : ""}` : ""}
+        </span>
       </div>
 
-      {/* Active filter chips */}
+      {/* ── Filter panel ── */}
+      {showFilters && (
+        <div style={{ background: "var(--bg-panel)", borderBottom: "1px solid var(--line)", padding: "12px 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
+            <select
+              value={filterEtat}
+              onChange={(e) => { setFilterEtat(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">État — Tous</option>
+              {(etats ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+            <select
+              value={filterTypeEnd}
+              onChange={(e) => { setFilterTypeEnd(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">Type END — Tous</option>
+              {(typesEnd ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+            <select
+              value={filterTypeMat}
+              onChange={(e) => { setFilterTypeMat(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">Type matériel — Tous</option>
+              {(typesMat ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+            <select
+              value={filterGroupe}
+              onChange={(e) => { setFilterGroupe(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">Groupe — Tous</option>
+              {(groupes ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+            <select
+              value={filterSite}
+              onChange={(e) => { setFilterSite(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">Site — Tous</option>
+              {siteOptions.map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+            <select
+              value={filterCompletude}
+              onChange={(e) => { setFilterCompletude(e.target.value); setPage(1); }}
+              className="oselect"
+            >
+              <option value="">Complétude — Tous</option>
+              {(completudes ?? []).map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+            </select>
+          </div>
+          {activeFilterCount > 0 && (
+            <button
+              onClick={clearFilters}
+              className="obtn ghost"
+              style={{ marginTop: 10, fontSize: 12 }}
+            >
+              Effacer tous les filtres
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Active filter chips ── */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center gap-2 flex-wrap mb-3">
-          {filterEtat && <FilterChip label="État" value={(etats ?? []).find(e => e.code === filterEtat)?.label ?? filterEtat} onClear={() => setFilterEtat("")} />}
-          {filterTypeEnd && <FilterChip label="Type END" value={(typesEnd ?? []).find(e => e.code === filterTypeEnd)?.label ?? filterTypeEnd} onClear={() => setFilterTypeEnd("")} />}
-          {filterTypeMat && <FilterChip label="Type" value={(typesMat ?? []).find(e => e.code === filterTypeMat)?.label ?? filterTypeMat} onClear={() => setFilterTypeMat("")} />}
-          {filterGroupe && <FilterChip label="Groupe" value={(groupes ?? []).find(e => e.code === filterGroupe)?.label ?? filterGroupe} onClear={() => setFilterGroupe("")} />}
-          {filterSite && <FilterChip label="Site" value={siteOptions.find(e => e.code === filterSite)?.label ?? filterSite} onClear={() => setFilterSite("")} />}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "10px 24px 4px" }}>
+          {filterEtat      && <FilterChip label="État"       value={(etats ?? []).find(e => e.code === filterEtat)?.label ?? filterEtat}                 onClear={() => setFilterEtat("")} />}
+          {filterTypeEnd   && <FilterChip label="Type END"   value={(typesEnd ?? []).find(e => e.code === filterTypeEnd)?.label ?? filterTypeEnd}         onClear={() => setFilterTypeEnd("")} />}
+          {filterTypeMat   && <FilterChip label="Type"       value={(typesMat ?? []).find(e => e.code === filterTypeMat)?.label ?? filterTypeMat}         onClear={() => setFilterTypeMat("")} />}
+          {filterGroupe    && <FilterChip label="Groupe"     value={(groupes ?? []).find(e => e.code === filterGroupe)?.label ?? filterGroupe}             onClear={() => setFilterGroupe("")} />}
+          {filterSite      && <FilterChip label="Site"       value={siteOptions.find(e => e.code === filterSite)?.label ?? filterSite}                   onClear={() => setFilterSite("")} />}
           {filterCompletude && <FilterChip label="Complétude" value={(completudes ?? []).find(e => e.code === filterCompletude)?.label ?? filterCompletude} onClear={() => setFilterCompletude("")} />}
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      {/* ── Table ── */}
+      <div style={{ background: "var(--bg-panel)", margin: "0 0" }}>
         {isLoading ? (
-          <div className="p-8">
-            <div className="animate-pulse space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-12 bg-gray-100 rounded" />)}
+          <div style={{ padding: "32px 24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} style={{ height: 44, background: "var(--bg-sunken)", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
+              ))}
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-[13px]">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ minWidth: "100%", borderCollapse: "collapse", fontSize: "var(--ui-fs)" }}>
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Réf · Type</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Modèle</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Localisation</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Responsable</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Validité</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">État · Complétude</th>
-                  <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Prêt</th>
-                  <th className="px-3 py-2.5 w-16"></th>
+                <tr>
+                  {["Réf · Type", "Modèle", "Localisation", "Responsable", "Validité", "État · Complétude", "Prêt", ""].map((h, i) => (
+                    <th
+                      key={i}
+                      style={{
+                        padding: "10px 12px",
+                        textAlign: "left",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                        color: "var(--ink-3)",
+                        borderBottom: "1px solid var(--line)",
+                        whiteSpace: "nowrap",
+                        width: i === 7 ? 56 : undefined,
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-16 text-center text-sm text-gray-400">
+                    <td colSpan={8} style={{ padding: "48px 24px", textAlign: "center", color: "var(--ink-4)", fontSize: 13 }}>
                       Aucun matériel trouvé
                       {activeFilterCount > 0 && (
-                        <button onClick={clearFilters} className="block mx-auto mt-2 text-xs text-edf-blue hover:underline">Effacer les filtres</button>
+                        <button
+                          onClick={clearFilters}
+                          style={{ display: "block", margin: "8px auto 0", fontSize: 12, background: "none", border: "none", color: "var(--accent)", cursor: "pointer", textDecoration: "underline" }}
+                        >
+                          Effacer les filtres
+                        </button>
                       )}
                     </td>
                   </tr>
                 ) : rows.map((m) => {
-                  const etat = etatConfig[m.etat] ?? { label: m.etat, color: "text-gray-600", bg: "bg-gray-50", border: "border-gray-200" };
-                  const comp = m.completude ? completudeConfig[m.completude] : null;
-                  const typeEndRef = (typesEnd ?? []).find((t) => t.code === m.typeEND);
-                  const typeMatRef = (typesMat ?? []).find((t) => t.code === m.typeMateriel);
-                  const siteRef = (sites ?? []).find((s) => s.code === m.site);
-                  const resp = m.responsable as { prenom: string; nom: string } | null | undefined;
+                  const pillVariant    = etatPillClass[m.etat] ?? "c-neutral";
+                  const pillLbl        = etatLabel[m.etat] ?? m.etat;
+                  const compVariant    = m.completude ? completudePillClass[m.completude] : null;
+                  const compLbl        = m.completude ? completudeLabel[m.completude] : null;
+                  const typeEndRef     = (typesEnd ?? []).find((t) => t.code === m.typeEND);
+                  const typeMatRef     = (typesMat ?? []).find((t) => t.code === m.typeMateriel);
+                  const siteRef        = (sites ?? []).find((s) => s.code === m.site);
+                  const resp           = m.responsable as { prenom: string; nom: string } | null | undefined;
+                  const isSelected     = selectedId === m.id;
+
+                  // Deterministic avatar color from initials
+                  const initials = resp ? `${resp.prenom?.[0] ?? ""}${resp.nom?.[0] ?? ""}` : "";
+                  const avatarColors = ["oklch(0.62 0.14 235)", "oklch(0.55 0.20 275)", "oklch(0.60 0.16 155)", "oklch(0.62 0.21 20)", "oklch(0.72 0.17 75)", "oklch(0.70 0.15 30)"];
+                  const avatarColor  = avatarColors[(initials.charCodeAt(0) ?? 0) % avatarColors.length];
 
                   return (
                     <tr
                       key={m.id}
                       onClick={() => setSelectedId(m.id)}
-                      className={`border-b border-gray-50 cursor-pointer transition-colors ${selectedId === m.id ? "bg-edf-blue/5" : "hover:bg-gray-50/80"}`}
+                      style={{
+                        borderBottom: "1px solid var(--line-2)",
+                        background: isSelected ? "var(--accent-soft)" : undefined,
+                        height: "var(--row-h)",
+                        cursor: "pointer",
+                        transition: "background 0.1s",
+                      }}
+                      onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "var(--bg-sunken)"; }}
+                      onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = ""; }}
                     >
-                      <td className="px-3 py-2.5">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-mono font-medium text-gray-900 text-[12px]">{m.reference}</span>
-                          <span className="text-[11px] text-gray-400">
+                      {/* Réf · Type */}
+                      <td style={{ padding: "0 12px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <span className="mono" style={{ fontWeight: 500, color: "var(--ink)", fontSize: 12 }}>{m.reference}</span>
+                          <span style={{ fontSize: 11, color: "var(--ink-4)" }}>
                             {typeMatRef?.label ?? m.typeMateriel ?? "—"}
                             {m.fournisseur ? ` · ${m.fournisseur}` : ""}
                           </span>
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium text-gray-900">{m.modele ?? "—"}</span>
+
+                      {/* Modèle */}
+                      <td style={{ padding: "0 12px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                          <span style={{ fontWeight: 500, color: "var(--ink)" }}>{m.modele ?? "—"}</span>
                           {m.typeEND && (
-                            <span className="inline-flex w-fit items-center px-1.5 py-0 rounded bg-gray-100 border border-gray-200 text-[10px] font-mono font-medium text-gray-600">
-                              {typeEndRef?.label ?? m.typeEND}
-                            </span>
+                            <span className="tag mono">{typeEndRef?.label ?? m.typeEND}</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="flex items-center gap-1 font-medium text-gray-800">
-                            <svg className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6}><path d="M10 18s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11z M10 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" /></svg>
+
+                      {/* Localisation */}
+                      <td style={{ padding: "0 12px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 4, fontWeight: 500, color: "var(--ink-2)" }}>
+                            <Icon name="pin" size={12} />
                             {siteRef?.label ?? m.site ?? "—"}
                           </span>
-                          <span className="text-[11px] text-gray-400">{m.groupe ?? ""} {m.enPret ? "· En prêt" : ""}</span>
+                          <span style={{ fontSize: 11, color: "var(--ink-4)" }}>
+                            {m.groupe ?? ""}
+                            {m.enPret ? (m.groupe ? " · En prêt" : "En prêt") : ""}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">
+
+                      {/* Responsable */}
+                      <td style={{ padding: "0 12px" }}>
                         {resp ? (
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-edf-blue/10 text-edf-blue flex items-center justify-center text-[10px] font-semibold shrink-0">
-                              {resp.prenom?.[0]}{resp.nom?.[0]}
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ width: 22, height: 22, borderRadius: "50%", background: avatarColor, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
+                              {initials}
                             </span>
-                            <span className="text-[12px] text-gray-700">{resp.prenom} {resp.nom}</span>
+                            <span style={{ fontSize: 12, color: "var(--ink-2)" }}>{resp.prenom} {resp.nom}</span>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-gray-400">—</span>
+                          <span style={{ fontSize: 11, color: "var(--ink-4)" }}>—</span>
                         )}
                       </td>
-                      <td className="px-3 py-2.5">
+
+                      {/* Validité */}
+                      <td style={{ padding: "0 12px" }}>
                         <ValidityBar m={m} />
                       </td>
-                      <td className="px-3 py-2.5">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <Pill label={etat.label} color={etat.color} bg={etat.bg} border={etat.border} />
-                          {comp && <Pill label={comp.label} color={comp.color} bg={comp.bg} />}
+
+                      {/* État · Complétude */}
+                      <td style={{ padding: "0 12px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                          <Pill label={pillLbl} variant={pillVariant} />
+                          {compVariant && compLbl && <Pill label={compLbl} variant={compVariant} />}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">
+
+                      {/* Prêt */}
+                      <td style={{ padding: "0 12px" }}>
                         {m.enPret ? (
-                          <Pill label="En prêt" color="text-sky-700" bg="bg-sky-50" border="border-sky-200" />
+                          <Pill label="En prêt" variant="c-sky" />
                         ) : (
-                          <span className="text-[11px] text-gray-400">—</span>
+                          <span style={{ fontSize: 11, color: "var(--ink-4)" }}>—</span>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
+
+                      {/* Actions */}
+                      <td style={{ padding: "0 12px", textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
                         <Link
                           to={`/materiels/${m.id}/edit`}
-                          className="p-1.5 text-gray-400 hover:text-edf-blue hover:bg-edf-blue/5 rounded-lg transition-colors inline-flex"
+                          className="icon-btn"
                           title="Modifier"
+                          style={{ textDecoration: "none" }}
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                          <Icon name="edit" size={14} />
                         </Link>
                       </td>
                     </tr>
@@ -368,27 +522,17 @@ export default function MaterielsListPage() {
         )}
       </div>
 
+      {/* ── Pagination ── */}
       {data && data.totalPages > 1 && (
-        <div className="mt-4">
+        <div style={{ padding: "16px 24px" }}>
           <Pagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
         </div>
       )}
 
-      {/* Detail Drawer */}
+      {/* ── Detail Drawer ── */}
       {selectedMat && (
         <MaterielDrawer materiel={selectedMat} onClose={() => setSelectedId(null)} />
       )}
     </div>
-  );
-}
-
-function FilterChip({ label, value, onClear }: { label: string; value: string; onClear: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-edf-blue/10 text-edf-blue border border-edf-blue/20 rounded-full text-[12px] font-medium">
-      <span className="text-edf-blue/60 text-[11px]">{label}:</span> {value}
-      <button onClick={onClear} className="ml-0.5 opacity-60 hover:opacity-100">
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={2}><path d="M5 5l10 10M15 5L5 15" /></svg>
-      </button>
-    </span>
   );
 }

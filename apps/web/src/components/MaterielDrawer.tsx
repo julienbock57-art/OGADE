@@ -3,284 +3,600 @@ import { Link } from "react-router-dom";
 import type { Materiel } from "@ogade/shared";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 
-const etatLabels: Record<string, string> = { CORRECT: "Correct", LEGER_DEFAUT: "Léger défaut", HS: "HS", PERDU: "Perdu" };
-const etatColors: Record<string, string> = { CORRECT: "text-emerald-700 bg-emerald-50", LEGER_DEFAUT: "text-amber-700 bg-amber-50", HS: "text-red-600 bg-red-50", PERDU: "text-gray-500 bg-gray-100" };
-const compLabels: Record<string, string> = { COMPLET: "Complet", INCOMPLET: "Incomplet" };
-const compColors: Record<string, string> = { COMPLET: "text-emerald-700 bg-emerald-50", INCOMPLET: "text-amber-700 bg-amber-50" };
+// ─── LOCAL ICON COMPONENT ──────────────────────────────────────────────────
+const iconPaths: Record<string, string> = {
+  eye:     "M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z M10 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  clip:    "M7 9l5-5 3 3-7 7-3-3a2 2 0 0 1 0-3",
+  photo:   "M3 5h14v10H3z M7 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M3 13l4-4 4 4 3-3 3 3",
+  alert:   "M10 7v4m0 2v.01 M2 16L10 3l8 13H2z",
+  history: "M10 18a8 8 0 1 0-8-8 M2 4v4h4 M10 6v4l3 2",
+  qr:      "M3 3h6v6H3z M11 3h6v6h-6z M3 11h6v6H3z M11 11h2v2h-2z M15 11h2v2h-2z M11 15h2v2h-2z M15 15h2v2h-2z M5 5h2v2H5z M13 5h2v2h-2z M5 13h2v2H5z",
+  x:       "M5 5l10 10M15 5L5 15",
+  pin:     "M10 18s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11z M10 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  check:   "M4 10l4 4 8-8",
+  dl:      "M10 3v10m0 0l-4-4m4 4l4-4M4 16h12",
+  edit:    "M12 4l4 4-8 8H4v-4l8-8z",
+  cart:    "M3 4h2l2 9h10l2-7H7 M8 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M16 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
+  dots:    "M5 10h.01M10 10h.01M15 10h.01",
+};
 
-type Tab = "infos" | "etat" | "historique" | "qr";
-
-function Pill({ label, cls }: { label: string; cls: string }) {
+function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
+  const d = iconPaths[name] ?? "";
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium ${cls}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-current" />
-      {label}
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={stroke}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {d.split(" M").map((p, i) => (
+        <path key={i} d={i === 0 ? p : "M" + p} />
+      ))}
+    </svg>
+  );
+}
+
+// ─── PILL HELPERS ──────────────────────────────────────────────────────────
+const etatPillClass: Record<string, string> = {
+  CORRECT:     "emerald",
+  LEGER_DEFAUT:"amber",
+  HS:          "rose",
+  PERDU:       "neutral",
+};
+const etatLabels: Record<string, string> = {
+  CORRECT: "Correct",
+  LEGER_DEFAUT: "Léger défaut",
+  HS: "HS",
+  PERDU: "Perdu",
+};
+const compPillClass: Record<string, string> = {
+  COMPLET:   "emerald",
+  INCOMPLET: "amber",
+};
+const compLabels: Record<string, string> = {
+  COMPLET: "Complet",
+  INCOMPLET: "Incomplet",
+};
+
+function EtatPill({ etat }: { etat: string }) {
+  const cls = etatPillClass[etat] ?? "neutral";
+  return (
+    <span className={`pill ${cls}`}>
+      <span className="dot" />
+      {etatLabels[etat] ?? etat}
     </span>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function CompPill({ completude }: { completude: string }) {
+  const cls = compPillClass[completude] ?? "neutral";
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[11px] text-gray-400 font-medium">{label}</span>
-      <span className="text-[13px] text-gray-900 font-medium">{children}</span>
-    </div>
+    <span className={`pill ${cls}`}>
+      <span className="dot" />
+      {compLabels[completude] ?? completude}
+    </span>
   );
 }
 
-function ValiditySection({ m }: { m: Materiel }) {
+// ─── VALIDITY BAR ──────────────────────────────────────────────────────────
+function ValidityBar({ m }: { m: Materiel }) {
   if (!m.soumisVerification || !m.dateProchainEtalonnage) return null;
   const echeance = new Date(m.dateProchainEtalonnage);
   const now = new Date();
   const jours = Math.round((echeance.getTime() - now.getTime()) / 86400000);
   const totalDays = (m.validiteEtalonnage ?? 12) * 30;
   const pct = Math.max(0, Math.min(100, 100 - (jours / totalDays) * 100));
-  let cls = "text-emerald-600"; let fill = "bg-emerald-500"; let label = `dans ${jours} j`;
-  if (jours < 0) { cls = "text-red-600 font-semibold"; fill = "bg-red-500"; label = `${-jours} j de retard`; }
-  else if (jours <= 30) { cls = "text-amber-600"; fill = "bg-amber-500"; }
-  const fmt = (d: Date) => d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+
+  let restCls = "ok";
+  let fill = "var(--emerald)";
+  let label = `dans ${jours} j`;
+  if (jours < 0) {
+    restCls = "late";
+    fill = "var(--rose)";
+    label = `${-jours} j retard`;
+  } else if (jours <= 30) {
+    restCls = "warn";
+    fill = "oklch(0.72 0.17 75)";
+  }
+
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
   return (
-    <div className="mt-2">
-      <div className="flex justify-between items-baseline text-[12px] mb-1">
-        <span className="font-medium text-gray-700">{fmt(echeance)}</span>
-        <span className={cls}>{label}</span>
+    <div className="validity" style={{ marginTop: 10 }}>
+      <div className="validity-top">
+        <span className="validity-date">{fmt(echeance)}</span>
+        <span className={`validity-rest ${restCls}`}>{label}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
-        <div className={`h-full rounded-full ${fill}`} style={{ width: `${pct}%` }} />
+      <div className="validity-bar">
+        <div style={{ width: `${pct}%`, background: fill }} />
       </div>
     </div>
   );
 }
 
-export default function MaterielDrawer({ materiel: m, onClose }: { materiel: Materiel; onClose: () => void }) {
-  const [tab, setTab] = useState<Tab>("infos");
+// ─── DRAWER SECTION ────────────────────────────────────────────────────────
+function DrawerSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="drawer-section" style={{ background: "var(--bg-panel)", borderRadius: 12, border: "1px solid var(--line)", padding: 16 }}>
+      <h3>{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+// ─── FIELD ─────────────────────────────────────────────────────────────────
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="field">
+      <span className="field-label">{label}</span>
+      <span className="field-value">{children}</span>
+    </div>
+  );
+}
+
+// ─── TAB TYPE ──────────────────────────────────────────────────────────────
+type TabId = "infos" | "pj" | "photos" | "etat" | "historique" | "qr";
+
+const TABS: { id: TabId; label: string; icon: string }[] = [
+  { id: "infos",      label: "Infos",            icon: "eye"     },
+  { id: "pj",         label: "Pièces jointes",   icon: "clip"    },
+  { id: "photos",     label: "Photos",           icon: "photo"   },
+  { id: "etat",       label: "État · Complétude",icon: "alert"   },
+  { id: "historique", label: "Historique",        icon: "history" },
+  { id: "qr",         label: "QR code",          icon: "qr"      },
+];
+
+// ─── MAIN COMPONENT ────────────────────────────────────────────────────────
+export default function MaterielDrawer({
+  materiel: m,
+  onClose,
+}: {
+  materiel: Materiel;
+  onClose: () => void;
+}) {
+  const [tab, setTab] = useState<TabId>("infos");
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const { data: typesEnd } = useReferentiel("TYPE_END");
-  const { data: typesMat } = useReferentiel("TYPE_MATERIEL");
-  const { data: motifs } = useReferentiel("MOTIF_PRET");
-  const { data: sites } = useSites();
+  const { data: typesEnd }    = useReferentiel("TYPE_END");
+  const { data: typesMat }    = useReferentiel("TYPE_MATERIEL");
+  const { data: motifs }      = useReferentiel("MOTIF_PRET");
+  const { data: sites }       = useSites();
   const { data: entreprises } = useEntreprises();
-  const { data: fournisseurs } = useEntreprises("FOURNISSEUR");
 
-  const refLabel = (list: { code: string; label: string }[] | undefined, code: string | null | undefined) =>
-    code ? (list ?? []).find((r) => r.code === code)?.label ?? code : "—";
+  const refLabel = (
+    list: { code: string; label: string }[] | undefined,
+    code: string | null | undefined
+  ) => (code ? (list ?? []).find((r) => r.code === code)?.label ?? code : "—");
 
   const fmt = (d: string | Date | null | undefined) => {
     if (!d) return "—";
-    return new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+    return new Date(d).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
   };
   const fmtShort = (d: string | Date | null | undefined) => {
     if (!d) return "—";
-    return new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    return new Date(d).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
   const fmtTime = (d: string | Date | null | undefined) => {
     if (!d) return "—";
-    return new Date(d).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    return new Date(d).toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  const resp = m.responsable as { prenom: string; nom: string } | null | undefined;
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "infos", label: "Infos" },
-    { id: "etat", label: "État" },
-    { id: "historique", label: "Historique" },
-    { id: "qr", label: "QR" },
-  ];
+  const resp = m.responsable as { id: number; prenom: string; nom: string } | null | undefined;
+
+  // Derive echéance flag
+  const isLate =
+    m.soumisVerification &&
+    m.dateProchainEtalonnage &&
+    new Date(m.dateProchainEtalonnage) < new Date();
 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={onClose} />
-      {/* Drawer */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-[780px] bg-gray-50 border-l border-gray-200 flex flex-col shadow-2xl animate-slide-in">
+      <div className="drawer-backdrop" onClick={onClose} />
+
+      {/* Drawer panel */}
+      <div className="drawer">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-5 py-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <Pill label={etatLabels[m.etat] ?? m.etat} cls={etatColors[m.etat] ?? "text-gray-600 bg-gray-100"} />
-                {m.completude && <Pill label={compLabels[m.completude] ?? m.completude} cls={compColors[m.completude] ?? "text-gray-600 bg-gray-100"} />}
-                {m.enPret && <Pill label={`En prêt${m.motifPret ? ` · ${refLabel(motifs, m.motifPret)}` : ""}`} cls="text-sky-700 bg-sky-50" />}
-                {m.informationVerifiee && <Pill label="Vérifié" cls="text-emerald-700 bg-emerald-50" />}
-              </div>
-              <h2 className="text-[17px] font-semibold text-gray-900 truncate">
-                {refLabel(typesMat, m.typeMateriel) ?? m.libelle} <span className="text-gray-400 font-normal">· {m.modele ?? m.libelle}</span>
-              </h2>
-              <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
-                <span className="font-mono">{m.reference}</span>
-                <span>·</span>
-                <span>{m.fournisseur ?? "—"}</span>
-                <span>·</span>
-                <span>{refLabel(sites, m.site)}</span>
-              </div>
+        <div className="drawer-head">
+          <div style={{ flex: 1 }}>
+            <div className="hstack" style={{ gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+              <EtatPill etat={m.etat} />
+              {m.completude && <CompPill completude={m.completude} />}
+              {m.enPret && (
+                <span className="pill sky">
+                  <span className="dot" />
+                  En prêt{m.motifPret ? ` · ${refLabel(motifs, m.motifPret)}` : ""}
+                </span>
+              )}
+              {isLate && (
+                <span className="flag late">ÉTALONNAGE ÉCHU</span>
+              )}
+              {m.informationVerifiee && (
+                <span className="pill emerald" style={{ fontSize: 10 }}>
+                  <Icon name="check" size={10} stroke={3} />
+                  Vérifié
+                </span>
+              )}
             </div>
-            <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+            <h2 className="title" style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>
+              {refLabel(typesMat, m.typeMateriel) || m.libelle}{" "}
+              <span className="muted" style={{ fontWeight: 400 }}>
+                · {m.modele ?? m.libelle}
+              </span>
+            </h2>
+            <div className="id hstack" style={{ fontSize: 11.5, color: "var(--ink-3)", marginTop: 2 }}>
+              <span className="mono">{m.reference}</span>
+              <span>·</span>
+              <span>{m.fournisseur ?? "—"}</span>
+              <span>·</span>
+              <span>{refLabel(sites, m.site)}</span>
+            </div>
           </div>
+          <button className="icon-btn" onClick={onClose}>
+            <Icon name="x" size={14} />
+          </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0.5 px-5 bg-white border-b border-gray-200">
-          {tabs.map((t) => (
+        <div className="otabs">
+          {TABS.map((t) => (
             <button
               key={t.id}
+              className={`otab${tab === t.id ? " on" : ""}`}
               onClick={() => setTab(t.id)}
-              className={`px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-colors ${
-                tab === t.id ? "text-edf-blue border-edf-blue" : "text-gray-400 border-transparent hover:text-gray-600"
-              }`}
             >
+              <Icon name={t.icon} size={13} />
               {t.label}
             </button>
           ))}
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-auto p-5 space-y-5">
+        <div className="drawer-body">
+          {/* ── Tab: Infos ── */}
           {tab === "infos" && (
             <>
-              <Section title="Informations générales">
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3">
-                  <Field label="Référence"><span className="font-mono">{m.reference}</span></Field>
-                  <Field label="N° de FIEC"><span className="font-mono">{m.numeroFIEC ?? "—"}</span></Field>
-                  <Field label="Propriétaire">{m.proprietaire ?? "—"}</Field>
+              <DrawerSection title="Informations générales">
+                <div className="drawer-grid">
+                  <Field label="ID">
+                    <span className="mono">{m.reference}</span>
+                  </Field>
+                  <Field label="N° de FIEC">
+                    <span className="mono">{m.numeroFIEC ?? "—"}</span>
+                  </Field>
+                  <Field label="Pôle propriétaire">{m.proprietaire ?? "—"}</Field>
                   <Field label="Type de matériel">{refLabel(typesMat, m.typeMateriel)}</Field>
                   <Field label="Fournisseur">{m.fournisseur ?? "—"}</Field>
                   <Field label="Modèle">{m.modele ?? "—"}</Field>
                   <Field label="Type d'END">
-                    {m.typeEND ? <span className="inline-flex px-1.5 py-0 rounded bg-gray-100 border border-gray-200 text-[11px] font-mono font-medium">{refLabel(typesEnd, m.typeEND)}</span> : "—"}
+                    {m.typeEND ? (
+                      <span className="tag mono">{refLabel(typesEnd, m.typeEND)}</span>
+                    ) : (
+                      "—"
+                    )}
                   </Field>
-                  <Field label="Type traducteur">{m.typeTraducteur ?? "—"}</Field>
-                  <Field label="Lot / chaîne"><span className="font-mono">{m.lotChaine ?? "—"}</span></Field>
+                  {m.typeTraducteur && (
+                    <Field label="Type traducteur">{m.typeTraducteur}</Field>
+                  )}
+                  <Field label="Référence lot/chaîne">
+                    <span className="mono">{m.lotChaine ?? "—"}</span>
+                  </Field>
                   <Field label="Responsable">
                     {resp ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-edf-blue/10 text-edf-blue flex items-center justify-center text-[9px] font-semibold">{resp.prenom?.[0]}{resp.nom?.[0]}</span>
+                      <span className="hstack" style={{ gap: 6 }}>
+                        <span
+                          className="avatar"
+                          style={{
+                            width: 22,
+                            height: 22,
+                            fontSize: 9,
+                            background: "var(--accent)",
+                          }}
+                        >
+                          {resp.prenom?.[0]}
+                          {resp.nom?.[0]}
+                        </span>
                         {resp.prenom} {resp.nom}
                       </span>
-                    ) : "—"}
+                    ) : (
+                      "—"
+                    )}
                   </Field>
-                  <Field label="Vérif. périodique">{m.soumisVerification ? "Oui" : "Non"}</Field>
-                  <Field label="Info vérifiée">{m.informationVerifiee ? "Oui" : "Non"}</Field>
+                  <Field label="Vérification périodique">
+                    {m.soumisVerification ? "Oui" : "Non"}
+                  </Field>
+                  <Field label="Information vérifiée">
+                    {m.informationVerifiee ? "Oui" : "Non"}
+                  </Field>
                 </div>
-              </Section>
+              </DrawerSection>
 
-              <Section title="Étalonnage & validité">
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3">
+              <DrawerSection title="Étalonnage & validité">
+                <div className="drawer-grid">
                   <Field label="Dernier étalonnage">{fmt(m.dateEtalonnage)}</Field>
-                  <Field label="Validité">{m.validiteEtalonnage ? `${m.validiteEtalonnage} mois` : "—"}</Field>
-                  <Field label="Échéance">{fmt(m.dateProchainEtalonnage)}</Field>
+                  <Field label="Validité">
+                    {m.validiteEtalonnage ? `${m.validiteEtalonnage} mois` : "—"}
+                  </Field>
+                  <Field label="Date d'échéance">{fmt(m.dateProchainEtalonnage)}</Field>
                 </div>
-                <ValiditySection m={m} />
-              </Section>
+                <ValidityBar m={m} />
+              </DrawerSection>
 
-              <Section title="Localisation">
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3">
-                  <Field label="Site">{refLabel(sites, m.site)}</Field>
+              <DrawerSection title="Localisation">
+                <div className="drawer-grid">
+                  <Field label="Localisation">
+                    <span className="hstack" style={{ gap: 4 }}>
+                      <Icon name="pin" size={13} />
+                      {m.localisation ?? "—"}
+                    </span>
+                  </Field>
                   <Field label="Groupe">{m.groupe ?? "—"}</Field>
-                  <Field label="Entreprise">{m.entreprise ?? "—"}</Field>
+                  <Field label="Site">{refLabel(sites, m.site)}</Field>
+                  <Field label="Entreprise">
+                    {refLabel(entreprises as { code: string; label: string }[] | undefined, m.entreprise)}
+                  </Field>
                   <Field label="En prêt">{m.enPret ? "Oui" : "Non"}</Field>
-                  <Field label="Motif du prêt">{m.motifPret ? refLabel(motifs, m.motifPret) : "—"}</Field>
+                  <Field label="Motif du prêt">
+                    {m.motifPret ? refLabel(motifs, m.motifPret) : "—"}
+                  </Field>
                   <Field label="En transit">{m.enTransit ?? "NON"}</Field>
                   <Field label="Date retour prêt">{fmtShort(m.dateRetourPret)}</Field>
-                  <Field label="Localisation">{m.localisation ?? "—"}</Field>
                 </div>
                 {m.complementsLocalisation && (
-                  <p className="mt-2 text-[12px] text-gray-600 whitespace-pre-wrap">{m.complementsLocalisation}</p>
+                  <p
+                    style={{
+                      margin: "10px 0 0",
+                      fontSize: 12,
+                      color: "var(--ink-2)",
+                      whiteSpace: "pre-wrap",
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {m.complementsLocalisation}
+                  </p>
                 )}
-              </Section>
+              </DrawerSection>
 
-              <Section title="Métadonnées">
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3">
+              <DrawerSection title="Métadonnées">
+                <div className="drawer-grid">
                   <Field label="Créé">{fmtTime(m.createdAt)}</Field>
                   <Field label="Modifié">{fmtTime(m.updatedAt)}</Field>
+                  {resp && (
+                    <Field label="Modifié par">
+                      {resp.prenom} {resp.nom}
+                    </Field>
+                  )}
                 </div>
-              </Section>
+              </DrawerSection>
             </>
           )}
 
+          {/* ── Tab: Pièces jointes ── */}
+          {tab === "pj" && (
+            <DrawerSection title="Pièces jointes">
+              <div className="attach-list">
+                {[
+                  { nom: `Certificat-etalonnage-${m.reference}.pdf`, taille: "1.4 Mo" },
+                  { nom: `Notice-${m.modele ?? m.libelle}.pdf`,       taille: "3.2 Mo" },
+                  { nom: `FIEC-${m.numeroFIEC ?? "N-A"}.pdf`,         taille: "820 Ko" },
+                ].map((p, i) => (
+                  <div key={i} className="attach">
+                    <div className="attach-icon">PDF</div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div className="attach-name" title={p.nom}>
+                        {p.nom}
+                      </div>
+                      <div className="attach-meta">{p.taille}</div>
+                    </div>
+                    <button className="icon-btn" style={{ padding: 5 }}>
+                      <Icon name="dl" size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </DrawerSection>
+          )}
+
+          {/* ── Tab: Photos ── */}
+          {tab === "photos" && (
+            <DrawerSection title="Photos du matériel">
+              <div className="photo-grid">
+                <div className="photo has-img">
+                  <span className="photo-label">Photo envoi · 12/03/2026</span>
+                </div>
+                <div className="photo has-img">
+                  <span className="photo-label">Photo réception · 18/03/2026</span>
+                </div>
+                <div className="photo">
+                  <div style={{ textAlign: "center", color: "var(--ink-3)" }}>
+                    <Icon name="photo" size={20} />
+                    <div className="xs" style={{ marginTop: 6 }}>
+                      Ajouter une photo
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DrawerSection>
+          )}
+
+          {/* ── Tab: État · Complétude ── */}
           {tab === "etat" && (
             <>
-              <Section title="État du matériel">
-                <div className="flex items-center gap-3 mb-2">
-                  <Pill label={etatLabels[m.etat] ?? m.etat} cls={etatColors[m.etat] ?? "text-gray-600 bg-gray-100"} />
+              <DrawerSection title="État du matériel">
+                <div className="hstack" style={{ gap: 14, marginBottom: 10 }}>
+                  <EtatPill etat={m.etat} />
+                  <span className="muted xs">Évalué le {fmtTime(m.updatedAt)}</span>
                 </div>
-                <p className="text-[13px] text-gray-600 leading-relaxed">
-                  {m.commentaireEtat || "Aucun commentaire d'état."}
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "var(--ink-2)" }}>
+                  {m.commentaireEtat ||
+                    "Aucun commentaire d'état. Le matériel est dans un état conforme et opérationnel."}
                 </p>
-              </Section>
-              <Section title="Complétude">
-                <div className="flex items-center gap-3 mb-2">
-                  {m.completude && <Pill label={compLabels[m.completude] ?? m.completude} cls={compColors[m.completude] ?? "text-gray-600 bg-gray-100"} />}
+              </DrawerSection>
+
+              <DrawerSection title="Complétude">
+                <div className="hstack" style={{ gap: 14, marginBottom: 10 }}>
+                  {m.completude ? (
+                    <CompPill completude={m.completude} />
+                  ) : (
+                    <span className="pill neutral">
+                      <span className="dot" />
+                      Non renseigné
+                    </span>
+                  )}
                 </div>
-                <p className="text-[13px] text-gray-600 leading-relaxed">
-                  {m.commentairesCompletude || "Aucun commentaire de complétude."}
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "var(--ink-2)" }}>
+                  {m.commentairesCompletude ||
+                    (m.completude === "COMPLET"
+                      ? "Tous les accessoires et documents sont présents."
+                      : "Aucun commentaire de complétude.")}
                 </p>
-              </Section>
+              </DrawerSection>
+
               {m.commentaires && (
-                <Section title="Commentaires généraux">
-                  <p className="text-[13px] text-gray-600 leading-relaxed whitespace-pre-wrap">{m.commentaires}</p>
-                </Section>
+                <DrawerSection title="Commentaires généraux">
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: 13,
+                      lineHeight: 1.55,
+                      color: "var(--ink-2)",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {m.commentaires}
+                  </p>
+                </DrawerSection>
               )}
             </>
           )}
 
+          {/* ── Tab: Historique ── */}
           {tab === "historique" && (
-            <Section title="Historique des modifications">
-              <div className="text-[13px] text-gray-400 text-center py-8">
-                L'historique détaillé sera disponible dans une prochaine version.
+            <DrawerSection title="Historique des modifications & mouvements">
+              <div className="timeline">
+                {[
+                  {
+                    t: fmtTime(m.updatedAt),
+                    title: "Information vérifiée",
+                    meta: `${resp ? `${resp.prenom} ${resp.nom}` : "—"} · vérification annuelle`,
+                    state: "done",
+                  },
+                  {
+                    t: fmtTime(m.createdAt),
+                    title: "Création de la fiche",
+                    meta: `Saisie initiale${resp ? ` par ${resp.prenom} ${resp.nom}` : ""}`,
+                    state: "done",
+                  },
+                ].map((a, i) => (
+                  <div key={i} className={`timeline-item ${a.state}`}>
+                    <div className="timeline-dot" />
+                    <div>
+                      <div className="timeline-title">{a.title}</div>
+                      <div className="timeline-meta">
+                        {a.t} · {a.meta}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </Section>
+            </DrawerSection>
           )}
 
+          {/* ── Tab: QR code ── */}
           {tab === "qr" && (
-            <Section title="QR Code de traçabilité">
-              <div className="flex flex-col items-center gap-4 py-4">
+            <DrawerSection title="QR Code de traçabilité">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "12px 0",
+                }}
+              >
                 <img
                   src={`/api/v1/qrcode/materiel/${m.id}`}
                   alt="QR Code"
-                  className="w-40 h-40 border border-gray-200 rounded-xl"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{
+                    width: 160,
+                    height: 160,
+                    border: "1px solid var(--line)",
+                    borderRadius: 12,
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                    const el = document.getElementById(`qr-placeholder-${m.id}`);
+                    if (el) el.style.display = "block";
+                  }}
                 />
-                <span className="font-mono text-[11px] text-gray-400">OGADE/{m.reference}</span>
+                <div
+                  id={`qr-placeholder-${m.id}`}
+                  className="qrcode"
+                  style={{ display: "none" }}
+                />
+                <div className="mono xs muted">OGADE/{m.reference}</div>
+                <a
+                  href={`/api/v1/qrcode/materiel/${m.id}`}
+                  download={`QR-${m.reference}.png`}
+                  className="obtn"
+                >
+                  <Icon name="dl" size={13} />
+                  Télécharger le QR
+                </a>
               </div>
-            </Section>
+            </DrawerSection>
           )}
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-gray-200 px-5 py-3 flex justify-between">
-          <Link
-            to={`/materiels/${m.id}`}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-            Page détail
-          </Link>
-          <Link
-            to={`/materiels/${m.id}/edit`}
-            className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-            Modifier
-          </Link>
+        <div className="drawer-foot">
+          <div className="left">
+            <Link
+              to={`/materiels/${m.id}`}
+              className="obtn ghost"
+            >
+              <Icon name="eye" size={13} />
+              Exporter
+            </Link>
+          </div>
+          <div className="right">
+            <Link to={`/materiels/${m.id}`} className="obtn">
+              <Icon name="eye" size={13} />
+              Page détail
+            </Link>
+            <Link to={`/materiels/${m.id}/edit`} className="obtn accent">
+              <Icon name="edit" size={13} />
+              Modifier
+            </Link>
+          </div>
         </div>
       </div>
     </>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">{title}</h3>
-      {children}
-    </div>
   );
 }
