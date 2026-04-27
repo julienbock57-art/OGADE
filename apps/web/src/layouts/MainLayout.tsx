@@ -2,97 +2,55 @@ import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 
-function LogoutButton() {
-  const { logout, authConfig } = useAuth();
-  const authRequired = authConfig?.microsoftAuth || authConfig?.localAuth;
-  if (!authRequired) return null;
+function Icon({ name, size = 14 }: { name: string; size?: number }) {
+  const paths: Record<string, string> = {
+    home:     "M3 10l7-7 7 7v6a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2v-6z",
+    list:     "M4 5h12M4 10h12M4 15h12",
+    box:      "M3 6l7-3 7 3v8l-7 3-7-3V6z M3 6l7 3 7-3 M10 9v8",
+    truck:    "M2 5h10v9H2z M12 8h4l2 3v3h-6 M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3 M14 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3",
+    user:     "M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M4 17a6 6 0 0 1 12 0",
+    star:     "M10 3l2.3 4.6 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2L2.5 8.4l5.2-.8L10 3z",
+    alert:    "M10 7v4m0 2v.01 M2 16L10 3l8 13H2z",
+    swap:     "M5 7h11l-3-3 M15 13H4l3 3",
+    cal:      "M4 5h12v12H4z M4 8h12 M7 3v4 M13 3v4",
+    flask:    "M8 3h4 M9 3v5l-4 8a2 2 0 0 0 2 3h6a2 2 0 0 0 2-3l-4-8V3",
+    map:      "M3 5l5-2 4 2 5-2v12l-5 2-4-2-5 2z M8 3v12 M12 5v12",
+    settings: "M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M16 10a6 6 0 0 1-.1 1l2 1.5-2 3.4-2.3-1a6 6 0 0 1-1.7 1l-.3 2.5h-3.2l-.3-2.5a6 6 0 0 1-1.7-1l-2.3 1-2-3.4 2-1.5a6 6 0 0 1 0-2l-2-1.5 2-3.4 2.3 1a6 6 0 0 1 1.7-1L8.4 2h3.2l.3 2.5a6 6 0 0 1 1.7 1l2.3-1 2 3.4-2 1.5a6 6 0 0 1 .1 1z",
+    logout:   "M14 10l3 0M14 10l-2-2m2 2l-2 2 M10 14v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1",
+  };
+  const d = paths[name] || "";
   return (
-    <button
-      onClick={logout}
-      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-      title="Déconnexion"
-    >
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-      </svg>
-    </button>
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      {d.split(" M").map((p, i) => <path key={i} d={i === 0 ? p : "M" + p} />)}
+    </svg>
   );
 }
 
-const navItems = [
+const navSections = [
   {
-    label: "Tableau de bord",
-    to: "/",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
+    label: "Inventaire",
+    items: [
+      { to: "/", label: "Tableau de bord", icon: "home" },
+      { to: "/materiels", label: "Matériels END", icon: "list" },
+      { to: "/maquettes", label: "Maquettes", icon: "box" },
+      { to: "/demandes-envoi", label: "Envois & retours", icon: "truck" },
+      { to: "/agents", label: "Agents", icon: "user" },
+    ],
   },
   {
-    label: "Matériels END",
-    to: "/materiels",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.42 15.17l-5.88-3.39a.562.562 0 010-.974l5.88-3.39a.562.562 0 01.562 0l5.88 3.39a.562.562 0 010 .974l-5.88 3.39a.562.562 0 01-.562 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.54 11.77L3.34 13a.562.562 0 000 .974l5.88 3.39a.562.562 0 00.562 0l5.88-3.39a.562.562 0 000-.974l-2.2-1.23" />
-      </svg>
-    ),
-  },
-  {
-    label: "Maquettes",
-    to: "/maquettes",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-      </svg>
-    ),
-  },
-  {
-    label: "Demandes d'envoi",
-    to: "/demandes-envoi",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-      </svg>
-    ),
-  },
-  {
-    label: "Agents",
-    to: "/agents",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-      </svg>
-    ),
-  },
-];
-
-const adminItems = [
-  {
-    label: "Référentiels",
-    to: "/admin/referentiels",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Agents autorisés",
-    to: "/admin/agents",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    ),
+    label: "Administration",
+    items: [
+      { to: "/admin/referentiels", label: "Référentiels", icon: "settings" },
+      { to: "/admin/sites", label: "Sites & groupes", icon: "map" },
+      { to: "/admin/entreprises", label: "Entreprises", icon: "flask" },
+      { to: "/admin/agents", label: "Agents autorisés", icon: "star" },
+    ],
   },
 ];
 
 export default function MainLayout() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout, authConfig } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isActive = (path: string) => {
@@ -100,128 +58,139 @@ export default function MainLayout() {
     return location.pathname.startsWith(path);
   };
 
+  const authRequired = authConfig?.microsoftAuth || authConfig?.localAuth;
+
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Mobile overlay */}
+    <div className="grid min-h-screen" style={{ gridTemplateColumns: "220px 1fr" }}>
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className="fixed lg:static inset-y-0 left-0 z-40 flex flex-col transition-transform duration-200 lg:translate-x-0"
+        style={{
+          width: 220,
+          background: "var(--bg-panel)",
+          borderRight: "1px solid var(--line)",
+          padding: "18px 14px",
+          gap: 4,
+          height: "100vh",
+          position: "sticky",
+          top: 0,
+          transform: sidebarOpen ? undefined : undefined,
+        }}
       >
-        {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
-          <Link to="/" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
-            <div className="w-8 h-8 bg-edf-blue rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">O</span>
-            </div>
-            <div>
-              <span className="text-lg font-bold text-edf-blue tracking-wide">OGADE</span>
-              <span className="block text-[10px] text-gray-400 leading-none -mt-0.5">Gestion des Actifs END</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive(item.to)
-                  ? "bg-edf-blue text-white shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
-
-          <div className="pt-4 mt-4 border-t border-gray-200">
-            <p className="px-3 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-              Administration
-            </p>
-            {adminItems.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.to)
-                    ? "bg-edf-blue text-white shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </Link>
-            ))}
+        {/* Brand */}
+        <Link to="/" className="flex items-center gap-[10px] px-1.5 pb-4 mb-2" style={{ borderBottom: "1px solid var(--line-2)" }} onClick={() => setSidebarOpen(false)}>
+          <div
+            className="w-[30px] h-[30px] rounded-lg grid place-items-center text-white font-bold text-[13px]"
+            style={{
+              background: "linear-gradient(135deg, var(--accent) 0%, oklch(0.55 0.20 320) 100%)",
+              boxShadow: "0 1px 0 rgba(255,255,255,.3) inset, 0 1px 2px rgba(0,0,0,.15)",
+            }}
+          >
+            O
           </div>
+          <div>
+            <div className="font-bold text-[14px] tracking-[0.02em]" style={{ color: "var(--ink)" }}>OGADE</div>
+            <div className="text-[10px] tracking-[0.06em] uppercase" style={{ color: "var(--ink-3)" }}>Matériel END</div>
+          </div>
+        </Link>
+
+        {/* Nav sections */}
+        <nav className="flex-1 flex flex-col gap-1 overflow-y-auto">
+          {navSections.map((section) => (
+            <div key={section.label}>
+              <div className="nav-sect">{section.label}</div>
+              {section.items.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`nav-item ${isActive(item.to) ? "active" : ""}`}
+                >
+                  <Icon name={item.icon} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          ))}
         </nav>
 
-        {/* Quick actions */}
-        <div className="px-3 pb-3">
-          <Link
-            to="/demandes-envoi/nouveau"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center justify-center gap-2 w-full px-3 py-2.5 bg-edf-blue/10 text-edf-blue rounded-lg text-sm font-medium hover:bg-edf-blue/20 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nouvelle demande d'envoi
-          </Link>
-        </div>
-
-        {/* User */}
-        <div className="px-4 py-3 border-t border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-edf-blue/10 text-edf-blue rounded-full flex items-center justify-center text-xs font-semibold">
+        {/* Footer — user */}
+        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid var(--line-2)" }}>
+          <div className="flex items-center gap-[10px] p-1.5 rounded-lg hover:bg-[var(--bg-sunken)] transition-colors">
+            <span
+              className="w-7 h-7 rounded-full grid place-items-center text-[11px] font-semibold text-white shrink-0"
+              style={{ background: "oklch(0.70 0.15 275)", boxShadow: "0 0 0 2px white, 0 0 0 3px var(--line-2)" }}
+            >
               {(user?.prenom?.[0] ?? "U") + (user?.nom?.[0] ?? "")}
-            </div>
+            </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">
+              <div className="text-[12.5px] font-medium truncate" style={{ color: "var(--ink)" }}>
                 {user ? `${user.prenom} ${user.nom}` : "Utilisateur"}
-              </p>
-              <p className="text-xs text-gray-400 truncate">{user?.email ?? ""}</p>
+              </div>
+              <div className="text-[10.5px] truncate" style={{ color: "var(--ink-3)" }}>
+                {user?.roles?.[0] ?? user?.email ?? ""}
+              </div>
             </div>
-            <LogoutButton />
+            {authRequired && (
+              <button
+                onClick={logout}
+                className="icon-btn"
+                style={{ padding: 5, border: 0 }}
+                title="Déconnexion"
+              >
+                <Icon name="logout" size={13} />
+              </button>
+            )}
           </div>
         </div>
       </aside>
 
-      {/* Main area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 lg:px-6 sticky top-0 z-20">
+      {/* Main */}
+      <div className="flex flex-col min-w-0" style={{ background: "var(--bg)" }}>
+        {/* Topbar */}
+        <header
+          className="flex items-center gap-3.5 sticky top-0 z-20"
+          style={{
+            padding: "14px 24px",
+            background: "var(--bg-panel)",
+            borderBottom: "1px solid var(--line)",
+          }}
+        >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700"
+            className="lg:hidden p-2 -ml-2"
+            style={{ color: "var(--ink-2)" }}
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6}>
+              <path d="M4 5h12M4 10h12M4 15h12" />
             </svg>
           </button>
 
+          <div className="text-[12px]" style={{ color: "var(--ink-3)" }}>
+            Espace END <span style={{ color: "var(--ink-4)" }}>/</span>{" "}
+            <b style={{ color: "var(--ink)", fontWeight: 600 }}>
+              {location.pathname === "/" && "Tableau de bord"}
+              {location.pathname.startsWith("/materiels") && "Gestion du matériel"}
+              {location.pathname.startsWith("/maquettes") && "Maquettes"}
+              {location.pathname.startsWith("/demandes") && "Envois & retours"}
+              {location.pathname.startsWith("/agents") && "Agents"}
+              {location.pathname.startsWith("/admin") && "Administration"}
+            </b>
+          </div>
+
           <div className="flex-1" />
 
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span className="hidden sm:block">{user?.email ?? ""}</span>
+          <div className="flex items-center gap-2">
+            <button className="icon-btn"><Icon name="settings" size={14} /></button>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
+        <main className="flex-1 flex flex-col min-w-0">
           <Outlet />
         </main>
       </div>
