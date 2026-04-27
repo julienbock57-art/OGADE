@@ -1,10 +1,8 @@
 export const EtatMateriel = {
-  DISPONIBLE: "DISPONIBLE",
-  EN_SERVICE: "EN_SERVICE",
-  EN_REPARATION: "EN_REPARATION",
-  REBUT: "REBUT",
-  PRETE: "PRETE",
-  ENVOYEE: "ENVOYEE",
+  CORRECT: "CORRECT",
+  LEGER_DEFAUT: "LEGER_DEFAUT",
+  HS: "HS",
+  PERDU: "PERDU",
 } as const;
 
 export type EtatMateriel = (typeof EtatMateriel)[keyof typeof EtatMateriel];
@@ -36,7 +34,18 @@ export type Materiel = {
   produitsChimiques?: boolean;
   commentaires?: string | null;
   entreprise?: string | null;
+  responsableId?: number | null;
+  commentaireEtat?: string | null;
+  commentairesCompletude?: string | null;
+  numeroFIEC?: string | null;
+  enTransit?: string | null;
+  lotChaine?: string | null;
+  complementsLocalisation?: string | null;
+  proprietaire?: string | null;
   createdAt: string | Date;
   updatedAt: string | Date;
   deletedAt?: string | Date | null;
+  createdById?: number | null;
+  updatedById?: number | null;
+  responsable?: { id: number; nom: string; prenom: string } | null;
 };

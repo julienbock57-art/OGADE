@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateAgentInput, UpdateAgentInput } from '@ogade/shared';
 
@@ -101,5 +101,33 @@ export class AgentsService {
     });
 
     return this.findOne(agentId);
+  }
+
+  async remove(id: number) {
+    await this.findOne(id);
+
+    const demandeCount = await this.prisma.demandeEnvoi.count({
+      where: { demandeurId: id },
+    });
+    if (demandeCount > 0) {
+      throw new BadRequestException(
+        `Impossible de supprimer cet agent : il est demandeur de ${demandeCount} demande(s) d'envoi.`,
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.maquette.updateMany({ where: { createdById: id }, data: { createdById: null } }),
+      this.prisma.maquette.updateMany({ where: { updatedById: id }, data: { updatedById: null } }),
+      this.prisma.maquette.updateMany({ where: { proprietaireId: id }, data: { proprietaireId: null } }),
+      this.prisma.maquette.updateMany({ where: { emprunteurId: id }, data: { emprunteurId: null } }),
+      this.prisma.materiel.updateMany({ where: { createdById: id }, data: { createdById: null } }),
+      this.prisma.materiel.updateMany({ where: { updatedById: id }, data: { updatedById: null } }),
+      this.prisma.materiel.updateMany({ where: { responsableId: id }, data: { responsableId: null } }),
+      this.prisma.defaut.updateMany({ where: { detecteParId: id }, data: { detecteParId: null } }),
+      this.prisma.evenement.updateMany({ where: { acteurId: id }, data: { acteurId: null } }),
+      this.prisma.fichier.updateMany({ where: { uploadedById: id }, data: { uploadedById: null } }),
+      this.prisma.agentRole.updateMany({ where: { grantedBy: id }, data: { grantedBy: null } }),
+      this.prisma.agent.delete({ where: { id } }),
+    ]);
   }
 }

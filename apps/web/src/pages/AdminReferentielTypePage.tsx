@@ -13,6 +13,7 @@ const typeLabels: Record<string, string> = {
   ETAT_MATERIEL: "États matériel",
   COMPLETUDE: "Complétude",
   MOTIF_PRET: "Motifs de prêt",
+  LOT_CHAINE: "Lots / Chaînes",
   TYPE_MAQUETTE: "Types de maquette",
   COMPOSANT: "Composants",
   CATEGORIE: "Catégories",
@@ -121,28 +122,30 @@ export default function AdminReferentielTypePage() {
       <form onSubmit={handleCreate} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
         <div className="flex items-end gap-3">
           <div className="flex-1">
-            <label className="block text-xs font-medium text-gray-500 mb-1">Code</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Code *</label>
             <input
               type="text"
+              required
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
               className={inputClass + " w-full"}
-              placeholder="CODE_VALEUR"
+              placeholder="Ex: UT"
             />
           </div>
           <div className="flex-[2]">
-            <label className="block text-xs font-medium text-gray-500 mb-1">Libellé</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Libellé *</label>
             <input
               type="text"
+              required
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
               className={inputClass + " w-full"}
-              placeholder="Libellé de la valeur"
+              placeholder="Ex: Ultrasons"
             />
           </div>
           <button
             type="submit"
-            disabled={createMut.isPending || !newCode.trim() || !newLabel.trim()}
+            disabled={createMut.isPending}
             className="inline-flex items-center gap-2 bg-edf-blue text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-edf-blue/90 transition-colors disabled:opacity-50 shadow-sm"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

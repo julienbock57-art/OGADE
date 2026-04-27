@@ -110,6 +110,11 @@ export default function AdminAgentsPage() {
     onSuccess: invalidate,
   });
 
+  const deleteMut = useMutation({
+    mutationFn: (id: number) => api.delete(`/agents/${id}`),
+    onSuccess: invalidate,
+  });
+
   const startEdit = (agent: AgentWithRoles) => {
     setEditingId(agent.id);
     setForm({ email: agent.email, nom: agent.nom, prenom: agent.prenom });
@@ -134,7 +139,7 @@ export default function AdminAgentsPage() {
   };
 
   const agents = data?.data ?? [];
-  const mutError = createMut.error || updateMut.error;
+  const mutError = createMut.error || updateMut.error || deleteMut.error;
 
   const agentHasRole = (agent: AgentWithRoles, roleCode: string) =>
     agent.roles.some((r) => r.role?.code === roleCode);
@@ -242,6 +247,12 @@ export default function AdminAgentsPage() {
             </button>
           </div>
         </form>
+      )}
+
+      {deleteMut.isError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+          <p className="text-sm text-red-700">{(deleteMut.error as Error).message}</p>
+        </div>
       )}
 
       {/* Table */}
@@ -453,6 +464,19 @@ export default function AdminAgentsPage() {
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm(`Supprimer l'agent "${agent.prenom} ${agent.nom}" ? Cette action est irréversible.`)) {
+                              deleteMut.mutate(agent.id);
+                            }
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Supprimer"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </div>

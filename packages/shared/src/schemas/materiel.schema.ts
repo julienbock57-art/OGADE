@@ -26,17 +26,23 @@ export const createMaterielSchema = z.object({
   produitsChimiques: z.boolean().optional(),
   commentaires: z.string().optional(),
   entreprise: z.string().optional(),
+  responsableId: z.number().optional().nullable(),
+  commentaireEtat: z.string().optional(),
+  commentairesCompletude: z.string().optional(),
+  numeroFIEC: z.string().optional(),
+  enTransit: z.string().optional(),
+  lotChaine: z.string().optional(),
+  complementsLocalisation: z.string().optional(),
+  proprietaire: z.string().optional(),
 });
 
 export const updateMaterielSchema = createMaterielSchema.partial().extend({
   etat: z
     .enum([
-      EtatMateriel.DISPONIBLE,
-      EtatMateriel.EN_SERVICE,
-      EtatMateriel.EN_REPARATION,
-      EtatMateriel.REBUT,
-      EtatMateriel.PRETE,
-      EtatMateriel.ENVOYEE,
+      EtatMateriel.CORRECT,
+      EtatMateriel.LEGER_DEFAUT,
+      EtatMateriel.HS,
+      EtatMateriel.PERDU,
     ])
     .optional(),
 });

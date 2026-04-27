@@ -10,12 +10,10 @@ import {
 } from "@/hooks/use-referentiels";
 
 const etatBadge: Record<string, { variant: string; label: string }> = {
-  DISPONIBLE: { variant: "success", label: "Disponible" },
-  EN_SERVICE: { variant: "info", label: "En service" },
-  EN_REPARATION: { variant: "warning", label: "En réparation" },
-  REBUT: { variant: "danger", label: "Rebut" },
-  PRETE: { variant: "purple", label: "Prêté" },
-  ENVOYEE: { variant: "default", label: "Envoyé" },
+  CORRECT: { variant: "success", label: "Correct" },
+  LEGER_DEFAUT: { variant: "warning", label: "Léger défaut" },
+  HS: { variant: "danger", label: "HS" },
+  PERDU: { variant: "default", label: "Perdu" },
 };
 
 function formatDate(value?: string | Date | null): string {
@@ -94,6 +92,7 @@ export default function MaterielDetailPage() {
   const groupeLabel = useRefLabel("GROUPE", materiel?.groupe);
   const completudeLabel = useRefLabel("COMPLETUDE", materiel?.completude);
   const motifPretLabel = useRefLabel("MOTIF_PRET", materiel?.motifPret);
+  const lotChaineLabel = useRefLabel("LOT_CHAINE", materiel?.lotChaine);
 
   const siteObj = (sites ?? []).find((s) => s.code === materiel?.site);
   const fournisseurObj = (fournisseurs ?? []).find((e) => e.code === materiel?.fournisseur);
@@ -168,9 +167,16 @@ export default function MaterielDetailPage() {
             <Field label="Libellé">{materiel.libelle}</Field>
             <Field label="Numéro de série">{materiel.numeroSerie}</Field>
             <Field label="Modèle">{materiel.modele}</Field>
+            <Field label="N° FIEC">{materiel.numeroFIEC}</Field>
+            <Field label="Propriétaire">{materiel.proprietaire}</Field>
             <Field label="État">
               <Badge variant={badge.variant} text={badge.label} />
             </Field>
+            {materiel.commentaireEtat && (
+              <Field label="Commentaire état">
+                <p className="whitespace-pre-wrap text-gray-600">{materiel.commentaireEtat}</p>
+              </Field>
+            )}
           </div>
         </SectionCard>
 
@@ -181,6 +187,7 @@ export default function MaterielDetailPage() {
             <Field label="Type de matériel">{typeMatLabel}</Field>
             <Field label="Type de traducteur">{typeTraducteurLabel}</Field>
             <Field label="Groupe">{groupeLabel}</Field>
+            <Field label="Lot / Chaîne">{lotChaineLabel}</Field>
             <Field label="Fournisseur">
               {fournisseurObj ? (
                 <span>
@@ -205,12 +212,22 @@ export default function MaterielDetailPage() {
                 materiel.entreprise || "—"
               )}
             </Field>
+            <Field label="Responsable">
+              {materiel.responsable ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-edf-blue/10 text-edf-blue flex items-center justify-center text-[10px] font-semibold">
+                    {materiel.responsable.prenom?.[0]}{materiel.responsable.nom?.[0]}
+                  </span>
+                  {materiel.responsable.prenom} {materiel.responsable.nom}
+                </span>
+              ) : "—"}
+            </Field>
           </div>
         </SectionCard>
 
         {/* Localisation */}
         <SectionCard title="Localisation">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
             <Field label="Site">
               {siteObj ? (
                 <div>
@@ -226,6 +243,8 @@ export default function MaterielDetailPage() {
               )}
             </Field>
             <Field label="Localisation">{materiel.localisation}</Field>
+            <Field label="Compléments">{materiel.complementsLocalisation}</Field>
+            <Field label="En transit">{materiel.enTransit === "OUI" ? "Oui" : "Non"}</Field>
           </div>
         </SectionCard>
 
@@ -261,6 +280,13 @@ export default function MaterielDetailPage() {
             <BoolField label="Information vérifiée" value={materiel.informationVerifiee} />
             <BoolField label="Produits chimiques" value={materiel.produitsChimiques} />
           </div>
+          {materiel.commentairesCompletude && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <Field label="Commentaire complétude">
+                <p className="whitespace-pre-wrap text-gray-600">{materiel.commentairesCompletude}</p>
+              </Field>
+            </div>
+          )}
         </SectionCard>
 
         {/* Description */}
