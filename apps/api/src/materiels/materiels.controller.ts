@@ -27,6 +27,11 @@ import { CurrentUser, RequestUser } from '../auth/auth.guard';
 export class MaterielsController {
   constructor(private readonly materielsService: MaterielsService) {}
 
+  @Get('stats')
+  async stats() {
+    return this.materielsService.stats();
+  }
+
   @Get()
   async findAll(
     @Query('page') page?: string,
@@ -37,16 +42,13 @@ export class MaterielsController {
     @Query('typeMateriel') typeMateriel?: string,
     @Query('groupe') groupe?: string,
     @Query('search') search?: string,
+    @Query('completude') completude?: string,
+    @Query('enPret') enPret?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
     return this.materielsService.findAll({
       ...pagination,
-      etat,
-      site,
-      typeEND,
-      typeMateriel,
-      groupe,
-      search,
+      etat, site, typeEND, typeMateriel, groupe, search, completude, enPret,
     });
   }
 

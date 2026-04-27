@@ -13,6 +13,7 @@ const typeLabels: Record<string, string> = {
   ETAT_MATERIEL: "États matériel",
   COMPLETUDE: "Complétude",
   MOTIF_PRET: "Motifs de prêt",
+  LOT_CHAINE: "Lots / Chaînes",
   TYPE_MAQUETTE: "Types de maquette",
   COMPOSANT: "Composants",
   CATEGORIE: "Catégories",

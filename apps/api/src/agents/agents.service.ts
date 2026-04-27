@@ -122,6 +122,7 @@ export class AgentsService {
       this.prisma.maquette.updateMany({ where: { emprunteurId: id }, data: { emprunteurId: null } }),
       this.prisma.materiel.updateMany({ where: { createdById: id }, data: { createdById: null } }),
       this.prisma.materiel.updateMany({ where: { updatedById: id }, data: { updatedById: null } }),
+      this.prisma.materiel.updateMany({ where: { responsableId: id }, data: { responsableId: null } }),
       this.prisma.defaut.updateMany({ where: { detecteParId: id }, data: { detecteParId: null } }),
       this.prisma.evenement.updateMany({ where: { acteurId: id }, data: { acteurId: null } }),
       this.prisma.fichier.updateMany({ where: { uploadedById: id }, data: { uploadedById: null } }),

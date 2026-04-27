@@ -31,6 +31,7 @@ model Agent {
   maquettesEmprunteur  Maquette[]        @relation("maquette_emprunteur")
   materielsCreees      Materiel[]        @relation("materiel_createur")
   materielsMaj         Materiel[]        @relation("materiel_maj")
+  materielsResponsable Materiel[]        @relation("materiel_responsable")
   defautsDetectes      Defaut[]          @relation("defaut_detecteur")
   rolesAccordes        AgentRole[]       @relation("role_granter")
 
@@ -135,7 +136,7 @@ model Materiel {
   id              Int       @id @default(autoincrement())
   reference       String    @unique
   libelle         String
-  etat            String    @default("DISPONIBLE")
+  etat            String    @default("CORRECT")
   typeMateriel    String?   @map("type_materiel")
   numeroSerie     String?   @map("numero_serie")
   localisation    String?
@@ -172,8 +173,19 @@ model Materiel {
   commentaires          String?  @map("commentaires")
   entreprise            String?  @map("entreprise")
 
+  // New PowerApps fields
+  responsableId             Int?      @map("responsable_id")
+  commentaireEtat           String?   @map("commentaire_etat")
+  commentairesCompletude    String?   @map("commentaires_completude")
+  numeroFIEC                String?   @map("numero_fiec")
+  enTransit                 String?   @default("NON") @map("en_transit")
+  lotChaine                 String?   @map("lot_chaine")
+  complementsLocalisation   String?   @map("complements_localisation")
+  proprietaire              String?   @map("proprietaire")
+
   createdBy    Agent?              @relation("materiel_createur", fields: [createdById], references: [id])
   updatedBy    Agent?              @relation("materiel_maj", fields: [updatedById], references: [id])
+  responsable  Agent?              @relation("materiel_responsable", fields: [responsableId], references: [id])
   lignesEnvoi  DemandeEnvoiLigne[] @relation("ligne_materiel")
 
   @@index([etat])

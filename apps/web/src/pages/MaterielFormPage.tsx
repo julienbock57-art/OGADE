@@ -17,6 +17,8 @@ import {
   useEntreprises,
 } from "@/hooks/use-referentiels";
 
+type Agent = { id: number; nom: string; prenom: string; email: string };
+
 const inputClass =
   "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-edf-blue/40 focus:border-edf-blue transition-colors";
 const selectClass =
@@ -80,9 +82,19 @@ export default function MaterielFormPage() {
   const { data: groupes } = useReferentiel("GROUPE");
   const { data: completudes } = useReferentiel("COMPLETUDE");
   const { data: motifsPret } = useReferentiel("MOTIF_PRET");
+  const { data: lotsChaines } = useReferentiel("LOT_CHAINE");
   const { data: sites } = useSites();
   const { data: fournisseurs } = useEntreprises("FOURNISSEUR");
   const { data: entreprises } = useEntreprises("ENTREPRISE");
+
+  const { data: agentsData } = useQuery<{ data: Agent[] }>({
+    queryKey: ["agents", { page: 1, pageSize: 500 }],
+    queryFn: () => api.get("/agents", { page: 1, pageSize: 500 }),
+  });
+  const agentOptions = (agentsData?.data ?? []).map((a) => ({
+    code: String(a.id),
+    label: `${a.prenom} ${a.nom}`,
+  }));
 
   const siteOptions = (sites ?? []).map((s) => ({ code: s.code, label: `${s.label}${s.ville ? ` — ${s.ville}` : ""}` }));
   const fournisseurOptions = (fournisseurs ?? []).map((e) => ({ code: e.code, label: e.label }));
@@ -131,6 +143,14 @@ export default function MaterielFormPage() {
         produitsChimiques: existing.produitsChimiques ?? false,
         commentaires: existing.commentaires ?? undefined,
         entreprise: existing.entreprise ?? "",
+        responsableId: existing.responsableId ?? undefined,
+        commentaireEtat: existing.commentaireEtat ?? undefined,
+        commentairesCompletude: existing.commentairesCompletude ?? undefined,
+        numeroFIEC: existing.numeroFIEC ?? undefined,
+        enTransit: existing.enTransit ?? "NON",
+        lotChaine: existing.lotChaine ?? "",
+        complementsLocalisation: existing.complementsLocalisation ?? undefined,
+        proprietaire: existing.proprietaire ?? undefined,
       });
     }
   }, [existing, reset]);
@@ -222,6 +242,14 @@ export default function MaterielFormPage() {
               <label className={labelClass}>Modèle</label>
               <input type="text" {...register("modele")} className={inputClass} />
             </div>
+            <div>
+              <label className={labelClass}>N° FIEC</label>
+              <input type="text" {...register("numeroFIEC")} className={inputClass} placeholder="Numéro FIEC" />
+            </div>
+            <div>
+              <label className={labelClass}>Propriétaire</label>
+              <input type="text" {...register("proprietaire")} className={inputClass} placeholder="Nom du propriétaire" />
+            </div>
             {isEdit && (
               <RefSelect
                 label="État"
@@ -267,6 +295,23 @@ export default function MaterielFormPage() {
               registration={register("entreprise")}
               options={entrepriseOptions}
             />
+            <RefSelect
+              label="Lot / Chaîne"
+              registration={register("lotChaine")}
+              options={lotsChaines ?? []}
+            />
+            <div>
+              <label className={labelClass}>Responsable</label>
+              <select
+                {...register("responsableId", { setValueAs: (v: string) => v ? Number(v) : undefined })}
+                className={selectClass}
+              >
+                <option value="">Sélectionner un responsable...</option>
+                {agentOptions.map((o) => (
+                  <option key={o.code} value={o.code}>{o.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -282,6 +327,17 @@ export default function MaterielFormPage() {
             <div>
               <label className={labelClass}>Localisation</label>
               <input type="text" {...register("localisation")} className={inputClass} placeholder="Bâtiment, salle, rayonnage..." />
+            </div>
+            <div>
+              <label className={labelClass}>Compléments localisation</label>
+              <input type="text" {...register("complementsLocalisation")} className={inputClass} placeholder="Détails supplémentaires" />
+            </div>
+            <div>
+              <label className={labelClass}>En transit</label>
+              <select {...register("enTransit")} className={selectClass}>
+                <option value="NON">Non</option>
+                <option value="OUI">Oui</option>
+              </select>
             </div>
           </div>
         </div>
@@ -346,19 +402,27 @@ export default function MaterielFormPage() {
               <input type="checkbox" {...register("produitsChimiques")} id="produitsChimiques" className="h-4 w-4 rounded border-gray-300 text-edf-blue focus:ring-edf-blue" />
               <label htmlFor="produitsChimiques" className="text-sm text-gray-700">Contient des produits chimiques</label>
             </div>
+            <div className="md:col-span-2">
+              <label className={labelClass}>Commentaire complétude</label>
+              <textarea rows={2} {...register("commentairesCompletude")} className={inputClass} placeholder="Détails sur la complétude..." />
+            </div>
           </div>
         </div>
 
-        {/* Description */}
+        {/* Description & commentaires */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <SectionHeader title="Description" />
+          <SectionHeader title="Description & commentaires" />
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Description</label>
               <textarea rows={3} {...register("description")} className={inputClass} placeholder="Description détaillée du matériel..." />
             </div>
             <div>
-              <label className={labelClass}>Commentaires</label>
+              <label className={labelClass}>Commentaire état</label>
+              <textarea rows={2} {...register("commentaireEtat")} className={inputClass} placeholder="Remarques sur l'état du matériel..." />
+            </div>
+            <div>
+              <label className={labelClass}>Commentaires généraux</label>
               <textarea rows={2} {...register("commentaires")} className={inputClass} />
             </div>
           </div>
