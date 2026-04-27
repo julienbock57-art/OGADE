@@ -284,5 +284,74 @@
 /* Utility */
 .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-feature-settings: 'zero', 'ss02'; }
 
+/* Expand button */
+.expand-btn {
+  appearance: none; border: 0; background: transparent;
+  width: 22px; height: 22px; border-radius: 5px;
+  display: grid; place-items: center; color: var(--ink-3);
+  cursor: default; font-family: inherit;
+}
+.expand-btn:hover { background: var(--bg-sunken); color: var(--ink); }
+.expand-btn svg { transition: transform 0.15s; }
+.expand-btn.open svg { transform: rotate(90deg); }
+
+/* Expanded row */
+tr.expanded-row > td {
+  padding: 0;
+  background: var(--bg-sunken);
+  border-bottom: 2px solid var(--line);
+}
+.expanded-content { padding: 16px 24px 18px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; }
+.expanded-section h4 { margin: 0 0 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+
+/* In-cart indicator */
+tr.in-cart td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
+/* Bulk action bar */
+.bulk-bar {
+  position: sticky; top: 56px; z-index: 9;
+  background: var(--accent); color: white;
+  padding: 10px 24px; display: flex; align-items: center; gap: 14px;
+  font-weight: 500; font-size: 13px;
+}
+.bulk-bar .obtn { background: rgba(255,255,255,.15); color: white; border-color: rgba(255,255,255,.25); }
+.bulk-bar .obtn:hover { background: rgba(255,255,255,.25); }
+
+/* Cart panel */
+.cart-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 99;
+  width: min(440px, 92vw);
+  background: var(--bg-panel); border-left: 1px solid var(--line);
+  box-shadow: -16px 0 40px rgba(0,0,0,.10);
+  display: flex; flex-direction: column;
+  animation: slidein 0.18s cubic-bezier(.2,.8,.2,1);
+}
+.cart-head { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+.cart-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.cart-body { flex: 1; overflow: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.cart-item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-panel); }
+.cart-item .cart-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-3); }
+.cart-item .cart-name { font-size: 13px; font-weight: 500; }
+.cart-item .cart-loc { font-size: 11.5px; color: var(--ink-3); grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; }
+.cart-foot { padding: 14px 16px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--bg-sunken); }
+
+/* Sort arrow */
+.sort-arr { display: inline-block; margin-left: 4px; opacity: 0.5; font-size: 10px; }
+th.sorted .sort-arr { opacity: 1; color: var(--accent); }
+
+/* Selected row */
+tr.row-selected { background: var(--accent-soft); }
+tr.row-selected td { border-bottom-color: var(--accent-line); }
+
+/* Danger / success button variants */
+.obtn.danger { background: var(--rose); color: white; border-color: var(--rose); }
+.obtn.danger:hover { background: oklch(0.55 0.21 20); }
+.obtn.success { background: var(--emerald); color: white; border-color: var(--emerald); }
+.obtn.success:hover { background: oklch(0.54 0.16 155); }
+.obtn.sm { padding: 4px 9px; font-size: 12px; }
+
+/* Checkbox partial state */
+.cbx.partial { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
 /* Spinner */
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
