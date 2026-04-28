@@ -4,6 +4,7 @@ import {
   Post,
   Delete,
   Param,
+  Query,
   Body,
   Res,
   HttpCode,
@@ -34,6 +35,8 @@ export class FichiersController {
     @Body('entityType') entityType: string,
     @Body('entityId') entityId: string,
     @Body('typeFichier') typeFichier: string | undefined,
+    @Body('context') context: string | undefined,
+    @Body('demandeEnvoiId') demandeEnvoiId: string | undefined,
     @CurrentUser() user: RequestUser | null,
   ) {
     if (!file) {
@@ -48,12 +51,16 @@ export class FichiersController {
       throw new BadRequestException('entityId must be a number');
     }
 
+    const parsedDemandeId = demandeEnvoiId ? parseInt(demandeEnvoiId, 10) : undefined;
+
     return this.fichiersService.upload(
       file,
       entityType,
       parsedEntityId,
       user?.agentId,
       typeFichier,
+      context,
+      parsedDemandeId,
     );
   }
 
@@ -82,8 +89,9 @@ export class FichiersController {
   async findByEntity(
     @Param('entityType') entityType: string,
     @Param('entityId', ParseIntPipe) entityId: number,
+    @Query('typeFichier') typeFichier?: string,
   ) {
-    return this.fichiersService.findByEntity(entityType, entityId);
+    return this.fichiersService.findByEntity(entityType, entityId, typeFichier);
   }
 
   @Delete(':id')

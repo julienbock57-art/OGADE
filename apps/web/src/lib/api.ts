@@ -104,4 +104,29 @@ export const api = {
     if (!response.ok) throw new Error(`Erreur ${response.status}`);
     return response.blob();
   },
+
+  async upload<T>(path: string, formData: FormData): Promise<T> {
+    const url = `${API_BASE}${path}`;
+    const headers: Record<string, string> = {};
+    const token = tokenGetter ? await tokenGetter() : null;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else {
+      headers["x-user-email"] = getUserEmail();
+    }
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    if (!response.ok) {
+      let message = `Erreur ${response.status}`;
+      try {
+        const body = await response.json();
+        if (body.message) message = typeof body.message === "string" ? body.message : message;
+      } catch { /* ignore */ }
+      throw new Error(message);
+    }
+    return response.json() as Promise<T>;
+  },
 };

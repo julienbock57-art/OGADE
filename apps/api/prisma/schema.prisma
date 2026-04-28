@@ -246,6 +246,7 @@ model DemandeEnvoi {
 
   demandeur Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   lignes    DemandeEnvoiLigne[]
+  fichiers  Fichier[]           @relation("fichier_demande")
 
   @@index([statut])
   @@map("demandes_envoi")
@@ -343,11 +344,15 @@ model Fichier {
   mimeType      String?  @map("mime_type")
   tailleOctets  Int?     @map("taille_octets")
   typeFichier   String?  @map("type_fichier")
+  context       String?  @map("context")
+  demandeEnvoiId Int?    @map("demande_envoi_id")
   uploadedById  Int?     @map("uploaded_by")
   uploadedAt    DateTime @default(now()) @map("uploaded_at")
 
-  uploadedBy Agent? @relation("fichier_uploader", fields: [uploadedById], references: [id])
+  uploadedBy    Agent?        @relation("fichier_uploader", fields: [uploadedById], references: [id])
+  demandeEnvoi  DemandeEnvoi? @relation("fichier_demande", fields: [demandeEnvoiId], references: [id])
 
   @@index([entityType, entityId])
+  @@index([demandeEnvoiId])
   @@map("fichiers")
 }
