@@ -176,13 +176,14 @@ function SearchableSelect({
 /* ─── Photo thumbnail for edit mode ────────────────────────────── */
 function FormPhotoThumb({ fichier, onDelete }: { fichier: Fichier; onDelete: () => void }) {
   const [src, setSrc] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   useEffect(() => {
     let revoke: string | null = null;
     api.fetchBlob(`/fichiers/${fichier.id}/download`).then((blob) => {
       const url = URL.createObjectURL(blob);
       revoke = url;
       setSrc(url);
-    }).catch(() => {});
+    }).catch(() => { setError(true); });
     return () => { if (revoke) URL.revokeObjectURL(revoke); };
   }, [fichier.id]);
 
@@ -192,6 +193,13 @@ function FormPhotoThumb({ fichier, onDelete }: { fichier: Fichier; onDelete: () 
     <div style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid var(--line)", background: "var(--bg-sunken)" }}>
       {src ? (
         <img src={src} alt={fichier.nomOriginal ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : error ? (
+        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", color: "var(--ink-4)", fontSize: 10 }}>
+          <div style={{ textAlign: "center" }}>
+            <Icon name="photo" size={18} stroke={1.2} />
+            <div style={{ marginTop: 2 }}>Indisponible</div>
+          </div>
+        </div>
       ) : (
         <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
           <div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />

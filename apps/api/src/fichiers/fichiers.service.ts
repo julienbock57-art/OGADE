@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 
-const UPLOADS_DIR = path.resolve(process.cwd(), 'uploads');
+const UPLOADS_DIR = path.resolve(__dirname, '..', '..', 'uploads');
 
 @Injectable()
 export class FichiersService {
