@@ -15,6 +15,7 @@ const iconPaths: Record<string, string> = {
   pin:     "M10 18s-6-6-6-11a6 6 0 0 1 12 0c0 5-6 11-6 11z M10 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
   check:   "M4 10l4 4 8-8",
   dl:      "M10 3v10m0 0l-4-4m4 4l4-4M4 16h12",
+  copy:    "M6 4h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M10 2h4a2 2 0 0 1 2 2v4",
   edit:    "M12 4l4 4-8 8H4v-4l8-8z",
   cart:    "M3 4h2l2 9h10l2-7H7 M8 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M16 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
   dots:    "M5 10h.01M10 10h.01M15 10h.01",
@@ -126,6 +127,62 @@ function DrawerSection({ title, children }: { title: string; children: React.Rea
       <h3>{title}</h3>
       {children}
     </div>
+  );
+}
+
+// ─── QR SECTION ───────────────────────────────────────────────────────────
+function QrSection({ id, reference, entity }: { id: number; reference: string; entity: "materiel" | "maquette" }) {
+  const [copied, setCopied] = useState(false);
+  const qrUrl = `/api/v1/qrcode/${entity}/${id}`;
+
+  const handleDownload = async () => {
+    const res = await fetch(qrUrl);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `QR-${reference}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopy = async () => {
+    try {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const res = await fetch(qrUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url);
+    }
+  };
+
+  return (
+    <DrawerSection title="QR Code de traçabilité">
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "12px 0" }}>
+        <img
+          src={qrUrl}
+          alt={`QR Code ${reference}`}
+          style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+        <div className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>OGADE/{reference}</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="obtn" onClick={handleDownload}>
+            <Icon name="dl" size={13} />
+            Télécharger le QR
+          </button>
+          <button className="obtn" onClick={handleCopy}>
+            <Icon name={copied ? "check" : "copy"} size={13} />
+            {copied ? "Copié !" : "Copier l'image"}
+          </button>
+        </div>
+      </div>
+    </DrawerSection>
   );
 }
 
@@ -530,47 +587,7 @@ export default function MaterielDrawer({
 
           {/* ── Tab: QR code ── */}
           {tab === "qr" && (
-            <DrawerSection title="QR Code de traçabilité">
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 14,
-                  padding: "12px 0",
-                }}
-              >
-                <img
-                  src={`/api/v1/qrcode/materiel/${m.id}`}
-                  alt="QR Code"
-                  style={{
-                    width: 160,
-                    height: 160,
-                    border: "1px solid var(--line)",
-                    borderRadius: 12,
-                  }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                    const el = document.getElementById(`qr-placeholder-${m.id}`);
-                    if (el) el.style.display = "block";
-                  }}
-                />
-                <div
-                  id={`qr-placeholder-${m.id}`}
-                  className="qrcode"
-                  style={{ display: "none" }}
-                />
-                <div className="mono xs muted">OGADE/{m.reference}</div>
-                <a
-                  href={`/api/v1/qrcode/materiel/${m.id}`}
-                  download={`QR-${m.reference}.png`}
-                  className="obtn"
-                >
-                  <Icon name="dl" size={13} />
-                  Télécharger le QR
-                </a>
-              </div>
-            </DrawerSection>
+            <QrSection id={m.id} reference={m.reference} entity="materiel" />
           )}
         </div>
 
