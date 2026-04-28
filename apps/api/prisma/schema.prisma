@@ -340,6 +340,7 @@ model Fichier {
   entityType    String   @map("entity_type")
   entityId      Int      @map("entity_id")
   blobKey       String   @unique @map("blob_key")
+  blobData      Bytes?   @map("blob_data")
   nomOriginal   String?  @map("nom_original")
   mimeType      String?  @map("mime_type")
   tailleOctets  Int?     @map("taille_octets")
