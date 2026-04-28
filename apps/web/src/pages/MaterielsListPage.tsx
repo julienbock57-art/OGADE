@@ -121,8 +121,8 @@ function CartPanel({ items, onClose, onRemove, onClear }: {
   );
 }
 
-function ExpandedRow({ m, typesEnd, typesMat, sites, inCart, onAddCart }: {
-  m: Materiel; typesEnd: any[]; typesMat: any[]; sites: any[]; inCart: boolean; onAddCart: () => void;
+function ExpandedRow({ m, typesEnd, typesMat, sites, inCart, onAddCart, onOpenQr }: {
+  m: Materiel; typesEnd: any[]; typesMat: any[]; sites: any[]; inCart: boolean; onAddCart: () => void; onOpenQr: () => void;
 }) {
   const navigate = useNavigate();
   const typeEndRef = typesEnd.find((t: any) => t.code === m.typeEND);
@@ -152,7 +152,7 @@ function ExpandedRow({ m, typesEnd, typesMat, sites, inCart, onAddCart }: {
           <button className="obtn sm" onClick={() => navigate(`/materiels/${m.id}`)}><Icon name="eye" size={12} />Détail</button>
           <button className="obtn sm" onClick={() => navigate(`/materiels/${m.id}/edit`)}><Icon name="edit" size={12} />Modifier</button>
           <button className="obtn sm" onClick={onAddCart} disabled={inCart}><Icon name="cart" size={12} />{inCart ? "Dans le panier" : "Ajouter au panier"}</button>
-          <button className="obtn sm"><Icon name="qr" size={12} />QR code</button>
+          <button className="obtn sm" onClick={onOpenQr}><Icon name="qr" size={12} />QR code</button>
           <button className="obtn sm"><Icon name="history" size={12} />Historique</button>
         </div>
         {m.commentaireEtat && (
@@ -176,6 +176,7 @@ export default function MaterielsListPage() {
   const [filterCompletude, setFilterCompletude] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [drawerTab, setDrawerTab] = useState<"infos" | "qr">("infos");
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selection, setSelection] = useState<Set<number>>(new Set());
   const [cart, setCart] = useState<Map<number, Materiel>>(new Map());
@@ -350,7 +351,7 @@ export default function MaterielsListPage() {
                   <React.Fragment key={m.id}>
                     <tr
                       className={`${isSelected ? "row-selected" : ""} ${inCart ? "in-cart" : ""}`}
-                      onClick={() => setSelectedId(m.id)}
+                      onClick={() => { setSelectedId(m.id); setDrawerTab("infos"); }}
                       style={{ height: "var(--row-h)", cursor: "pointer", transition: "background 0.1s" }}
                       onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "var(--bg-sunken)"; }}
                       onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = ""; }}
@@ -413,7 +414,7 @@ export default function MaterielsListPage() {
                     {/* Expanded row */}
                     {expanded && (
                       <tr className="expanded-row"><td colSpan={11}>
-                        <ExpandedRow m={m} typesEnd={typesEnd ?? []} typesMat={typesMat ?? []} sites={sites ?? []} inCart={inCart} onAddCart={() => addCart(m)} />
+                        <ExpandedRow m={m} typesEnd={typesEnd ?? []} typesMat={typesMat ?? []} sites={sites ?? []} inCart={inCart} onAddCart={() => addCart(m)} onOpenQr={() => { setSelectedId(m.id); setDrawerTab("qr"); }} />
                       </td></tr>
                     )}
                   </React.Fragment>
@@ -432,7 +433,7 @@ export default function MaterielsListPage() {
       )}
 
       {/* Drawer */}
-      {selectedMat && <MaterielDrawer materiel={selectedMat} onClose={() => setSelectedId(null)} />}
+      {selectedMat && <MaterielDrawer materiel={selectedMat} onClose={() => setSelectedId(null)} initialTab={drawerTab} />}
 
       {/* Cart */}
       {cartOpen && <CartPanel items={cartItems} onClose={() => setCartOpen(false)} onRemove={removeCart} onClear={clearCart} />}

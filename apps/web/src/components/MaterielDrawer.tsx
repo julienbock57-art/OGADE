@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { Materiel } from "@ogade/shared";
+import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 
 // ─── LOCAL ICON COMPONENT ──────────────────────────────────────────────────
@@ -132,51 +133,71 @@ function DrawerSection({ title, children }: { title: string; children: React.Rea
 
 // ─── QR SECTION ───────────────────────────────────────────────────────────
 function QrSection({ id, reference, entity }: { id: number; reference: string; entity: "materiel" | "maquette" }) {
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const qrUrl = `/api/v1/qrcode/${entity}/${id}`;
+  const [error, setError] = useState(false);
+  const apiPath = `/qrcode/${entity}/${id}`;
+
+  useEffect(() => {
+    let revoke: string | null = null;
+    api.fetchBlob(apiPath).then(blob => {
+      const url = URL.createObjectURL(blob);
+      revoke = url;
+      setImgSrc(url);
+    }).catch(() => setError(true));
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [apiPath]);
 
   const handleDownload = async () => {
-    const res = await fetch(qrUrl);
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `QR-${reference}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = await api.fetchBlob(apiPath);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `QR-${reference}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { /* ignore */ }
   };
 
   const handleCopy = async () => {
     try {
-      const res = await fetch(qrUrl);
-      const blob = await res.blob();
+      const blob = await api.fetchBlob(apiPath);
       await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      const res = await fetch(qrUrl);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url);
+      try {
+        const blob = await api.fetchBlob(apiPath);
+        const url = URL.createObjectURL(blob);
+        window.open(url);
+      } catch { /* ignore */ }
     }
   };
 
   return (
     <DrawerSection title="QR Code de traçabilité">
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "12px 0" }}>
-        <img
-          src={qrUrl}
-          alt={`QR Code ${reference}`}
-          style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
+        {imgSrc && (
+          <img
+            src={imgSrc}
+            alt={`QR Code ${reference}`}
+            style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
+          />
+        )}
+        {error && <div style={{ fontSize: 13, color: "var(--ink-3)" }}>Impossible de charger le QR code</div>}
+        {!imgSrc && !error && (
+          <div style={{ width: 200, height: 200, borderRadius: 12, background: "var(--bg-sunken)", display: "grid", placeItems: "center" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+          </div>
+        )}
         <div className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>OGADE/{reference}</div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="obtn" onClick={handleDownload}>
+          <button className="obtn" onClick={handleDownload} disabled={!imgSrc}>
             <Icon name="dl" size={13} />
             Télécharger le QR
           </button>
-          <button className="obtn" onClick={handleCopy}>
+          <button className="obtn" onClick={handleCopy} disabled={!imgSrc}>
             <Icon name={copied ? "check" : "copy"} size={13} />
             {copied ? "Copié !" : "Copier l'image"}
           </button>
@@ -212,11 +233,13 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
 export default function MaterielDrawer({
   materiel: m,
   onClose,
+  initialTab = "infos",
 }: {
   materiel: Materiel;
   onClose: () => void;
+  initialTab?: TabId;
 }) {
-  const [tab, setTab] = useState<TabId>("infos");
+  const [tab, setTab] = useState<TabId>(initialTab);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

@@ -90,4 +90,18 @@ export const api = {
       method: "DELETE",
     });
   },
+
+  async fetchBlob(path: string): Promise<Blob> {
+    const url = `${API_BASE}${path}`;
+    const headers: Record<string, string> = {};
+    const token = tokenGetter ? await tokenGetter() : null;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else {
+      headers["x-user-email"] = getUserEmail();
+    }
+    const response = await fetch(url, { headers });
+    if (!response.ok) throw new Error(`Erreur ${response.status}`);
+    return response.blob();
+  },
 };
