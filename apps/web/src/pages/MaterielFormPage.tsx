@@ -376,7 +376,9 @@ export default function MaterielFormPage() {
       setStep(stepsWithErrors[0]);
       return;
     }
-    handleSubmit(onSubmit)();
+    // Bypass zodResolver (we did our own validation) and submit directly
+    // with the computed libelle handled by onSubmit.
+    onSubmit(watchedValues as CreateMaterielInput & { etat?: string });
   };
 
   const responsableLabel =
