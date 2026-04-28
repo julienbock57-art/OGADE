@@ -259,12 +259,26 @@ const EVENT_TITLES: Record<string, string> = {
   CREATED: "Création de la fiche",
   UPDATED: "Modification",
   DELETED: "Suppression de la fiche",
+  FILE_ADDED: "Fichier ajouté",
+  FILE_DELETED: "Fichier supprimé",
+  PHOTO_ADDED: "Photo ajoutée",
+  PHOTO_DELETED: "Photo supprimée",
 };
 
 const EVENT_DOT_COLORS: Record<string, string> = {
   CREATED: "emerald",
   UPDATED: "accent",
   DELETED: "rose",
+  FILE_ADDED: "sky",
+  FILE_DELETED: "rose",
+  PHOTO_ADDED: "sky",
+  PHOTO_DELETED: "rose",
+};
+
+const DOT_STYLE_MAP: Record<string, React.CSSProperties> = {
+  accent: { background: "var(--accent)", boxShadow: "0 0 0 1.5px var(--accent)" },
+  rose: { background: "var(--rose)", boxShadow: "0 0 0 1.5px var(--rose)" },
+  sky: { background: "oklch(0.65 0.15 230)", boxShadow: "0 0 0 1.5px oklch(0.65 0.15 230)" },
 };
 
 function formatFieldValue(v: any): string {
@@ -318,6 +332,9 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
     );
   }
 
+  const isFileEvent = (t: string) =>
+    t === "FILE_ADDED" || t === "FILE_DELETED" || t === "PHOTO_ADDED" || t === "PHOTO_DELETED";
+
   return (
     <DrawerSection title="Historique des modifications & mouvements">
       <div className="timeline">
@@ -325,7 +342,7 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
           const title = EVENT_TITLES[evt.eventType] ?? evt.eventType;
           const dotColor = EVENT_DOT_COLORS[evt.eventType] ?? "neutral";
           const acteur = evt.acteur;
-          const payload = evt.payload;
+          const payload = evt.payload as Record<string, any> | null;
           const changedFields = payload?.changedFields;
           const fieldCount = changedFields ? Object.keys(changedFields).length : 0;
           const isExpanded = expandedId === evt.id;
@@ -336,14 +353,11 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
             meta += ` · ${fieldCount} champ${fieldCount > 1 ? "s" : ""} modifié${fieldCount > 1 ? "s" : ""}`;
           } else if (evt.eventType === "CREATED") {
             meta += " · Saisie initiale";
+          } else if (isFileEvent(evt.eventType) && payload?.fichierNom) {
+            meta += ` · ${payload.fichierNom}`;
           }
 
-          const dotStyle =
-            dotColor === "accent"
-              ? { background: "var(--accent)", boxShadow: "0 0 0 1.5px var(--accent)" }
-              : dotColor === "rose"
-                ? { background: "var(--rose)", boxShadow: "0 0 0 1.5px var(--rose)" }
-                : undefined;
+          const dotStyle = DOT_STYLE_MAP[dotColor];
 
           return (
             <div key={evt.id} className="timeline-item done">
@@ -364,6 +378,34 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
                 <div className="timeline-meta">
                   {fmtEvt(evt.occurredAt)} · {meta}
                 </div>
+
+                {/* File/photo event details */}
+                {isFileEvent(evt.eventType) && payload && (
+                  <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                    <span style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "3px 10px", borderRadius: 6, fontSize: 11, fontWeight: 500,
+                      background: evt.eventType.includes("DELETED") ? "var(--rose-soft)" : "var(--accent-soft)",
+                      color: evt.eventType.includes("DELETED") ? "var(--rose)" : "var(--accent)",
+                      border: `1px solid ${evt.eventType.includes("DELETED") ? "color-mix(in oklch, var(--rose) 25%, transparent)" : "color-mix(in oklch, var(--accent) 25%, transparent)"}`,
+                    }}>
+                      {evt.eventType.includes("PHOTO") ? "Photo" : "Fichier"}
+                      {payload.fichierContext && ` · ${payload.fichierContext}`}
+                    </span>
+                    <span style={{ fontSize: 12, color: "var(--ink-2)", fontFamily: "'JetBrains Mono', monospace" }}>
+                      {payload.fichierNom}
+                    </span>
+                    {payload.fichierTaille && (
+                      <span style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                        ({payload.fichierTaille < 1024 * 1024
+                          ? `${(payload.fichierTaille / 1024).toFixed(0)} Ko`
+                          : `${(payload.fichierTaille / (1024 * 1024)).toFixed(1)} Mo`})
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Changed fields table for CREATED/UPDATED */}
                 {isExpanded && changedFields && (
                   <div style={{ marginTop: 10, background: "var(--bg-sunken)", borderRadius: 8, border: "1px solid var(--line)", overflow: "hidden" }}>
                     <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
@@ -379,15 +421,18 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(changedFields).map(([field, diff]) => (
-                          <tr key={field} style={{ borderBottom: "1px solid var(--line-2)" }}>
-                            <td style={{ padding: "5px 10px", fontWeight: 500, color: "var(--ink)" }}>{FIELD_LABELS[field] ?? field}</td>
-                            {evt.eventType === "UPDATED" && (
-                              <td style={{ padding: "5px 10px", color: "var(--rose)", textDecoration: diff.old !== null ? "line-through" : undefined }}>{formatFieldValue(diff.old)}</td>
-                            )}
-                            <td style={{ padding: "5px 10px", color: "var(--emerald)", fontWeight: 500 }}>{formatFieldValue(diff.new)}</td>
-                          </tr>
-                        ))}
+                        {Object.entries(changedFields).map(([field, rawDiff]) => {
+                          const diff = rawDiff as { old?: any; new?: any };
+                          return (
+                            <tr key={field} style={{ borderBottom: "1px solid var(--line-2)" }}>
+                              <td style={{ padding: "5px 10px", fontWeight: 500, color: "var(--ink)" }}>{FIELD_LABELS[field] ?? field}</td>
+                              {evt.eventType === "UPDATED" && (
+                                <td style={{ padding: "5px 10px", color: "var(--rose)", textDecoration: diff.old !== null ? "line-through" : undefined }}>{formatFieldValue(diff.old)}</td>
+                              )}
+                              <td style={{ padding: "5px 10px", color: "var(--emerald)", fontWeight: 500 }}>{formatFieldValue(diff.new)}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
