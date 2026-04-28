@@ -108,7 +108,7 @@ export default function AdminReferentielTypePage() {
   };
 
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto", paddingBottom: 40 }}>
+    <div style={{ padding: "22px 28px 40px" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
         <Link
@@ -185,6 +185,13 @@ export default function AdminReferentielTypePage() {
         )}
       </form>
 
+      {/* Update error */}
+      {updateMut.isError && (
+        <div style={{ background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 30%, transparent)", borderRadius: 8, padding: "8px 12px", marginBottom: 12 }}>
+          <p style={{ fontSize: 12, color: "var(--rose)", margin: 0 }}>Erreur de modification : {(updateMut.error as Error).message}</p>
+        </div>
+      )}
+
       {/* Table */}
       <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
         {isLoading ? (
@@ -196,7 +203,7 @@ export default function AdminReferentielTypePage() {
             </div>
           </div>
         ) : (
-          <table style={{ minWidth: "100%", borderCollapse: "collapse" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
                 <th style={{ ...thStyle, width: 48 }}>#</th>
@@ -256,7 +263,7 @@ export default function AdminReferentielTypePage() {
                             style={{
                               appearance: "none", border: "none", background: "none",
                               padding: 6, borderRadius: 7, color: "var(--emerald)",
-                              cursor: "default", display: "flex",
+                              cursor: "pointer", display: "flex",
                             }}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "var(--emerald-soft)")}
                             onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
@@ -272,7 +279,7 @@ export default function AdminReferentielTypePage() {
                             style={{
                               appearance: "none", border: "none", background: "none",
                               padding: 6, borderRadius: 7, color: "var(--ink-3)",
-                              cursor: "default", display: "flex",
+                              cursor: "pointer", display: "flex",
                             }}
                             onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-sunken)")}
                             onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
@@ -296,11 +303,12 @@ export default function AdminReferentielTypePage() {
                       <td style={{ ...tdStyle, textAlign: "right" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
                           <button
+                            type="button"
                             onClick={() => startEdit(item)}
                             style={{
                               appearance: "none", border: "none", background: "none",
                               padding: 6, borderRadius: 7, color: "var(--ink-3)",
-                              cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                              cursor: "pointer", display: "flex", transition: "color 0.12s, background 0.12s",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.color = "var(--accent-ink)";
@@ -317,6 +325,7 @@ export default function AdminReferentielTypePage() {
                             </svg>
                           </button>
                           <button
+                            type="button"
                             onClick={() => {
                               if (confirm(`Supprimer la valeur "${item.label}" ?`)) {
                                 deleteMut.mutate(item.id);
@@ -325,7 +334,7 @@ export default function AdminReferentielTypePage() {
                             style={{
                               appearance: "none", border: "none", background: "none",
                               padding: 6, borderRadius: 7, color: "var(--ink-3)",
-                              cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                              cursor: "pointer", display: "flex", transition: "color 0.12s, background 0.12s",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.color = "var(--rose)";
