@@ -319,7 +319,7 @@ tr.in-cart td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 
 /* Cart panel */
 .cart-panel {
-  position: fixed; top: 0; right: 0; bottom: 0; z-index: 99;
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 101;
   width: min(440px, 92vw);
   background: var(--bg-panel); border-left: 1px solid var(--line);
   box-shadow: -16px 0 40px rgba(0,0,0,.10);
