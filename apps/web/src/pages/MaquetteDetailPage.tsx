@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Maquette } from "@ogade/shared";
@@ -30,12 +30,23 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function QrCard({ id, reference }: { id: number; reference: string }) {
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const qrUrl = `/api/v1/qrcode/maquette/${id}`;
+  const [error, setError] = useState(false);
+  const apiPath = `/qrcode/maquette/${id}`;
+
+  useEffect(() => {
+    let revoke: string | null = null;
+    api.fetchBlob(apiPath).then(blob => {
+      const url = URL.createObjectURL(blob);
+      revoke = url;
+      setImgSrc(url);
+    }).catch(() => setError(true));
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [apiPath]);
 
   const handleDownload = async () => {
-    const res = await fetch(qrUrl);
-    const blob = await res.blob();
+    const blob = await api.fetchBlob(apiPath);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -46,14 +57,12 @@ function QrCard({ id, reference }: { id: number; reference: string }) {
 
   const handleCopy = async () => {
     try {
-      const res = await fetch(qrUrl);
-      const blob = await res.blob();
+      const blob = await api.fetchBlob(apiPath);
       await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      const res = await fetch(qrUrl);
-      const blob = await res.blob();
+      const blob = await api.fetchBlob(apiPath);
       const url = URL.createObjectURL(blob);
       window.open(url);
     }
@@ -65,21 +74,30 @@ function QrCard({ id, reference }: { id: number; reference: string }) {
         QR Code de traçabilité
       </h2>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "12px 0" }}>
-        <img
-          src={qrUrl}
-          alt={`QR Code ${reference}`}
-          style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
+        {error ? (
+          <div style={{ width: 200, height: 200, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)", borderRadius: 12, background: "white", color: "var(--ink-3)", fontSize: 12 }}>
+            QR indisponible
+          </div>
+        ) : imgSrc ? (
+          <img
+            src={imgSrc}
+            alt={`QR Code ${reference}`}
+            style={{ width: 200, height: 200, border: "1px solid var(--line)", borderRadius: 12, background: "white", padding: 8 }}
+          />
+        ) : (
+          <div style={{ width: 200, height: 200, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--line)", borderRadius: 12, background: "white" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+          </div>
+        )}
         <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "var(--ink-3)" }}>OGADE/{reference}</div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="obtn" onClick={handleDownload}>
+          <button className="obtn" onClick={handleDownload} disabled={!imgSrc}>
             <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 3v10m0 0l-4-4m4 4l4-4" /><path d="M4 16h12" />
             </svg>
             Télécharger le QR
           </button>
-          <button className="obtn" onClick={handleCopy}>
+          <button className="obtn" onClick={handleCopy} disabled={!imgSrc}>
             <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
               {copied
                 ? <path d="M4 10l4 4 8-8" />
