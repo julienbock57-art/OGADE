@@ -9,6 +9,7 @@ import {
   type CreateMaterielInput,
   type UpdateMaterielInput,
   type Materiel,
+  type Fichier,
 } from "@ogade/shared";
 import { api } from "@/lib/api";
 import {
@@ -18,6 +19,7 @@ import {
 } from "@/hooks/use-referentiels";
 
 type Agent = { id: number; nom: string; prenom: string; email: string };
+type PendingFile = { file: File; typeFichier: "DOCUMENT" | "PHOTO"; context?: string; preview?: string };
 
 /* ─── Icon component ────────────────────────────────────────────── */
 function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
@@ -29,6 +31,9 @@ function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; 
     alert: "M10 3l7 14H3L10 3z M10 9v4 M10 15v.5",
     photo: "M4 15l4-4 3 3 3-4 4 5H4z M15 7a2 2 0 1 0-4 0 2 2 0 0 0 4 0z M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z",
     upload: "M10 14V6 M6 10l4-4 4 4 M4 16h12",
+    clip: "M7 9l5-5 3 3-7 7-3-3a2 2 0 0 1 0-3",
+    dl: "M10 3v10m0 0l-4-4m4 4l4-4M4 16h12",
+    trash: "M5 6h10 M8 6V4h4v2 M6 6v10a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6",
   };
   const d = paths[name] ?? "";
   return (
@@ -168,6 +173,40 @@ function SearchableSelect({
   );
 }
 
+/* ─── Photo thumbnail for edit mode ────────────────────────────── */
+function FormPhotoThumb({ fichier, onDelete }: { fichier: Fichier; onDelete: () => void }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let revoke: string | null = null;
+    api.fetchBlob(`/fichiers/${fichier.id}/download`).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      revoke = url;
+      setSrc(url);
+    }).catch(() => {});
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [fichier.id]);
+
+  const ctxLabel = fichier.context ?? "Générale";
+
+  return (
+    <div style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid var(--line)", background: "var(--bg-sunken)" }}>
+      {src ? (
+        <img src={src} alt={fichier.nomOriginal ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : (
+        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
+          <div style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+        </div>
+      )}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "3px 6px", background: "linear-gradient(transparent, rgba(0,0,0,0.6))", fontSize: 10, color: "white" }}>
+        {ctxLabel}
+      </div>
+      <button type="button" className="icon-btn" style={{ position: "absolute", top: 3, right: 3, background: "rgba(0,0,0,0.5)", color: "white", borderRadius: 4, padding: 2, width: 20, height: 20 }} onClick={onDelete}>
+        <Icon name="x" size={10} />
+      </button>
+    </div>
+  );
+}
+
 /* ─── Main component ────────────────────────────────────────────── */
 export default function MaterielFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -177,6 +216,10 @@ export default function MaterielFormPage() {
 
   const [step, setStep] = useState(0);
   const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [photoContext, setPhotoContext] = useState("GENERAL");
+  const docInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   /* ── Data fetching ─────────────────────────────────────────────── */
   const { data: existing, isLoading: loadingExisting } = useQuery<Materiel>({
@@ -205,6 +248,17 @@ export default function MaterielFormPage() {
     code: String(a.id),
     label: `${a.prenom} ${a.nom}`,
   }));
+
+  const { data: existingDocs, refetch: refetchDocs } = useQuery<Fichier[]>({
+    queryKey: ["fichiers", "MATERIEL", id, "DOCUMENT"],
+    queryFn: () => api.get(`/fichiers/entity/MATERIEL/${id}`, { typeFichier: "DOCUMENT" }),
+    enabled: isEdit,
+  });
+  const { data: existingPhotos, refetch: refetchPhotos } = useQuery<Fichier[]>({
+    queryKey: ["fichiers", "MATERIEL", id, "PHOTO"],
+    queryFn: () => api.get(`/fichiers/entity/MATERIEL/${id}`, { typeFichier: "PHOTO" }),
+    enabled: isEdit,
+  });
 
   const siteOptions = (sites ?? []).map((s) => ({
     code: s.code,
@@ -284,7 +338,11 @@ export default function MaterielFormPage() {
   /* ── Mutations ─────────────────────────────────────────────────── */
   const createMutation = useMutation({
     mutationFn: (data: CreateMaterielInput) => api.post<Materiel>("/materiels", data),
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
+      if (pendingFiles.length > 0) {
+        await uploadFilesToMateriel(result.id);
+        setPendingFiles([]);
+      }
       queryClient.invalidateQueries({ queryKey: ["materiels"] });
       navigate(`/materiels/${result.id}`);
     },
@@ -316,6 +374,58 @@ export default function MaterielFormPage() {
   };
 
   const mutationError = createMutation.error || updateMutation.error;
+
+  /* ── File helpers ─────────────────────────────────────────────── */
+  const uploadFilesToMateriel = async (materielId: number) => {
+    for (const pf of pendingFiles) {
+      const fd = new FormData();
+      fd.append("file", pf.file);
+      fd.append("entityType", "MATERIEL");
+      fd.append("entityId", String(materielId));
+      fd.append("typeFichier", pf.typeFichier);
+      if (pf.context) fd.append("context", pf.context);
+      await api.upload("/fichiers/upload", fd);
+    }
+  };
+
+  const handleAddPendingFiles = (files: FileList, typeFichier: "DOCUMENT" | "PHOTO", context?: string) => {
+    const newPending: PendingFile[] = Array.from(files).map((file) => {
+      const pf: PendingFile = { file, typeFichier, context };
+      if (typeFichier === "PHOTO" && file.type.startsWith("image/")) {
+        pf.preview = URL.createObjectURL(file);
+      }
+      return pf;
+    });
+    setPendingFiles((prev) => [...prev, ...newPending]);
+  };
+
+  const removePendingFile = (idx: number) => {
+    setPendingFiles((prev) => {
+      const pf = prev[idx];
+      if (pf.preview) URL.revokeObjectURL(pf.preview);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  const handleDirectUpload = async (files: FileList, typeFichier: "DOCUMENT" | "PHOTO", context?: string) => {
+    for (const file of Array.from(files)) {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("entityType", "MATERIEL");
+      fd.append("entityId", String(id));
+      fd.append("typeFichier", typeFichier);
+      if (context) fd.append("context", context);
+      await api.upload("/fichiers/upload", fd);
+    }
+    if (typeFichier === "DOCUMENT") refetchDocs();
+    else refetchPhotos();
+  };
+
+  const handleDeleteFile = async (fichierIdToDelete: number, typeFichier: string) => {
+    await api.delete(`/fichiers/${fichierIdToDelete}`);
+    if (typeFichier === "DOCUMENT") refetchDocs();
+    else refetchPhotos();
+  };
 
   /* ── Watched values ─────────────────────────────────────────────── */
   const watchedValues = watch();
@@ -947,17 +1057,167 @@ export default function MaterielFormPage() {
                 />
               </div>
 
-              {/* Upload zone */}
+              {/* ── Pièces jointes ─────────────────────────────── */}
               <div className="field full">
-                <label className="field-label">Photos & pièces jointes</label>
-                <div className="upload-zone" style={{ marginTop: 2 }}>
-                  <Icon name="photo" size={20} />
-                  <div style={{ marginTop: 8, fontSize: 13 }}>
-                    Glissez photos d'envoi/réception ou{" "}
-                    <span className="link">parcourir</span>
+                <label className="field-label" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Icon name="clip" size={13} />
+                  Pièces jointes
+                </label>
+                <input
+                  ref={docInputRef}
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (!e.target.files?.length) return;
+                    if (isEdit) handleDirectUpload(e.target.files, "DOCUMENT");
+                    else handleAddPendingFiles(e.target.files, "DOCUMENT");
+                    e.target.value = "";
+                  }}
+                />
+                <div
+                  className="upload-zone"
+                  style={{ marginTop: 4 }}
+                  onClick={() => docInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files.length > 0) {
+                      if (isEdit) handleDirectUpload(e.dataTransfer.files, "DOCUMENT");
+                      else handleAddPendingFiles(e.dataTransfer.files, "DOCUMENT");
+                    }
+                  }}
+                >
+                  <Icon name="clip" size={18} />
+                  <div style={{ marginTop: 6, fontSize: 12 }}>
+                    Glisser-déposer ou <span style={{ color: "var(--accent)", fontWeight: 500 }}>parcourir</span>
                   </div>
-                  <div style={{ fontSize: 11, marginTop: 4 }}>JPG, PNG, PDF · 20 Mo max</div>
+                  <div style={{ fontSize: 11, marginTop: 2, color: "var(--ink-3)" }}>PDF, DOC, XLS… · 20 Mo max</div>
                 </div>
+
+                {/* Existing docs (edit mode) */}
+                {isEdit && existingDocs && existingDocs.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+                    {existingDocs.map((f) => (
+                      <div key={f.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "var(--bg-sunken)", borderRadius: 8, fontSize: 12 }}>
+                        <span style={{ fontWeight: 600, fontSize: 10, color: "var(--accent)", background: "var(--accent-soft)", padding: "2px 6px", borderRadius: 4 }}>
+                          {(f.nomOriginal ?? "").split(".").pop()?.toUpperCase() ?? "DOC"}
+                        </span>
+                        <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.nomOriginal ?? f.blobKey}</span>
+                        <span style={{ color: "var(--ink-3)", fontSize: 11 }}>{f.tailleOctets ? `${(f.tailleOctets / 1024).toFixed(0)} Ko` : ""}</span>
+                        <button type="button" className="icon-btn" style={{ padding: 3, color: "var(--rose)" }} onClick={() => { if (confirm("Supprimer ce fichier ?")) handleDeleteFile(f.id, "DOCUMENT"); }}>
+                          <Icon name="trash" size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pending docs (create mode) */}
+                {!isEdit && pendingFiles.filter((p) => p.typeFichier === "DOCUMENT").length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+                    {pendingFiles.map((pf, idx) =>
+                      pf.typeFichier === "DOCUMENT" ? (
+                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "var(--bg-sunken)", borderRadius: 8, fontSize: 12 }}>
+                          <span style={{ fontWeight: 600, fontSize: 10, color: "var(--accent)", background: "var(--accent-soft)", padding: "2px 6px", borderRadius: 4 }}>
+                            {pf.file.name.split(".").pop()?.toUpperCase() ?? "DOC"}
+                          </span>
+                          <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pf.file.name}</span>
+                          <span style={{ color: "var(--ink-3)", fontSize: 11 }}>{(pf.file.size / 1024).toFixed(0)} Ko</span>
+                          <button type="button" className="icon-btn" style={{ padding: 3, color: "var(--rose)" }} onClick={() => removePendingFile(idx)}>
+                            <Icon name="trash" size={12} />
+                          </button>
+                        </div>
+                      ) : null,
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Photos ──────────────────────────────────────── */}
+              <div className="field full">
+                <label className="field-label" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Icon name="photo" size={13} />
+                  Photos
+                </label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2, marginBottom: 8 }}>
+                  {[
+                    { value: "GENERAL", label: "Générale" },
+                    { value: "ENVOI", label: "Envoi" },
+                    { value: "RECEPTION", label: "Réception" },
+                    { value: "PRET", label: "Prêt" },
+                    { value: "ETALONNAGE", label: "Étalonnage" },
+                    { value: "DEFAUT", label: "Défaut" },
+                  ].map((ctx) => (
+                    <button
+                      key={ctx.value}
+                      type="button"
+                      className={`tag-btn${photoContext === ctx.value ? " on" : ""}`}
+                      onClick={() => setPhotoContext(ctx.value)}
+                    >
+                      {ctx.label}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (!e.target.files?.length) return;
+                    if (isEdit) handleDirectUpload(e.target.files, "PHOTO", photoContext);
+                    else handleAddPendingFiles(e.target.files, "PHOTO", photoContext);
+                    e.target.value = "";
+                  }}
+                />
+                <div
+                  className="upload-zone"
+                  onClick={() => photoInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files.length > 0) {
+                      if (isEdit) handleDirectUpload(e.dataTransfer.files, "PHOTO", photoContext);
+                      else handleAddPendingFiles(e.dataTransfer.files, "PHOTO", photoContext);
+                    }
+                  }}
+                >
+                  <Icon name="photo" size={18} />
+                  <div style={{ marginTop: 6, fontSize: 12 }}>
+                    Glisser-déposer ou <span style={{ color: "var(--accent)", fontWeight: 500 }}>parcourir</span>
+                  </div>
+                  <div style={{ fontSize: 11, marginTop: 2, color: "var(--ink-3)" }}>JPG, PNG · 20 Mo max</div>
+                </div>
+
+                {/* Existing photos (edit mode) — thumbnails */}
+                {isEdit && existingPhotos && existingPhotos.length > 0 && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 8, marginTop: 10 }}>
+                    {existingPhotos.map((p) => (
+                      <FormPhotoThumb key={p.id} fichier={p} onDelete={() => { if (confirm("Supprimer cette photo ?")) handleDeleteFile(p.id, "PHOTO"); }} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Pending photos (create mode) — previews */}
+                {!isEdit && pendingFiles.filter((p) => p.typeFichier === "PHOTO").length > 0 && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 8, marginTop: 10 }}>
+                    {pendingFiles.map((pf, idx) =>
+                      pf.typeFichier === "PHOTO" ? (
+                        <div key={idx} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid var(--line)", background: "var(--bg-sunken)" }}>
+                          {pf.preview && <img src={pf.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+                          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "3px 6px", background: "linear-gradient(transparent, rgba(0,0,0,0.6))", fontSize: 10, color: "white" }}>
+                            {pf.context ?? "Générale"}
+                          </div>
+                          <button type="button" className="icon-btn" style={{ position: "absolute", top: 3, right: 3, background: "rgba(0,0,0,0.5)", color: "white", borderRadius: 4, padding: 2, width: 20, height: 20 }} onClick={() => removePendingFile(idx)}>
+                            <Icon name="x" size={10} />
+                          </button>
+                        </div>
+                      ) : null,
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
