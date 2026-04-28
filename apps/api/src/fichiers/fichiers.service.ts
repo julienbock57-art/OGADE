@@ -20,6 +20,8 @@ export class FichiersService {
     entityId: number,
     uploadedById?: number,
     typeFichier?: string,
+    context?: string,
+    demandeEnvoiId?: number,
   ) {
     const blobKey = `${randomUUID()}-${file.originalname}`;
     const filePath = path.join(UPLOADS_DIR, blobKey);
@@ -35,6 +37,8 @@ export class FichiersService {
         mimeType: file.mimetype,
         tailleOctets: file.size,
         typeFichier: typeFichier ?? null,
+        context: context ?? null,
+        demandeEnvoiId: demandeEnvoiId ?? null,
         uploadedById: uploadedById ?? null,
       },
     });
@@ -48,10 +52,13 @@ export class FichiersService {
     return fichier;
   }
 
-  async findByEntity(entityType: string, entityId: number) {
+  async findByEntity(entityType: string, entityId: number, typeFichier?: string) {
+    const where: any = { entityType, entityId };
+    if (typeFichier) where.typeFichier = typeFichier;
     return this.prisma.fichier.findMany({
-      where: { entityType, entityId },
+      where,
       orderBy: { uploadedAt: 'desc' },
+      include: { uploadedBy: { select: { id: true, nom: true, prenom: true } } },
     });
   }
 

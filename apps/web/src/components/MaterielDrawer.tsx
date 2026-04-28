@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import type { Materiel, Evenement } from "@ogade/shared";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Materiel, Evenement, Fichier } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 
@@ -401,6 +401,406 @@ function HistoriqueTab({ materielId }: { materielId: number }) {
   );
 }
 
+// ─── PIECES JOINTES TAB ───────────────────────────────────────────────────
+function formatSize(bytes: number | null): string {
+  if (!bytes) return "—";
+  if (bytes < 1024) return `${bytes} o`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} Ko`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
+
+function fileExtIcon(name: string | null): string {
+  if (!name) return "DOC";
+  const ext = name.split(".").pop()?.toUpperCase() ?? "DOC";
+  return ext.length <= 4 ? ext : "DOC";
+}
+
+function PiecesJointesTab({ materielId }: { materielId: number }) {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const { data: fichiers, isLoading } = useQuery<Fichier[]>({
+    queryKey: ["fichiers", "MATERIEL", materielId, "DOCUMENT"],
+    queryFn: () => api.get(`/fichiers/entity/MATERIEL/${materielId}`, { typeFichier: "DOCUMENT" }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/fichiers/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fichiers", "MATERIEL", materielId, "DOCUMENT"] }),
+  });
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("entityType", "MATERIEL");
+        fd.append("entityId", String(materielId));
+        fd.append("typeFichier", "DOCUMENT");
+        await api.upload("/fichiers/upload", fd);
+      }
+      queryClient.invalidateQueries({ queryKey: ["fichiers", "MATERIEL", materielId, "DOCUMENT"] });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDownload = async (f: Fichier) => {
+    const blob = await api.fetchBlob(`/fichiers/${f.id}/download`);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = f.nomOriginal ?? f.blobKey;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const fmtDate = (d: string | Date) =>
+    new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+  return (
+    <DrawerSection title="Pièces jointes">
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        style={{ display: "none" }}
+        onChange={handleUpload}
+      />
+      <div
+        className="upload-zone"
+        onClick={() => fileInputRef.current?.click()}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (e.dataTransfer.files.length > 0) {
+            const dt = new DataTransfer();
+            Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f));
+            if (fileInputRef.current) {
+              fileInputRef.current.files = dt.files;
+              fileInputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          }
+        }}
+      >
+        {uploading ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13 }}>
+            <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+            Envoi en cours...
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", color: "var(--ink-3)" }}>
+            <Icon name="clip" size={20} />
+            <div style={{ fontSize: 12, marginTop: 6 }}>Cliquer ou glisser-déposer un fichier</div>
+          </div>
+        )}
+      </div>
+
+      {isLoading && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 0", color: "var(--ink-3)", fontSize: 13 }}>
+          <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+          Chargement...
+        </div>
+      )}
+
+      {fichiers && fichiers.length > 0 && (
+        <div className="attach-list" style={{ marginTop: 12 }}>
+          {fichiers.map((f) => (
+            <div key={f.id} className="attach">
+              <div className="attach-icon">{fileExtIcon(f.nomOriginal)}</div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div className="attach-name" title={f.nomOriginal ?? f.blobKey}>
+                  {f.nomOriginal ?? f.blobKey}
+                </div>
+                <div className="attach-meta">
+                  {formatSize(f.tailleOctets)} · {fmtDate(f.uploadedAt)}
+                  {f.uploadedBy ? ` · ${f.uploadedBy.prenom} ${f.uploadedBy.nom}` : ""}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                <button className="icon-btn" style={{ padding: 5 }} onClick={() => handleDownload(f)}>
+                  <Icon name="dl" size={12} />
+                </button>
+                <button
+                  className="icon-btn"
+                  style={{ padding: 5, color: "var(--rose)" }}
+                  onClick={() => { if (confirm("Supprimer ce fichier ?")) deleteMutation.mutate(f.id); }}
+                >
+                  <Icon name="x" size={12} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {fichiers && fichiers.length === 0 && !isLoading && (
+        <p style={{ fontSize: 13, color: "var(--ink-3)", margin: "12px 0 0" }}>Aucune pièce jointe.</p>
+      )}
+    </DrawerSection>
+  );
+}
+
+// ─── PHOTOS TAB ───────────────────────────────────────────────────────────
+const PHOTO_CONTEXTS: { value: string; label: string }[] = [
+  { value: "GENERAL", label: "Photo générale" },
+  { value: "ENVOI", label: "Photo envoi" },
+  { value: "RECEPTION", label: "Photo réception" },
+  { value: "PRET", label: "Photo prêt" },
+  { value: "ETALONNAGE", label: "Photo étalonnage" },
+  { value: "DEFAUT", label: "Photo défaut" },
+];
+
+function PhotosTab({ materielId }: { materielId: number }) {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [selectedContext, setSelectedContext] = useState("GENERAL");
+  const [lightbox, setLightbox] = useState<Fichier | null>(null);
+
+  const { data: photos, isLoading } = useQuery<Fichier[]>({
+    queryKey: ["fichiers", "MATERIEL", materielId, "PHOTO"],
+    queryFn: () => api.get(`/fichiers/entity/MATERIEL/${materielId}`, { typeFichier: "PHOTO" }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/fichiers/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["fichiers", "MATERIEL", materielId, "PHOTO"] }),
+  });
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("entityType", "MATERIEL");
+        fd.append("entityId", String(materielId));
+        fd.append("typeFichier", "PHOTO");
+        fd.append("context", selectedContext);
+        await api.upload("/fichiers/upload", fd);
+      }
+      queryClient.invalidateQueries({ queryKey: ["fichiers", "MATERIEL", materielId, "PHOTO"] });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const fmtDate = (d: string | Date) =>
+    new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+  const contextLabel = (ctx: string | null) =>
+    PHOTO_CONTEXTS.find((c) => c.value === ctx)?.label ?? ctx ?? "Photo";
+
+  return (
+    <>
+      <DrawerSection title="Photos du matériel">
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
+            Contexte de la photo
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {PHOTO_CONTEXTS.map((ctx) => (
+              <button
+                key={ctx.value}
+                className={`tag-btn${selectedContext === ctx.value ? " on" : ""}`}
+                onClick={() => setSelectedContext(ctx.value)}
+              >
+                {ctx.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: "none" }}
+          onChange={handleUpload}
+        />
+        <div
+          className="upload-zone"
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length > 0) {
+              const dt = new DataTransfer();
+              Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f));
+              if (fileInputRef.current) {
+                fileInputRef.current.files = dt.files;
+                fileInputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+              }
+            }
+          }}
+        >
+          {uploading ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 13 }}>
+              <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+              Envoi en cours...
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", color: "var(--ink-3)" }}>
+              <Icon name="photo" size={20} />
+              <div style={{ fontSize: 12, marginTop: 6 }}>Cliquer ou glisser-déposer une photo</div>
+            </div>
+          )}
+        </div>
+
+        {isLoading && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 0", color: "var(--ink-3)", fontSize: 13 }}>
+            <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+            Chargement...
+          </div>
+        )}
+
+        {photos && photos.length > 0 && (
+          <div className="photo-grid" style={{ marginTop: 12 }}>
+            {photos.map((p) => (
+              <PhotoThumb
+                key={p.id}
+                fichier={p}
+                label={`${contextLabel(p.context)} · ${fmtDate(p.uploadedAt)}`}
+                onClick={() => setLightbox(p)}
+                onDelete={() => { if (confirm("Supprimer cette photo ?")) deleteMutation.mutate(p.id); }}
+              />
+            ))}
+          </div>
+        )}
+
+        {photos && photos.length === 0 && !isLoading && (
+          <p style={{ fontSize: 13, color: "var(--ink-3)", margin: "12px 0 0" }}>Aucune photo.</p>
+        )}
+      </DrawerSection>
+
+      {lightbox && (
+        <PhotoLightbox fichier={lightbox} onClose={() => setLightbox(null)} contextLabel={contextLabel(lightbox.context)} />
+      )}
+    </>
+  );
+}
+
+function PhotoThumb({
+  fichier,
+  label,
+  onClick,
+  onDelete,
+}: {
+  fichier: Fichier;
+  label: string;
+  onClick: () => void;
+  onDelete: () => void;
+}) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    let revoke: string | null = null;
+    api.fetchBlob(`/fichiers/${fichier.id}/download`).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      revoke = url;
+      setSrc(url);
+    }).catch(() => {});
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [fichier.id]);
+
+  return (
+    <div className="photo has-img" style={{ position: "relative", cursor: "pointer" }} onClick={onClick}>
+      {src ? (
+        <img src={src} alt={fichier.nomOriginal ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} />
+      ) : (
+        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", background: "var(--bg-sunken)", borderRadius: 8 }}>
+          <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+        </div>
+      )}
+      <span className="photo-label">{label}</span>
+      <button
+        className="icon-btn"
+        style={{ position: "absolute", top: 4, right: 4, background: "rgba(0,0,0,0.5)", color: "white", borderRadius: 6, padding: 3, width: 22, height: 22 }}
+        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+      >
+        <Icon name="x" size={10} />
+      </button>
+    </div>
+  );
+}
+
+function PhotoLightbox({
+  fichier,
+  onClose,
+  contextLabel,
+}: {
+  fichier: Fichier;
+  onClose: () => void;
+  contextLabel: string;
+}) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    let revoke: string | null = null;
+    api.fetchBlob(`/fichiers/${fichier.id}/download`).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      revoke = url;
+      setSrc(url);
+    }).catch(() => {});
+    return () => { if (revoke) URL.revokeObjectURL(revoke); };
+  }, [fichier.id]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const handleDownload = () => {
+    if (!src) return;
+    const a = document.createElement("a");
+    a.href = src;
+    a.download = fichier.nomOriginal ?? "photo.jpg";
+    a.click();
+  };
+
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.85)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+      onClick={onClose}
+    >
+      <div style={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 8 }}>
+        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={(e) => { e.stopPropagation(); handleDownload(); }}>
+          <Icon name="dl" size={13} />
+          Télécharger
+        </button>
+        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={onClose}>
+          <Icon name="x" size={13} />
+          Fermer
+        </button>
+      </div>
+      {src ? (
+        <img
+          src={src}
+          alt={fichier.nomOriginal ?? ""}
+          style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8, boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : (
+        <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.2)", borderTopColor: "white", animation: "spin 0.7s linear infinite" }} />
+      )}
+      <div style={{ marginTop: 12, color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
+        {contextLabel} · {fichier.nomOriginal}
+      </div>
+    </div>
+  );
+}
+
 // ─── TAB TYPE ──────────────────────────────────────────────────────────────
 type TabId = "infos" | "pj" | "photos" | "etat" | "historique" | "qr";
 
@@ -662,52 +1062,10 @@ export default function MaterielDrawer({
           )}
 
           {/* ── Tab: Pièces jointes ── */}
-          {tab === "pj" && (
-            <DrawerSection title="Pièces jointes">
-              <div className="attach-list">
-                {[
-                  { nom: `Certificat-etalonnage-${m.reference}.pdf`, taille: "1.4 Mo" },
-                  { nom: `Notice-${m.modele ?? m.libelle}.pdf`,       taille: "3.2 Mo" },
-                  { nom: `FIEC-${m.numeroFIEC ?? "N-A"}.pdf`,         taille: "820 Ko" },
-                ].map((p, i) => (
-                  <div key={i} className="attach">
-                    <div className="attach-icon">PDF</div>
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div className="attach-name" title={p.nom}>
-                        {p.nom}
-                      </div>
-                      <div className="attach-meta">{p.taille}</div>
-                    </div>
-                    <button className="icon-btn" style={{ padding: 5 }}>
-                      <Icon name="dl" size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </DrawerSection>
-          )}
+          {tab === "pj" && <PiecesJointesTab materielId={m.id} />}
 
           {/* ── Tab: Photos ── */}
-          {tab === "photos" && (
-            <DrawerSection title="Photos du matériel">
-              <div className="photo-grid">
-                <div className="photo has-img">
-                  <span className="photo-label">Photo envoi · 12/03/2026</span>
-                </div>
-                <div className="photo has-img">
-                  <span className="photo-label">Photo réception · 18/03/2026</span>
-                </div>
-                <div className="photo">
-                  <div style={{ textAlign: "center", color: "var(--ink-3)" }}>
-                    <Icon name="photo" size={20} />
-                    <div className="xs" style={{ marginTop: 6 }}>
-                      Ajouter une photo
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DrawerSection>
-          )}
+          {tab === "photos" && <PhotosTab materielId={m.id} />}
 
           {/* ── Tab: État · Complétude ── */}
           {tab === "etat" && (
