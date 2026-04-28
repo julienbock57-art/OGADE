@@ -402,3 +402,19 @@ tr.row-selected td { border-bottom-color: var(--accent-line); }
 
 /* Spinner */
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Validation error states */
+.oinput.has-error, .oselect.has-error, .otextarea.has-error {
+  border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-soft);
+}
+.field-label.has-error { color: var(--rose); }
+.wizard-step { cursor: pointer; }
+.wizard-step:hover .num { transform: scale(1.05); }
+.wizard-step.has-error .bar { background: var(--rose); }
+.wizard-step.has-error .num { background: var(--rose); border-color: var(--rose); color: white; }
+.wizard-step.has-error .wlabel { color: var(--rose); }
+.required-group-error {
+  padding: 4px; border: 1px solid var(--rose); border-radius: 6px;
+  box-shadow: 0 0 0 3px var(--rose-soft);
+}
+.field-error { font-size: 11px; color: var(--rose); margin-top: 4px; }

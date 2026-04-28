@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -74,6 +74,100 @@ function computeEcheance(dateEtalonnage: string | undefined, validite: number | 
   return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
+/* ─── Searchable select (combobox) ──────────────────────────────── */
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  hasError,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { code: string; label: string }[];
+  placeholder?: string;
+  hasError?: boolean;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = options.find((o) => o.code === value);
+  const filtered = query
+    ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <input
+        type="text"
+        className={`oinput ${hasError ? "has-error" : ""}`}
+        placeholder={placeholder ?? "Rechercher..."}
+        value={open ? query : selected?.label ?? ""}
+        onFocus={() => {
+          setOpen(true);
+          setQuery("");
+        }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
+      />
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            background: "var(--bg-panel)",
+            border: "1px solid var(--line)",
+            borderRadius: 8,
+            maxHeight: 220,
+            overflowY: "auto",
+            boxShadow: "0 8px 24px rgba(0,0,0,.10)",
+          }}
+        >
+          {filtered.length === 0 ? (
+            <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--ink-3)" }}>
+              Aucun résultat
+            </div>
+          ) : (
+            filtered.map((o) => (
+              <div
+                key={o.code}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(o.code);
+                  setOpen(false);
+                  setQuery("");
+                }}
+                style={{
+                  padding: "8px 12px",
+                  fontSize: 13,
+                  cursor: "default",
+                  background: value === o.code ? "var(--accent-soft)" : "transparent",
+                }}
+              >
+                {o.label}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Main component ────────────────────────────────────────────── */
 export default function MaterielFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -82,6 +176,7 @@ export default function MaterielFormPage() {
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(0);
+  const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
 
   /* ── Data fetching ─────────────────────────────────────────────── */
   const { data: existing, isLoading: loadingExisting } = useQuery<Materiel>({
@@ -93,6 +188,8 @@ export default function MaterielFormPage() {
   const { data: etats } = useReferentiel("ETAT_MATERIEL");
   const { data: typesEnd } = useReferentiel("TYPE_END");
   const { data: typesMat } = useReferentiel("TYPE_MATERIEL");
+  const { data: typesTraducteur } = useReferentiel("TYPE_TRADUCTEUR");
+  const { data: lotsChaines } = useReferentiel("LOT_CHAINE");
   const { data: groupes } = useReferentiel("GROUPE");
   const { data: completudes } = useReferentiel("COMPLETUDE");
   const { data: motifsPret } = useReferentiel("MOTIF_PRET");
@@ -202,8 +299,14 @@ export default function MaterielFormPage() {
   });
 
   const onSubmit = (data: CreateMaterielInput & { etat?: string }) => {
+    const computedLibelle =
+      data.libelle ||
+      `${data.typeMateriel ?? ""} ${data.modele ?? ""}`.trim() ||
+      data.reference;
     const cleaned = Object.fromEntries(
-      Object.entries(data).filter(([, v]) => v !== "" && v !== undefined),
+      Object.entries({ ...data, libelle: computedLibelle }).filter(
+        ([, v]) => v !== "" && v !== undefined,
+      ),
     );
     if (isEdit) {
       updateMutation.mutate(cleaned as UpdateMaterielInput);
@@ -238,6 +341,43 @@ export default function MaterielFormPage() {
   const wCompletude = watchedValues.completude ?? "";
 
   const echeanceDisplay = computeEcheance(wDateEtalonnage, wValidite);
+
+  /* ── Validation ─────────────────────────────────────────────────── */
+  const stepRequired: Record<number, string[]> = {
+    0: ["reference", "typeMateriel", "typeEND"],
+    1: ["groupe", "site", "entreprise", "responsableId"],
+    3: ["etat", "completude"],
+  };
+
+  const stepHasErrors = (s: number): boolean => {
+    const required = stepRequired[s] ?? [];
+    return required.some((field) => {
+      const v = (watchedValues as Record<string, unknown>)[field];
+      return v === undefined || v === null || v === "";
+    });
+  };
+
+  const handleNext = () => {
+    if (stepHasErrors(step)) {
+      setTriedAdvance((prev) => new Set(prev).add(step));
+      return;
+    }
+    setStep(step + 1);
+  };
+
+  const handleFinalSubmit = () => {
+    const stepsWithErrors = [0, 1, 3].filter((s) => stepHasErrors(s));
+    if (stepsWithErrors.length > 0) {
+      setTriedAdvance((prev) => {
+        const next = new Set(prev);
+        stepsWithErrors.forEach((s) => next.add(s));
+        return next;
+      });
+      setStep(stepsWithErrors[0]);
+      return;
+    }
+    handleSubmit(onSubmit)();
+  };
 
   const responsableLabel =
     wResponsableId
@@ -307,20 +447,31 @@ export default function MaterielFormPage() {
           }}
         >
           <div className="wizard-steps">
-            {STEPS.map((s, i) => (
-              <div
-                key={i}
-                className={`wizard-step ${i < step ? "done" : i === step ? "current" : ""}`}
-              >
-                <div className="bar" />
-                <div className="wlabel">
-                  <span className="num">
-                    {i < step ? <Icon name="check" size={10} stroke={3} /> : i + 1}
-                  </span>
-                  {s}
+            {STEPS.map((s, i) => {
+              const hasErr = triedAdvance.has(i) && stepHasErrors(i);
+              const cls = hasErr
+                ? "has-error"
+                : i < step
+                  ? "done"
+                  : i === step
+                    ? "current"
+                    : "";
+              return (
+                <div
+                  key={i}
+                  className={`wizard-step ${cls}`}
+                  onClick={() => setStep(i)}
+                >
+                  <div className="bar" />
+                  <div className="wlabel">
+                    <span className="num">
+                      {hasErr ? "!" : i < step ? <Icon name="check" size={10} stroke={3} /> : i + 1}
+                    </span>
+                    {s}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -363,13 +514,20 @@ export default function MaterielFormPage() {
             <div className="form-grid">
               {/* ID matériel */}
               <div className="field">
-                <label className="field-label">ID matériel *</label>
+                <label
+                  className={`field-label ${triedAdvance.has(0) && !wRef ? "has-error" : ""}`}
+                >
+                  ID matériel *
+                </label>
                 <input
                   type="text"
                   {...register("reference")}
-                  className="oinput mono"
+                  className={`oinput mono ${triedAdvance.has(0) && !wRef ? "has-error" : ""}`}
                   placeholder="ex. 11740RT"
                 />
+                {triedAdvance.has(0) && !wRef && (
+                  <p className="field-error">Champ requis</p>
+                )}
                 {errors.reference && (
                   <span style={{ fontSize: 11, color: "var(--rose)", marginTop: 2 }}>
                     {errors.reference.message}
@@ -390,8 +548,15 @@ export default function MaterielFormPage() {
 
               {/* Type de matériel */}
               <div className="field">
-                <label className="field-label">Type de matériel *</label>
-                <select {...register("typeMateriel")} className="oselect">
+                <label
+                  className={`field-label ${triedAdvance.has(0) && !wTypeMat ? "has-error" : ""}`}
+                >
+                  Type de matériel *
+                </label>
+                <select
+                  {...register("typeMateriel")}
+                  className={`oselect ${triedAdvance.has(0) && !wTypeMat ? "has-error" : ""}`}
+                >
                   <option value="">Sélectionner...</option>
                   {(typesMat ?? []).map((o) => (
                     <option key={o.code} value={o.code}>
@@ -399,6 +564,9 @@ export default function MaterielFormPage() {
                     </option>
                   ))}
                 </select>
+                {triedAdvance.has(0) && !wTypeMat && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Modèle */}
@@ -438,8 +606,15 @@ export default function MaterielFormPage() {
 
               {/* Type d'END */}
               <div className="field full">
-                <label className="field-label">Type d'END *</label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}>
+                <label
+                  className={`field-label ${triedAdvance.has(0) && !wTypeEND ? "has-error" : ""}`}
+                >
+                  Type d'END *
+                </label>
+                <div
+                  className={triedAdvance.has(0) && !wTypeEND ? "required-group-error" : ""}
+                  style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}
+                >
                   {(typesEnd ?? []).map((t) => (
                     <button
                       key={t.code}
@@ -451,28 +626,35 @@ export default function MaterielFormPage() {
                     </button>
                   ))}
                 </div>
+                {triedAdvance.has(0) && !wTypeEND && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Type traducteur */}
               <div className="field">
                 <label className="field-label">Type traducteur</label>
-                <input
-                  type="text"
-                  {...register("typeTraducteur")}
-                  className="oinput"
-                  placeholder="ex. angle 45°"
-                />
+                <select {...register("typeTraducteur")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {(typesTraducteur ?? []).map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Lot / chaîne */}
               <div className="field">
                 <label className="field-label">Lot / chaîne</label>
-                <input
-                  type="text"
-                  {...register("lotChaine")}
-                  className="oinput mono"
-                  placeholder="LOT-123"
-                />
+                <select {...register("lotChaine")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {(lotsChaines ?? []).map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
@@ -482,8 +664,15 @@ export default function MaterielFormPage() {
             <div className="form-grid">
               {/* Groupe */}
               <div className="field">
-                <label className="field-label">Groupe *</label>
-                <select {...register("groupe")} className="oselect">
+                <label
+                  className={`field-label ${triedAdvance.has(1) && !wGroupe ? "has-error" : ""}`}
+                >
+                  Groupe *
+                </label>
+                <select
+                  {...register("groupe")}
+                  className={`oselect ${triedAdvance.has(1) && !wGroupe ? "has-error" : ""}`}
+                >
                   <option value="">Sélectionner...</option>
                   {(groupes ?? []).map((o) => (
                     <option key={o.code} value={o.code}>
@@ -491,12 +680,22 @@ export default function MaterielFormPage() {
                     </option>
                   ))}
                 </select>
+                {triedAdvance.has(1) && !wGroupe && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Site */}
               <div className="field">
-                <label className="field-label">Site *</label>
-                <select {...register("site")} className="oselect">
+                <label
+                  className={`field-label ${triedAdvance.has(1) && !wSite ? "has-error" : ""}`}
+                >
+                  Site *
+                </label>
+                <select
+                  {...register("site")}
+                  className={`oselect ${triedAdvance.has(1) && !wSite ? "has-error" : ""}`}
+                >
                   <option value="">Sélectionner...</option>
                   {siteOptions.map((o) => (
                     <option key={o.code} value={o.code}>
@@ -504,12 +703,22 @@ export default function MaterielFormPage() {
                     </option>
                   ))}
                 </select>
+                {triedAdvance.has(1) && !wSite && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Entreprise */}
               <div className="field">
-                <label className="field-label">Entreprise *</label>
-                <select {...register("entreprise")} className="oselect">
+                <label
+                  className={`field-label ${triedAdvance.has(1) && !wEntreprise ? "has-error" : ""}`}
+                >
+                  Entreprise *
+                </label>
+                <select
+                  {...register("entreprise")}
+                  className={`oselect ${triedAdvance.has(1) && !wEntreprise ? "has-error" : ""}`}
+                >
                   <option value="">Sélectionner...</option>
                   {entrepriseOptions.map((o) => (
                     <option key={o.code} value={o.code}>
@@ -517,24 +726,28 @@ export default function MaterielFormPage() {
                     </option>
                   ))}
                 </select>
+                {triedAdvance.has(1) && !wEntreprise && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Responsable */}
               <div className="field">
-                <label className="field-label">Responsable *</label>
-                <select
-                  {...register("responsableId", {
-                    setValueAs: (v: string) => (v ? Number(v) : undefined),
-                  })}
-                  className="oselect"
+                <label
+                  className={`field-label ${triedAdvance.has(1) && !wResponsableId ? "has-error" : ""}`}
                 >
-                  <option value="">Sélectionner...</option>
-                  {agentOptions.map((o) => (
-                    <option key={o.code} value={o.code}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  Responsable *
+                </label>
+                <SearchableSelect
+                  value={wResponsableId ? String(wResponsableId) : ""}
+                  onChange={(v) => setValue("responsableId", v ? Number(v) : undefined)}
+                  options={agentOptions}
+                  placeholder="Rechercher un agent..."
+                  hasError={triedAdvance.has(1) && !wResponsableId}
+                />
+                {triedAdvance.has(1) && !wResponsableId && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Compléments de localisation */}
@@ -645,8 +858,15 @@ export default function MaterielFormPage() {
             <div className="form-grid">
               {/* État du matériel */}
               <div className="field">
-                <label className="field-label">État du matériel *</label>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+                <label
+                  className={`field-label ${triedAdvance.has(3) && !wEtat ? "has-error" : ""}`}
+                >
+                  État du matériel *
+                </label>
+                <div
+                  className={triedAdvance.has(3) && !wEtat ? "required-group-error" : ""}
+                  style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}
+                >
                   {(etats ?? []).map((e) => {
                     const colorCls = etatColor[e.code] ?? "c-neutral";
                     const isOn = wEtat === e.code;
@@ -665,12 +885,22 @@ export default function MaterielFormPage() {
                     );
                   })}
                 </div>
+                {triedAdvance.has(3) && !wEtat && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Complétude */}
               <div className="field">
-                <label className="field-label">Complétude *</label>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+                <label
+                  className={`field-label ${triedAdvance.has(3) && !wCompletude ? "has-error" : ""}`}
+                >
+                  Complétude *
+                </label>
+                <div
+                  className={triedAdvance.has(3) && !wCompletude ? "required-group-error" : ""}
+                  style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}
+                >
                   {(completudes ?? []).map((c) => {
                     const colorCls = completudeColor[c.code] ?? "c-neutral";
                     const isOn = wCompletude === c.code;
@@ -689,6 +919,9 @@ export default function MaterielFormPage() {
                     );
                   })}
                 </div>
+                {triedAdvance.has(3) && !wCompletude && (
+                  <p className="field-error">Champ requis</p>
+                )}
               </div>
 
               {/* Commentaire état */}
@@ -846,7 +1079,7 @@ export default function MaterielFormPage() {
               <button
                 type="button"
                 className="obtn accent"
-                onClick={() => setStep(step + 1)}
+                onClick={handleNext}
               >
                 Suivant
                 <Icon name="chevR" size={13} />
@@ -856,7 +1089,7 @@ export default function MaterielFormPage() {
                 type="button"
                 className="obtn accent"
                 disabled={isSubmitting}
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleFinalSubmit}
               >
                 <Icon name="check" size={13} stroke={2.5} />
                 {isSubmitting
