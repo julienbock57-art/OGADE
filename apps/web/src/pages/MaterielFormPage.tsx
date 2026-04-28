@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,62 +19,71 @@ import {
 
 type Agent = { id: number; nom: string; prenom: string; email: string };
 
-const labelStyle: React.CSSProperties = {
-  display: "block", fontSize: 12, fontWeight: 500,
-  color: "var(--ink-2)", marginBottom: 5,
+/* ─── Icon component ────────────────────────────────────────────── */
+function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
+  const paths: Record<string, string> = {
+    x: "M5 5l10 10M15 5L5 15",
+    check: "M4 10l4 4 8-8",
+    chevR: "M7 5l5 5-5 5",
+    chevL: "M13 5l-5 5 5 5",
+    alert: "M10 3l7 14H3L10 3z M10 9v4 M10 15v.5",
+    photo: "M4 15l4-4 3 3 3-4 4 5H4z M15 7a2 2 0 1 0-4 0 2 2 0 0 0 4 0z M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z",
+    upload: "M10 14V6 M6 10l4-4 4 4 M4 16h12",
+  };
+  const d = paths[name] ?? "";
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={stroke}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {d.split(" M").map((p, i) => (
+        <path key={i} d={i === 0 ? p : "M" + p} />
+      ))}
+    </svg>
+  );
+}
+
+/* ─── Helpers ───────────────────────────────────────────────────── */
+const STEPS = ["Identité", "Localisation", "Étalonnage", "État & PJ", "Revue"];
+
+// Maps etat code → pill color class
+const etatColor: Record<string, string> = {
+  CORRECT: "c-emerald",
+  LEGER_DEFAUT: "c-amber",
+  HS: "c-rose",
+  PERDU: "c-neutral",
 };
-const errorStyle: React.CSSProperties = { fontSize: 11, color: "var(--rose)", marginTop: 4 };
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px" }}>
-      <h2 style={{
-        fontSize: 11, fontWeight: 600, textTransform: "uppercase",
-        letterSpacing: "0.06em", color: "var(--ink-3)",
-        margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)",
-      }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
+// Maps completude code → pill color class
+const completudeColor: Record<string, string> = {
+  COMPLET: "c-emerald",
+  INCOMPLET: "c-amber",
+};
+
+function computeEcheance(dateEtalonnage: string | undefined, validite: number | undefined): string {
+  if (!dateEtalonnage || !validite || isNaN(validite)) return "—";
+  const d = new Date(dateEtalonnage);
+  if (isNaN(d.getTime())) return "—";
+  d.setMonth(d.getMonth() + validite);
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-function RefSelect({
-  label,
-  registration,
-  options,
-  placeholder,
-  error,
-}: {
-  label: string;
-  registration: ReturnType<ReturnType<typeof useForm>["register"]>;
-  options: { code: string; label: string }[];
-  placeholder?: string;
-  error?: string;
-}) {
-  return (
-    <div>
-      <label style={labelStyle}>{label}</label>
-      <select {...registration} className="oselect">
-        <option value="">{placeholder ?? `Sélectionner ${label.toLowerCase()}...`}</option>
-        {options.map((o) => (
-          <option key={o.code} value={o.code}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-      {error && <p style={errorStyle}>{error}</p>}
-    </div>
-  );
-}
-
+/* ─── Main component ────────────────────────────────────────────── */
 export default function MaterielFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const [step, setStep] = useState(0);
+
+  /* ── Data fetching ─────────────────────────────────────────────── */
   const { data: existing, isLoading: loadingExisting } = useQuery<Materiel>({
     queryKey: ["materiels", id],
     queryFn: () => api.get(`/materiels/${id}`),
@@ -84,11 +93,9 @@ export default function MaterielFormPage() {
   const { data: etats } = useReferentiel("ETAT_MATERIEL");
   const { data: typesEnd } = useReferentiel("TYPE_END");
   const { data: typesMat } = useReferentiel("TYPE_MATERIEL");
-  const { data: typesTraducteur } = useReferentiel("TYPE_TRADUCTEUR");
   const { data: groupes } = useReferentiel("GROUPE");
   const { data: completudes } = useReferentiel("COMPLETUDE");
   const { data: motifsPret } = useReferentiel("MOTIF_PRET");
-  const { data: lotsChaines } = useReferentiel("LOT_CHAINE");
   const { data: sites } = useSites();
   const { data: fournisseurs } = useEntreprises("FOURNISSEUR");
   const { data: entreprises } = useEntreprises("ENTREPRISE");
@@ -102,17 +109,27 @@ export default function MaterielFormPage() {
     label: `${a.prenom} ${a.nom}`,
   }));
 
-  const siteOptions = (sites ?? []).map((s) => ({ code: s.code, label: `${s.label}${s.ville ? ` — ${s.ville}` : ""}` }));
+  const siteOptions = (sites ?? []).map((s) => ({
+    code: s.code,
+    label: `${s.label}${s.ville ? ` — ${s.ville}` : ""}`,
+  }));
   const fournisseurOptions = (fournisseurs ?? []).map((e) => ({ code: e.code, label: e.label }));
   const entrepriseOptions = (entreprises ?? []).map((e) => ({ code: e.code, label: e.label }));
 
+  /* ── Form ──────────────────────────────────────────────────────── */
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CreateMaterielInput & { etat?: string }>({
     resolver: zodResolver(isEdit ? updateMaterielSchema : createMaterielSchema),
+    defaultValues: {
+      soumisVerification: true,
+      enPret: false,
+    },
   });
 
   useEffect(() => {
@@ -126,10 +143,14 @@ export default function MaterielFormPage() {
         site: existing.site ?? "",
         description: existing.description ?? undefined,
         dateEtalonnage: existing.dateEtalonnage
-          ? new Date(existing.dateEtalonnage)
+          ? (typeof existing.dateEtalonnage === "string"
+            ? existing.dateEtalonnage.slice(0, 10)
+            : new Date(existing.dateEtalonnage).toISOString().slice(0, 10)) as unknown as Date
           : undefined,
         dateProchainEtalonnage: existing.dateProchainEtalonnage
-          ? new Date(existing.dateProchainEtalonnage)
+          ? (typeof existing.dateProchainEtalonnage === "string"
+            ? existing.dateProchainEtalonnage.slice(0, 10)
+            : new Date(existing.dateProchainEtalonnage).toISOString().slice(0, 10)) as unknown as Date
           : undefined,
         etat: existing.etat,
         modele: existing.modele ?? undefined,
@@ -142,7 +163,9 @@ export default function MaterielFormPage() {
         enPret: existing.enPret ?? false,
         motifPret: existing.motifPret ?? "",
         dateRetourPret: existing.dateRetourPret
-          ? new Date(existing.dateRetourPret)
+          ? (typeof existing.dateRetourPret === "string"
+            ? existing.dateRetourPret.slice(0, 10)
+            : new Date(existing.dateRetourPret).toISOString().slice(0, 10)) as unknown as Date
           : undefined,
         completude: existing.completude ?? "",
         informationVerifiee: existing.informationVerifiee ?? false,
@@ -161,9 +184,9 @@ export default function MaterielFormPage() {
     }
   }, [existing, reset]);
 
+  /* ── Mutations ─────────────────────────────────────────────────── */
   const createMutation = useMutation({
-    mutationFn: (data: CreateMaterielInput) =>
-      api.post<Materiel>("/materiels", data),
+    mutationFn: (data: CreateMaterielInput) => api.post<Materiel>("/materiels", data),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["materiels"] });
       navigate(`/materiels/${result.id}`);
@@ -171,8 +194,7 @@ export default function MaterielFormPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: UpdateMaterielInput) =>
-      api.patch<Materiel>(`/materiels/${id}`, data),
+    mutationFn: (data: UpdateMaterielInput) => api.patch<Materiel>(`/materiels/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["materiels"] });
       navigate(`/materiels/${id}`);
@@ -192,228 +214,661 @@ export default function MaterielFormPage() {
 
   const mutationError = createMutation.error || updateMutation.error;
 
+  /* ── Watched values ─────────────────────────────────────────────── */
+  const watchedValues = watch();
+  const wRef = watchedValues.reference ?? "";
+  const wFiec = watchedValues.numeroFIEC ?? "";
+  const wTypeMat = watchedValues.typeMateriel ?? "";
+  const wModele = watchedValues.modele ?? "";
+  const wTypeEND = watchedValues.typeEND ?? "";
+  const wTypeTraducteur = watchedValues.typeTraducteur ?? "";
+  const wFournisseur = watchedValues.fournisseur ?? "";
+  const wProprietaire = watchedValues.proprietaire ?? "";
+  const wLotChaine = watchedValues.lotChaine ?? "";
+  const wGroupe = watchedValues.groupe ?? "";
+  const wSite = watchedValues.site ?? "";
+  const wEntreprise = watchedValues.entreprise ?? "";
+  const wResponsableId = watchedValues.responsableId;
+  const wSoumis = watchedValues.soumisVerification ?? true;
+  const wEnPret = watchedValues.enPret ?? false;
+  const wMotifPret = watchedValues.motifPret ?? "";
+  const wValidite = watchedValues.validiteEtalonnage;
+  const wDateEtalonnage = watchedValues.dateEtalonnage as unknown as string | undefined;
+  const wEtat = watchedValues.etat ?? "";
+  const wCompletude = watchedValues.completude ?? "";
+
+  const echeanceDisplay = computeEcheance(wDateEtalonnage, wValidite);
+
+  const responsableLabel =
+    wResponsableId
+      ? agentOptions.find((a) => a.code === String(wResponsableId))?.label ?? String(wResponsableId)
+      : "—";
+
+  const etatLabel = (etats?.find((e) => e.code === wEtat)?.label ?? wEtat) || "—";
+  const completudeLabel = (completudes?.find((c) => c.code === wCompletude)?.label ?? wCompletude) || "—";
+  const motifPretLabel = (motifsPret?.find((m) => m.code === wMotifPret)?.label ?? wMotifPret) || "—";
+
+  /* ── Loading state ─────────────────────────────────────────────── */
   if (isEdit && loadingExisting) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 0" }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: "50%",
-          border: "2.5px solid var(--accent-soft)",
-          borderTopColor: "var(--accent)",
-          animation: "spin 0.7s linear infinite",
-        }} />
+      <div className="modal-backdrop">
+        <div className="modal" style={{ alignItems: "center", justifyContent: "center", minHeight: 300 }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              border: "2.5px solid var(--accent-soft)",
+              borderTopColor: "var(--accent)",
+              animation: "spin 0.7s linear infinite",
+            }}
+          />
+        </div>
       </div>
     );
   }
 
+  /* ── Render ─────────────────────────────────────────────────────── */
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <button
-          onClick={() => navigate(-1)}
-          style={{ color: "var(--ink-3)", background: "none", border: 0, padding: 4, cursor: "pointer", display: "flex", alignItems: "center" }}
-        >
-          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
-            {isEdit ? "Modifier le matériel" : "Nouveau matériel END"}
-          </h1>
-        </div>
-      </div>
-
-      {mutationError && (
-        <div style={{
-          marginBottom: 20, padding: "12px 16px",
-          background: "var(--rose-soft)",
-          border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
-          color: "var(--rose)", borderRadius: 10, fontSize: 13,
-          display: "flex", alignItems: "flex-start", gap: 8,
-        }}>
-          <svg width="16" height="16" style={{ flexShrink: 0, marginTop: 1 }} fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-          </svg>
-          {mutationError.message}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        {/* Identification */}
-        <SectionCard title="Identification">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
-            <div>
-              <label style={labelStyle}>Référence *</label>
-              <input type="text" {...register("reference")} className="oinput" placeholder="Ex: MAT-2026-001" />
-              {errors.reference && <p style={errorStyle}>{errors.reference.message}</p>}
-            </div>
-            <div>
-              <label style={labelStyle}>Libellé *</label>
-              <input type="text" {...register("libelle")} className="oinput" placeholder="Nom du matériel" />
-              {errors.libelle && <p style={errorStyle}>{errors.libelle.message}</p>}
-            </div>
-            <div>
-              <label style={labelStyle}>Numéro de série</label>
-              <input type="text" {...register("numeroSerie")} className="oinput" />
-            </div>
-            <div>
-              <label style={labelStyle}>Modèle</label>
-              <input type="text" {...register("modele")} className="oinput" />
-            </div>
-            <div>
-              <label style={labelStyle}>N° FIEC</label>
-              <input type="text" {...register("numeroFIEC")} className="oinput" placeholder="Numéro FIEC" />
-            </div>
-            <div>
-              <label style={labelStyle}>Propriétaire</label>
-              <input type="text" {...register("proprietaire")} className="oinput" placeholder="Nom du propriétaire" />
-            </div>
-            {isEdit && (
-              <RefSelect
-                label="État"
-                registration={register("etat")}
-                options={etats ?? []}
-                placeholder="Sélectionner l'état..."
-              />
-            )}
-          </div>
-        </SectionCard>
-
-        {/* Classification */}
-        <SectionCard title="Classification">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
-            <RefSelect label="Type END" registration={register("typeEND")} options={typesEnd ?? []} />
-            <RefSelect label="Type de matériel" registration={register("typeMateriel")} options={typesMat ?? []} />
-            <RefSelect label="Type de traducteur" registration={register("typeTraducteur")} options={typesTraducteur ?? []} />
-            <RefSelect label="Groupe" registration={register("groupe")} options={groupes ?? []} />
-            <RefSelect label="Fournisseur" registration={register("fournisseur")} options={fournisseurOptions} />
-            <RefSelect label="Entreprise" registration={register("entreprise")} options={entrepriseOptions} />
-            <RefSelect label="Lot / Chaîne" registration={register("lotChaine")} options={lotsChaines ?? []} />
-            <div>
-              <label style={labelStyle}>Responsable</label>
-              <select
-                {...register("responsableId", { setValueAs: (v: string) => v ? Number(v) : undefined })}
-                className="oselect"
-              >
-                <option value="">Sélectionner un responsable...</option>
-                {agentOptions.map((o) => (
-                  <option key={o.code} value={o.code}>{o.label}</option>
-                ))}
-              </select>
+    <div
+      className="modal-backdrop"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) navigate(-1);
+      }}
+    >
+      <div className="modal">
+        {/* HEAD */}
+        <div className="modal-head">
+          <div style={{ flex: 1 }}>
+            <h2 className="modal-title">
+              {isEdit ? "Modifier le matériel" : "Ajouter un matériel"}
+            </h2>
+            <div className="modal-sub">
+              {isEdit ? (
+                <>
+                  Édition de <span className="mono">{existing?.reference}</span>
+                </>
+              ) : (
+                "Saisie d'un nouvel équipement END dans l'inventaire"
+              )}
             </div>
           </div>
-        </SectionCard>
-
-        {/* Localisation */}
-        <SectionCard title="Localisation">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
-            <RefSelect label="Site" registration={register("site")} options={siteOptions} />
-            <div>
-              <label style={labelStyle}>Localisation</label>
-              <input type="text" {...register("localisation")} className="oinput" placeholder="Bâtiment, salle, rayonnage..." />
-            </div>
-            <div>
-              <label style={labelStyle}>Compléments localisation</label>
-              <input type="text" {...register("complementsLocalisation")} className="oinput" placeholder="Détails supplémentaires" />
-            </div>
-            <div>
-              <label style={labelStyle}>En transit</label>
-              <select {...register("enTransit")} className="oselect">
-                <option value="NON">Non</option>
-                <option value="OUI">Oui</option>
-              </select>
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Étalonnage */}
-        <SectionCard title="Étalonnage">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
-            <div>
-              <label style={labelStyle}>Date dernier étalonnage</label>
-              <input type="date" {...register("dateEtalonnage")} className="oinput" />
-            </div>
-            <div>
-              <label style={labelStyle}>Date prochain étalonnage</label>
-              <input type="date" {...register("dateProchainEtalonnage")} className="oinput" />
-            </div>
-            <div>
-              <label style={labelStyle}>Validité (mois)</label>
-              <input type="number" {...register("validiteEtalonnage", { valueAsNumber: true })} className="oinput" placeholder="12" />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 20 }}>
-              <input type="checkbox" {...register("soumisVerification")} id="soumisVerification"
-                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
-              <label htmlFor="soumisVerification" style={{ fontSize: 13, color: "var(--ink)" }}>Soumis à vérification périodique</label>
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Prêt */}
-        <SectionCard title="Prêt">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input type="checkbox" {...register("enPret")} id="enPret"
-                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
-              <label htmlFor="enPret" style={{ fontSize: 13, color: "var(--ink)" }}>Matériel actuellement en prêt</label>
-            </div>
-            <RefSelect label="Motif du prêt" registration={register("motifPret")} options={motifsPret ?? []} />
-            <div>
-              <label style={labelStyle}>Date de retour prêt</label>
-              <input type="date" {...register("dateRetourPret")} className="oinput" />
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Complétude et vérification */}
-        <SectionCard title="Complétude et vérification">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
-            <RefSelect label="Complétude" registration={register("completude")} options={completudes ?? []} />
-            <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 20 }}>
-              <input type="checkbox" {...register("informationVerifiee")} id="informationVerifiee"
-                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
-              <label htmlFor="informationVerifiee" style={{ fontSize: 13, color: "var(--ink)" }}>Information vérifiée</label>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input type="checkbox" {...register("produitsChimiques")} id="produitsChimiques"
-                style={{ accentColor: "var(--accent)", width: 15, height: 15 }} />
-              <label htmlFor="produitsChimiques" style={{ fontSize: 13, color: "var(--ink)" }}>Contient des produits chimiques</label>
-            </div>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label style={labelStyle}>Commentaire complétude</label>
-              <textarea rows={2} {...register("commentairesCompletude")} className="otextarea" placeholder="Détails sur la complétude..." />
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Description & commentaires */}
-        <SectionCard title="Description & commentaires">
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label style={labelStyle}>Description</label>
-              <textarea rows={3} {...register("description")} className="otextarea" placeholder="Description détaillée du matériel..." />
-            </div>
-            <div>
-              <label style={labelStyle}>Commentaire état</label>
-              <textarea rows={2} {...register("commentaireEtat")} className="otextarea" placeholder="Remarques sur l'état du matériel..." />
-            </div>
-            <div>
-              <label style={labelStyle}>Commentaires généraux</label>
-              <textarea rows={2} {...register("commentaires")} className="otextarea" />
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
-          <button type="submit" disabled={isSubmitting} className="obtn accent">
-            {isSubmitting ? "Enregistrement..." : isEdit ? "Enregistrer les modifications" : "Créer le matériel"}
+          <button className="icon-btn" onClick={() => navigate(-1)} aria-label="Fermer">
+            <Icon name="x" size={14} />
           </button>
-          <button type="button" onClick={() => navigate(-1)} className="obtn">
+        </div>
+
+        {/* WIZARD STEPS BAR */}
+        <div
+          style={{
+            padding: "14px 22px",
+            background: "var(--bg-panel)",
+            borderBottom: "1px solid var(--line)",
+          }}
+        >
+          <div className="wizard-steps">
+            {STEPS.map((s, i) => (
+              <div
+                key={i}
+                className={`wizard-step ${i < step ? "done" : i === step ? "current" : ""}`}
+              >
+                <div className="bar" />
+                <div className="wlabel">
+                  <span className="num">
+                    {i < step ? <Icon name="check" size={10} stroke={3} /> : i + 1}
+                  </span>
+                  {s}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* BODY */}
+        <div className="modal-body">
+          {/* Error alert */}
+          {mutationError && (
+            <div
+              style={{
+                padding: "10px 14px",
+                background: "var(--rose-soft)",
+                border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+                color: "var(--rose)",
+                borderRadius: 8,
+                fontSize: 13,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+              }}
+            >
+              <svg
+                width="15"
+                height="15"
+                style={{ flexShrink: 0, marginTop: 1 }}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {mutationError.message}
+            </div>
+          )}
+
+          {/* ── STEP 0: Identité ───────────────────────────────────── */}
+          {step === 0 && (
+            <div className="form-grid">
+              {/* ID matériel */}
+              <div className="field">
+                <label className="field-label">ID matériel *</label>
+                <input
+                  type="text"
+                  {...register("reference")}
+                  className="oinput mono"
+                  placeholder="ex. 11740RT"
+                />
+                {errors.reference && (
+                  <span style={{ fontSize: 11, color: "var(--rose)", marginTop: 2 }}>
+                    {errors.reference.message}
+                  </span>
+                )}
+              </div>
+
+              {/* N° de FIEC */}
+              <div className="field">
+                <label className="field-label">N° de FIEC</label>
+                <input
+                  type="text"
+                  {...register("numeroFIEC")}
+                  className="oinput mono"
+                  placeholder="FIEC-12345"
+                />
+              </div>
+
+              {/* Type de matériel */}
+              <div className="field">
+                <label className="field-label">Type de matériel *</label>
+                <select {...register("typeMateriel")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {(typesMat ?? []).map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Modèle */}
+              <div className="field">
+                <label className="field-label">Modèle</label>
+                <input
+                  type="text"
+                  {...register("modele")}
+                  className="oinput"
+                  placeholder="ex. DENSITO 301 TX"
+                />
+              </div>
+
+              {/* Fournisseur */}
+              <div className="field">
+                <label className="field-label">Fournisseur</label>
+                <select {...register("fournisseur")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {fournisseurOptions.map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Propriétaire */}
+              <div className="field">
+                <label className="field-label">Propriétaire</label>
+                <input
+                  type="text"
+                  {...register("proprietaire")}
+                  className="oinput"
+                  placeholder="Nom du propriétaire"
+                />
+              </div>
+
+              {/* Type d'END */}
+              <div className="field full">
+                <label className="field-label">Type d'END *</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}>
+                  {(typesEnd ?? []).map((t) => (
+                    <button
+                      key={t.code}
+                      type="button"
+                      className={`tag-btn${wTypeEND === t.code ? " on" : ""}`}
+                      onClick={() => setValue("typeEND", wTypeEND === t.code ? "" : t.code)}
+                    >
+                      {t.code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Type traducteur */}
+              <div className="field">
+                <label className="field-label">Type traducteur</label>
+                <input
+                  type="text"
+                  {...register("typeTraducteur")}
+                  className="oinput"
+                  placeholder="ex. angle 45°"
+                />
+              </div>
+
+              {/* Lot / chaîne */}
+              <div className="field">
+                <label className="field-label">Lot / chaîne</label>
+                <input
+                  type="text"
+                  {...register("lotChaine")}
+                  className="oinput mono"
+                  placeholder="LOT-123"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── STEP 1: Localisation ──────────────────────────────── */}
+          {step === 1 && (
+            <div className="form-grid">
+              {/* Groupe */}
+              <div className="field">
+                <label className="field-label">Groupe *</label>
+                <select {...register("groupe")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {(groupes ?? []).map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Site */}
+              <div className="field">
+                <label className="field-label">Site *</label>
+                <select {...register("site")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {siteOptions.map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Entreprise */}
+              <div className="field">
+                <label className="field-label">Entreprise *</label>
+                <select {...register("entreprise")} className="oselect">
+                  <option value="">Sélectionner...</option>
+                  {entrepriseOptions.map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Responsable */}
+              <div className="field">
+                <label className="field-label">Responsable *</label>
+                <select
+                  {...register("responsableId", {
+                    setValueAs: (v: string) => (v ? Number(v) : undefined),
+                  })}
+                  className="oselect"
+                >
+                  <option value="">Sélectionner...</option>
+                  {agentOptions.map((o) => (
+                    <option key={o.code} value={o.code}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Compléments de localisation */}
+              <div className="field span2">
+                <label className="field-label">Compléments de localisation</label>
+                <textarea
+                  {...register("complementsLocalisation")}
+                  className="otextarea"
+                  rows={2}
+                  placeholder="ex. armoire B12, étagère 3"
+                />
+              </div>
+
+              {/* Checkbox: en prêt */}
+              <label
+                className="hstack full"
+                style={{ gap: 10, alignItems: "center", cursor: "default" }}
+              >
+                <span
+                  className={`cbx${wEnPret ? " on" : ""}`}
+                  onClick={() => setValue("enPret", !wEnPret)}
+                >
+                  {wEnPret && <Icon name="check" size={10} stroke={2.8} />}
+                </span>
+                <span style={{ fontSize: 13 }}>
+                  Le matériel est <strong>en prêt</strong>
+                </span>
+              </label>
+
+              {/* Motif du prêt (conditional) */}
+              {wEnPret && (
+                <div className="field">
+                  <label className="field-label">Motif du prêt</label>
+                  <select {...register("motifPret")} className="oselect">
+                    <option value="">Sélectionner...</option>
+                    {(motifsPret ?? []).map((o) => (
+                      <option key={o.code} value={o.code}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── STEP 2: Étalonnage ────────────────────────────────── */}
+          {step === 2 && (
+            <div className="form-grid">
+              {/* Checkbox: soumis à vérification */}
+              <label
+                className="hstack full"
+                style={{ gap: 10, alignItems: "center", cursor: "default" }}
+              >
+                <span
+                  className={`cbx${wSoumis ? " on" : ""}`}
+                  onClick={() => setValue("soumisVerification", !wSoumis)}
+                >
+                  {wSoumis && <Icon name="check" size={10} stroke={2.8} />}
+                </span>
+                <span style={{ fontSize: 13 }}>
+                  Soumis à <strong>vérification périodique</strong>
+                </span>
+              </label>
+
+              {wSoumis && (
+                <>
+                  {/* Date dernier étalonnage */}
+                  <div className="field">
+                    <label className="field-label">Date dernier étalonnage</label>
+                    <input
+                      type="date"
+                      {...register("dateEtalonnage")}
+                      className="oinput"
+                    />
+                  </div>
+
+                  {/* Validité (mois) */}
+                  <div className="field">
+                    <label className="field-label">Validité (mois)</label>
+                    <input
+                      type="number"
+                      {...register("validiteEtalonnage", { valueAsNumber: true })}
+                      className="oinput"
+                      placeholder="12"
+                      min={1}
+                    />
+                  </div>
+
+                  {/* Date d'échéance (calculée) */}
+                  <div className="field">
+                    <label className="field-label">Date d'échéance (calculée)</label>
+                    <input
+                      type="text"
+                      className="oinput muted"
+                      disabled
+                      value={echeanceDisplay}
+                      readOnly
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── STEP 3: État & PJ ─────────────────────────────────── */}
+          {step === 3 && (
+            <div className="form-grid">
+              {/* État du matériel */}
+              <div className="field">
+                <label className="field-label">État du matériel *</label>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+                  {(etats ?? []).map((e) => {
+                    const colorCls = etatColor[e.code] ?? "c-neutral";
+                    const isOn = wEtat === e.code;
+                    return (
+                      <button
+                        key={e.code}
+                        type="button"
+                        className={`pill-btn${isOn ? " on" : ""}`}
+                        onClick={() => setValue("etat", isOn ? "" : e.code)}
+                      >
+                        <span className={`pill ${colorCls}`} style={{ fontSize: 12 }}>
+                          <span className="dot" />
+                          {e.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Complétude */}
+              <div className="field">
+                <label className="field-label">Complétude *</label>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+                  {(completudes ?? []).map((c) => {
+                    const colorCls = completudeColor[c.code] ?? "c-neutral";
+                    const isOn = wCompletude === c.code;
+                    return (
+                      <button
+                        key={c.code}
+                        type="button"
+                        className={`pill-btn${isOn ? " on" : ""}`}
+                        onClick={() => setValue("completude", isOn ? "" : c.code)}
+                      >
+                        <span className={`pill ${colorCls}`} style={{ fontSize: 12 }}>
+                          <span className="dot" />
+                          {c.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Commentaire état */}
+              <div className="field full">
+                <label className="field-label">Commentaire état</label>
+                <textarea
+                  {...register("commentaireEtat")}
+                  className="otextarea"
+                  rows={2}
+                  placeholder="Décrire l'état observé, défauts éventuels…"
+                />
+              </div>
+
+              {/* Commentaires généraux */}
+              <div className="field full">
+                <label className="field-label">Commentaires généraux</label>
+                <textarea
+                  {...register("commentaires")}
+                  className="otextarea"
+                  rows={2}
+                />
+              </div>
+
+              {/* Upload zone */}
+              <div className="field full">
+                <label className="field-label">Photos & pièces jointes</label>
+                <div className="upload-zone" style={{ marginTop: 2 }}>
+                  <Icon name="photo" size={20} />
+                  <div style={{ marginTop: 8, fontSize: 13 }}>
+                    Glissez photos d'envoi/réception ou{" "}
+                    <span className="link">parcourir</span>
+                  </div>
+                  <div style={{ fontSize: 11, marginTop: 4 }}>JPG, PNG, PDF · 20 Mo max</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── STEP 4: Revue ─────────────────────────────────────── */}
+          {step === 4 && (
+            <div className="vstack" style={{ gap: 18 }}>
+              <div className="drawer-grid">
+                <div className="field">
+                  <span className="field-label">ID · FIEC</span>
+                  <span className="field-value mono">
+                    {wRef || "—"} · {wFiec || "—"}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Type · Modèle</span>
+                  <span className="field-value">
+                    {wTypeMat || "—"} · {wModele || "—"}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Type END · Traducteur</span>
+                  <span className="field-value">
+                    {wTypeEND ? (
+                      <span className="tag mono" style={{ marginRight: 4 }}>
+                        {wTypeEND}
+                      </span>
+                    ) : (
+                      "—"
+                    )}{" "}
+                    {wTypeTraducteur || ""}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Fournisseur</span>
+                  <span className="field-value">{wFournisseur || "—"}</span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Propriétaire</span>
+                  <span className="field-value">{wProprietaire || "—"}</span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Lot / chaîne</span>
+                  <span className="field-value mono">{wLotChaine || "—"}</span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Localisation</span>
+                  <span className="field-value">
+                    {wGroupe || "—"} / {wSite || "—"}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Entreprise</span>
+                  <span className="field-value">{wEntreprise || "—"}</span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Responsable</span>
+                  <span className="field-value">{responsableLabel}</span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Validité · Vérif périodique</span>
+                  <span className="field-value">
+                    {wSoumis ? `${wValidite ?? "—"} mois` : "Non soumis"}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">État · Complétude</span>
+                  <span className="field-value">
+                    {etatLabel} · {completudeLabel}
+                  </span>
+                </div>
+                <div className="field">
+                  <span className="field-label">Prêt · Motif</span>
+                  <span className="field-value">
+                    {wEnPret ? `Oui · ${motifPretLabel}` : "Non"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Info banner */}
+              <div
+                style={{
+                  background: "var(--accent-soft)",
+                  border: "1px solid var(--accent-line)",
+                  padding: 12,
+                  borderRadius: 10,
+                  fontSize: 12.5,
+                  color: "var(--accent-ink)",
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "flex-start",
+                }}
+              >
+                <Icon name="alert" size={16} />
+                <div>
+                  À la validation, un QR code de traçabilité sera généré et la fiche sera
+                  ajoutée à l'inventaire {wEntreprise || "…"}.
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* FOOT */}
+        <div className="modal-foot">
+          <button type="button" className="obtn ghost" onClick={() => navigate(-1)}>
             Annuler
           </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {step > 0 && (
+              <button
+                type="button"
+                className="obtn"
+                onClick={() => setStep(step - 1)}
+              >
+                <Icon name="chevL" size={13} />
+                Précédent
+              </button>
+            )}
+            {step < STEPS.length - 1 ? (
+              <button
+                type="button"
+                className="obtn accent"
+                onClick={() => setStep(step + 1)}
+              >
+                Suivant
+                <Icon name="chevR" size={13} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="obtn accent"
+                disabled={isSubmitting}
+                onClick={handleSubmit(onSubmit)}
+              >
+                <Icon name="check" size={13} stroke={2.5} />
+                {isSubmitting
+                  ? "Enregistrement..."
+                  : isEdit
+                  ? "Enregistrer"
+                  : "Créer le matériel"}
+              </button>
+            )}
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

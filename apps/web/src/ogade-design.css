@@ -269,6 +269,20 @@
 .wizard-step.current .num { background: var(--accent); color: white; border-color: var(--accent); }
 .wizard-step.done .num { background: var(--emerald); color: white; border-color: var(--emerald); }
 
+/* Modal head/body/foot */
+.modal-head { padding: 18px 22px; display: flex; align-items: center; gap: 12px; background: var(--bg-panel); border-bottom: 1px solid var(--line); }
+.modal-title { font-size: 17px; font-weight: 600; margin: 0; color: var(--ink); }
+.modal-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.modal-body { padding: 22px; overflow: auto; display: flex; flex-direction: column; gap: 22px; flex: 1; }
+.modal-foot { padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--bg-panel); border-top: 1px solid var(--line); }
+
+/* Form grid */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px 18px; }
+.form-grid.two { grid-template-columns: 1fr 1fr; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-grid .span2 { grid-column: span 2; }
+.form-grid .field-label { display: block; margin-bottom: 5px; }
+
 /* Form inputs */
 .oinput, .oselect, .otextarea {
   appearance: none; width: 100%; font: inherit; color: inherit;
@@ -280,6 +294,39 @@
 .oinput:hover, .oselect:hover, .otextarea:hover { border-color: oklch(0.82 0.008 270); }
 .oinput:focus, .oselect:focus, .otextarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .otextarea { min-height: 70px; resize: vertical; font-family: inherit; line-height: 1.5; }
+.oinput:disabled, .oselect:disabled, .otextarea:disabled { background: var(--bg-sunken); color: var(--ink-3); cursor: not-allowed; }
+.oinput.muted { color: var(--ink-3); }
+.oselect { cursor: default; padding-right: 30px; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2372716B' stroke-width='1.5'><path d='M4 6l4 4 4-4'/></svg>"); background-repeat: no-repeat; background-position: right 10px center; }
+
+/* Tag for END type buttons */
+.tag-btn {
+  appearance: none; cursor: default;
+  padding: 4px 10px; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+  border-radius: 6px; border: 1px solid var(--line); background: var(--bg-panel); color: var(--ink-2);
+  transition: all 0.12s;
+}
+.tag-btn:hover { border-color: var(--accent); }
+.tag-btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+
+/* Pill button (selectable) */
+.pill-btn {
+  appearance: none; cursor: default; background: transparent; padding: 0;
+}
+.pill-btn .pill { border: 1.5px solid transparent; }
+.pill-btn.on .pill { border-color: currentColor; }
+
+/* Upload zone */
+.upload-zone {
+  border: 1.5px dashed var(--line); border-radius: 10px;
+  padding: 22px; text-align: center; color: var(--ink-3);
+  background: var(--bg-sunken);
+}
+.upload-zone .link { color: var(--accent); font-weight: 500; cursor: default; }
+
+/* Layout helpers */
+.hstack { display: flex; align-items: center; gap: 8px; }
+.vstack { display: flex; flex-direction: column; gap: 8px; }
+.hstack.full { width: 100%; }
 
 /* Utility */
 .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-feature-settings: 'zero', 'ss02'; }
