@@ -84,7 +84,7 @@ export default function AdminReferentielsPage() {
   }));
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto", paddingBottom: 40 }}>
+    <div style={{ padding: "22px 28px 40px" }}>
       {/* Page header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
