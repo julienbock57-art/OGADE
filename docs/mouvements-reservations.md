@@ -14,6 +14,9 @@
 | 4 | Réservations | **Pas de chevauchement** — contrainte `dateDebut/dateFin` exclusive |
 | 5 | Pôle EDF | **= Groupe** (référentiel `GROUPE` existant) |
 | 6 | Réservation → Mouvement | **Action manuelle** — un agent doit activer explicitement |
+| 7 | Prêt interne | **Même rigueur** que prêt externe si déplacement physique (photo, bon, validation magasin) |
+| 8 | Certificat étalonnage | **Saisie manuelle** des dates, avec extraction PDF si simple |
+| 9 | Réservation panier | **Multi-matériel possible** mais on simplifie l'UI au maximum |
 
 ---
 
