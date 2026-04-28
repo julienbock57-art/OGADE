@@ -601,6 +601,7 @@ function PhotoThumb({
   onClick: () => void;
 }) {
   const [src, setSrc] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let revoke: string | null = null;
@@ -608,7 +609,7 @@ function PhotoThumb({
       const url = URL.createObjectURL(blob);
       revoke = url;
       setSrc(url);
-    }).catch(() => {});
+    }).catch(() => { setError(true); });
     return () => { if (revoke) URL.revokeObjectURL(revoke); };
   }, [fichier.id]);
 
@@ -616,6 +617,13 @@ function PhotoThumb({
     <div className="photo has-img" style={{ position: "relative", cursor: "pointer" }} onClick={onClick}>
       {src ? (
         <img src={src} alt={fichier.nomOriginal ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }} />
+      ) : error ? (
+        <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", background: "var(--bg-sunken)", borderRadius: 8 }}>
+          <div style={{ textAlign: "center", color: "var(--ink-4)", fontSize: 11 }}>
+            <Icon name="photo" size={20} stroke={1.2} />
+            <div style={{ marginTop: 4 }}>Indisponible</div>
+          </div>
+        </div>
       ) : (
         <div style={{ width: "100%", height: "100%", display: "grid", placeItems: "center", background: "var(--bg-sunken)", borderRadius: 8 }}>
           <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
@@ -636,6 +644,7 @@ function PhotoLightbox({
   contextLabel: string;
 }) {
   const [src, setSrc] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let revoke: string | null = null;
@@ -643,7 +652,7 @@ function PhotoLightbox({
       const url = URL.createObjectURL(blob);
       revoke = url;
       setSrc(url);
-    }).catch(() => {});
+    }).catch(() => { setError(true); });
     return () => { if (revoke) URL.revokeObjectURL(revoke); };
   }, [fichier.id]);
 
@@ -672,11 +681,11 @@ function PhotoLightbox({
       onClick={onClose}
     >
       <div style={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 8 }}>
-        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={(e) => { e.stopPropagation(); handleOpen(); }}>
+        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={(e) => { e.stopPropagation(); handleOpen(); }} disabled={!src}>
           <Icon name="eye" size={13} />
           Ouvrir
         </button>
-        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={(e) => { e.stopPropagation(); handleDownload(); }}>
+        <button className="obtn" style={{ background: "rgba(255,255,255,0.15)", color: "white", borderColor: "rgba(255,255,255,0.2)" }} onClick={(e) => { e.stopPropagation(); handleDownload(); }} disabled={!src}>
           <Icon name="dl" size={13} />
           Télécharger
         </button>
@@ -692,6 +701,12 @@ function PhotoLightbox({
           style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8, boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}
           onClick={(e) => e.stopPropagation()}
         />
+      ) : error ? (
+        <div style={{ color: "rgba(255,255,255,0.5)", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+          <Icon name="photo" size={48} stroke={1} />
+          <div style={{ marginTop: 8, fontSize: 14 }}>Photo indisponible</div>
+          <div style={{ marginTop: 4, fontSize: 12 }}>Le fichier physique n'a pas été trouvé sur le serveur</div>
+        </div>
       ) : (
         <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.2)", borderTopColor: "white", animation: "spin 0.7s linear infinite" }} />
       )}
