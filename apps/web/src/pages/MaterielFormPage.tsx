@@ -198,8 +198,8 @@ export default function MaterielFormPage() {
   const { data: entreprises } = useEntreprises("ENTREPRISE");
 
   const { data: agentsData } = useQuery<{ data: Agent[] }>({
-    queryKey: ["agents", { page: 1, pageSize: 500 }],
-    queryFn: () => api.get("/agents", { page: 1, pageSize: 500 }),
+    queryKey: ["agents", { page: 1, pageSize: 100 }],
+    queryFn: () => api.get("/agents", { page: 1, pageSize: 100 }),
   });
   const agentOptions = (agentsData?.data ?? []).map((a) => ({
     code: String(a.id),
