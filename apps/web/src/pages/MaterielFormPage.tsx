@@ -79,6 +79,14 @@ function computeEcheance(dateEtalonnage: string | undefined, validite: number | 
   return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
+function computeEcheanceISO(dateEtalonnage: string | undefined, validite: number | undefined): string | undefined {
+  if (!dateEtalonnage || !validite || isNaN(validite)) return undefined;
+  const d = new Date(dateEtalonnage);
+  if (isNaN(d.getTime())) return undefined;
+  d.setMonth(d.getMonth() + validite);
+  return d.toISOString();
+}
+
 /* ─── Searchable select (combobox) ──────────────────────────────── */
 function SearchableSelect({
   value,
@@ -369,8 +377,16 @@ export default function MaterielFormPage() {
       data.libelle ||
       `${data.typeMateriel ?? ""} ${data.modele ?? ""}`.trim() ||
       data.reference;
+    const echeanceISO = computeEcheanceISO(
+      data.dateEtalonnage as unknown as string | undefined,
+      data.validiteEtalonnage,
+    );
     const cleaned = Object.fromEntries(
-      Object.entries({ ...data, libelle: computedLibelle }).filter(
+      Object.entries({
+        ...data,
+        libelle: computedLibelle,
+        dateProchainEtalonnage: echeanceISO,
+      }).filter(
         ([, v]) => v !== "" && v !== undefined,
       ),
     );
