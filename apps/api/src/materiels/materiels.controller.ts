@@ -44,11 +44,15 @@ export class MaterielsController {
     @Query('search') search?: string,
     @Query('completude') completude?: string,
     @Query('enPret') enPret?: string,
+    @Query('etalonnageEchu') etalonnageEchu?: string,
+    @Query('echeance30j') echeance30j?: string,
+    @Query('hsIncomplet') hsIncomplet?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
     return this.materielsService.findAll({
       ...pagination,
       etat, site, typeEND, typeMateriel, groupe, search, completude, enPret,
+      etalonnageEchu, echeance30j, hsIncomplet,
     });
   }
 
