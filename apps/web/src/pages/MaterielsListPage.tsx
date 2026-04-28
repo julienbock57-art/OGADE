@@ -74,9 +74,18 @@ function ValidityBar({ m }: { m: Materiel }) {
   );
 }
 
-function KpiCard({ label, value, sub, accent }: { label: string; value: number; sub: string; accent: string }) {
+function KpiCard({ label, value, sub, accent, active, onClick }: { label: string; value: number; sub: string; accent: string; active?: boolean; onClick?: () => void }) {
   return (
-    <div className="kpi" style={{ "--kpi-accent": accent } as React.CSSProperties}>
+    <div
+      className={`kpi${active ? " kpi-active" : ""}`}
+      style={{
+        "--kpi-accent": accent,
+        cursor: onClick ? "pointer" : undefined,
+        borderColor: active ? accent : undefined,
+        boxShadow: active ? `0 0 0 1px ${accent}, 0 2px 8px ${accent}22` : undefined,
+      } as React.CSSProperties}
+      onClick={onClick}
+    >
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{value}</div>
       <div className="kpi-sub">{sub}</div>
@@ -175,6 +184,7 @@ export default function MaterielsListPage() {
   const [filterGroupe, setFilterGroupe] = useState("");
   const [filterCompletude, setFilterCompletude] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [activeKpi, setActiveKpi] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [drawerTab, setDrawerTab] = useState<"infos" | "qr">("infos");
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -193,13 +203,27 @@ export default function MaterielsListPage() {
   const siteOptions = useMemo(() => (sites ?? []).map((s) => ({ code: s.code, label: s.label })), [sites]);
 
   const { data: stats } = useQuery<Stats>({ queryKey: ["materiels-stats"], queryFn: () => api.get("/materiels/stats") });
+  const kpiFilters = useMemo(() => {
+    if (activeKpi === 'echus') return { etalonnageEchu: 'true' };
+    if (activeKpi === 'prochains') return { echeance30j: 'true' };
+    if (activeKpi === 'enPret') return { enPret: 'true' };
+    if (activeKpi === 'hsIncomplet') return { hsIncomplet: 'true' };
+    return {};
+  }, [activeKpi]);
+
   const { data, isLoading } = useQuery<PaginatedResult<Materiel>>({
-    queryKey: ["materiels", { ...queryParams, search, etat: filterEtat, typeEND: filterTypeEnd, typeMateriel: filterTypeMat, site: filterSite, groupe: filterGroupe, completude: filterCompletude }],
-    queryFn: () => api.get("/materiels", { ...queryParams, search: search || undefined, etat: filterEtat || undefined, typeEND: filterTypeEnd || undefined, typeMateriel: filterTypeMat || undefined, site: filterSite || undefined, groupe: filterGroupe || undefined, completude: filterCompletude || undefined }),
+    queryKey: ["materiels", { ...queryParams, search, etat: filterEtat, typeEND: filterTypeEnd, typeMateriel: filterTypeMat, site: filterSite, groupe: filterGroupe, completude: filterCompletude, ...kpiFilters }],
+    queryFn: () => api.get("/materiels", { ...queryParams, search: search || undefined, etat: filterEtat || undefined, typeEND: filterTypeEnd || undefined, typeMateriel: filterTypeMat || undefined, site: filterSite || undefined, groupe: filterGroupe || undefined, completude: filterCompletude || undefined, ...kpiFilters }),
   });
 
+  const handleKpiClick = useCallback((key: string | null) => {
+    setActiveKpi(prev => prev === key ? null : key);
+    setFilterEtat(""); setFilterTypeEnd(""); setFilterTypeMat(""); setFilterSite(""); setFilterGroupe(""); setFilterCompletude("");
+    setPage(1);
+  }, [setPage]);
+
   const activeFilterCount = [filterEtat, filterTypeEnd, filterTypeMat, filterSite, filterGroupe, filterCompletude].filter(Boolean).length;
-  const clearFilters = () => { setFilterEtat(""); setFilterTypeEnd(""); setFilterTypeMat(""); setFilterSite(""); setFilterGroupe(""); setFilterCompletude(""); setSearch(""); setPage(1); };
+  const clearFilters = () => { setFilterEtat(""); setFilterTypeEnd(""); setFilterTypeMat(""); setFilterSite(""); setFilterGroupe(""); setFilterCompletude(""); setSearch(""); setActiveKpi(null); setPage(1); };
   const rows = data?.data ?? [];
   const selectedMat = selectedId ? rows.find((r) => r.id === selectedId) : null;
 
@@ -241,11 +265,11 @@ export default function MaterielsListPage() {
       {/* KPIs */}
       {stats && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, padding: "0 24px 18px" }}>
-          <KpiCard label="Matériels actifs" value={stats.total} sub="inventaire complet" accent="var(--accent)" />
-          <KpiCard label="Étalonnages échus" value={stats.echus} sub="à régulariser" accent="var(--rose)" />
-          <KpiCard label="Échéance < 30 j" value={stats.prochains} sub="à planifier" accent="var(--amber)" />
-          <KpiCard label="En prêt / mission" value={stats.enPret} sub="hors magasin" accent="var(--sky)" />
-          <KpiCard label="HS · Incomplets" value={stats.hs + stats.incomplets} sub={`${stats.hs} HS · ${stats.incomplets} incomplets`} accent="var(--violet)" />
+          <KpiCard label="Matériels actifs" value={stats.total} sub="inventaire complet" accent="var(--accent)" active={activeKpi === null} onClick={() => handleKpiClick(null)} />
+          <KpiCard label="Étalonnages échus" value={stats.echus} sub="à régulariser" accent="var(--rose)" active={activeKpi === "echus"} onClick={() => handleKpiClick("echus")} />
+          <KpiCard label="Échéance < 30 j" value={stats.prochains} sub="à planifier" accent="var(--amber)" active={activeKpi === "prochains"} onClick={() => handleKpiClick("prochains")} />
+          <KpiCard label="En prêt / mission" value={stats.enPret} sub="hors magasin" accent="var(--sky)" active={activeKpi === "enPret"} onClick={() => handleKpiClick("enPret")} />
+          <KpiCard label="HS · Incomplets" value={stats.hs + stats.incomplets} sub={`${stats.hs} HS · ${stats.incomplets} incomplets`} accent="var(--violet)" active={activeKpi === "hsIncomplet"} onClick={() => handleKpiClick("hsIncomplet")} />
         </div>
       )}
 
@@ -268,21 +292,22 @@ export default function MaterielsListPage() {
       {showFilters && (
         <div style={{ background: "var(--bg-panel)", borderBottom: "1px solid var(--line)", padding: "12px 24px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
-            <select value={filterEtat} onChange={(e) => { setFilterEtat(e.target.value); setPage(1); }} className="oselect"><option value="">État — Tous</option>{(etats ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
-            <select value={filterTypeEnd} onChange={(e) => { setFilterTypeEnd(e.target.value); setPage(1); }} className="oselect"><option value="">Type END — Tous</option>{(typesEnd ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
-            <select value={filterTypeMat} onChange={(e) => { setFilterTypeMat(e.target.value); setPage(1); }} className="oselect"><option value="">Type matériel — Tous</option>{(typesMat ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
-            <select value={filterGroupe} onChange={(e) => { setFilterGroupe(e.target.value); setPage(1); }} className="oselect"><option value="">Groupe — Tous</option>{(groupes ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
-            <select value={filterSite} onChange={(e) => { setFilterSite(e.target.value); setPage(1); }} className="oselect"><option value="">Site — Tous</option>{siteOptions.map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
-            <select value={filterCompletude} onChange={(e) => { setFilterCompletude(e.target.value); setPage(1); }} className="oselect"><option value="">Complétude — Tous</option>{(completudes ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterEtat} onChange={(e) => { setFilterEtat(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">État — Tous</option>{(etats ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterTypeEnd} onChange={(e) => { setFilterTypeEnd(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Type END — Tous</option>{(typesEnd ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterTypeMat} onChange={(e) => { setFilterTypeMat(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Type matériel — Tous</option>{(typesMat ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterGroupe} onChange={(e) => { setFilterGroupe(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Groupe — Tous</option>{(groupes ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterSite} onChange={(e) => { setFilterSite(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Site — Tous</option>{siteOptions.map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
+            <select value={filterCompletude} onChange={(e) => { setFilterCompletude(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Complétude — Tous</option>{(completudes ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
           </div>
           {activeFilterCount > 0 && <button onClick={clearFilters} className="obtn ghost" style={{ marginTop: 10, fontSize: 12 }}>Effacer tous les filtres</button>}
         </div>
       )}
 
       {/* Active filter chips */}
-      {activeFilterCount > 0 && (
+      {(activeFilterCount > 0 || activeKpi) && (
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "10px 24px 4px", background: "var(--bg-panel)", borderBottom: "1px solid var(--line-2)" }}>
           <span style={{ color: "var(--ink-3)", fontSize: 11 }}>{data?.total ?? 0} matériel{(data?.total ?? 0) > 1 ? "s" : ""} ·</span>
+          {activeKpi && <span className="chip" style={{ background: "var(--accent)", color: "white" }}><span style={{ fontSize: 11 }}>{{ echus: "Étalonnages échus", prochains: "Échéance < 30 j", enPret: "En prêt / mission", hsIncomplet: "HS · Incomplets" }[activeKpi]}</span><button onClick={() => setActiveKpi(null)} style={{ background: "none", border: "none", padding: 0, color: "inherit", marginLeft: 2, display: "inline-flex" }}><Icon name="x" size={11} /></button></span>}
           {filterEtat && <span className="chip"><span style={{ opacity: 0.7, fontSize: 11 }}>État:</span> {(etats ?? []).find(e => e.code === filterEtat)?.label ?? filterEtat}<button onClick={() => setFilterEtat("")} style={{ background: "none", border: "none", padding: 0, color: "inherit", marginLeft: 2, display: "inline-flex" }}><Icon name="x" size={11} /></button></span>}
           {filterTypeEnd && <span className="chip"><span style={{ opacity: 0.7, fontSize: 11 }}>Type END:</span> {(typesEnd ?? []).find(e => e.code === filterTypeEnd)?.label ?? filterTypeEnd}<button onClick={() => setFilterTypeEnd("")} style={{ background: "none", border: "none", padding: 0, color: "inherit", marginLeft: 2, display: "inline-flex" }}><Icon name="x" size={11} /></button></span>}
           {filterTypeMat && <span className="chip"><span style={{ opacity: 0.7, fontSize: 11 }}>Type:</span> {(typesMat ?? []).find(e => e.code === filterTypeMat)?.label ?? filterTypeMat}<button onClick={() => setFilterTypeMat("")} style={{ background: "none", border: "none", padding: 0, color: "inherit", marginLeft: 2, display: "inline-flex" }}><Icon name="x" size={11} /></button></span>}

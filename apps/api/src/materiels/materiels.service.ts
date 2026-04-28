@@ -43,8 +43,11 @@ export class MaterielsService {
     search?: string;
     completude?: string;
     enPret?: string;
+    etalonnageEchu?: string;
+    echeance30j?: string;
+    hsIncomplet?: string;
   }) {
-    const { page, pageSize, etat, site, typeEND, typeMateriel, groupe, search, completude, enPret } = params;
+    const { page, pageSize, etat, site, typeEND, typeMateriel, groupe, search, completude, enPret, etalonnageEchu, echeance30j, hsIncomplet } = params;
     const skip = (page - 1) * pageSize;
 
     const where: any = {
@@ -60,6 +63,32 @@ export class MaterielsService {
     if (completude) where.AND.push({ completude });
     if (enPret === 'true') where.AND.push({ enPret: true });
     if (enPret === 'false') where.AND.push({ enPret: false });
+
+    if (etalonnageEchu === 'true') {
+      where.AND.push({
+        soumisVerification: true,
+        dateProchainEtalonnage: { lt: new Date() },
+      });
+    }
+
+    if (echeance30j === 'true') {
+      const now = new Date();
+      const in30Days = new Date(now.getTime() + 30 * 86400000);
+      where.AND.push({
+        soumisVerification: true,
+        dateProchainEtalonnage: { gte: now, lte: in30Days },
+      });
+    }
+
+    if (hsIncomplet === 'true') {
+      where.AND.push({
+        OR: [
+          { etat: { in: ['HS', 'PERDU'] } },
+          { completude: 'INCOMPLET' },
+        ],
+      });
+    }
+
     if (search) {
       where.AND.push({
         OR: [
