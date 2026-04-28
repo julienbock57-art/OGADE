@@ -52,6 +52,11 @@ export class MaterielsController {
     });
   }
 
+  @Get(':id/historique')
+  async findHistorique(@Param('id', ParseIntPipe) id: number) {
+    return this.materielsService.findHistorique(id);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.materielsService.findOne(id);
@@ -82,7 +87,10 @@ export class MaterielsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.materielsService.softDelete(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    await this.materielsService.softDelete(id, user?.agentId);
   }
 }
