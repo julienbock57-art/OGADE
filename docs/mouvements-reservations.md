@@ -1,233 +1,309 @@
 # Mouvements & Réservations — Design Doc
 
-> **Statut** : DRAFT — en discussion, ne pas implémenter avant validation.
+> **Statut** : DRAFT v2 — décisions clés validées, workflow affiné.
+
+---
+
+## Décisions validées
+
+| # | Sujet | Décision |
+|---|-------|----------|
+| 1 | Modèle | **Unifié** — un seul `Mouvement` avec 4 types |
+| 2 | DemandeEnvoi | **On étend** — renommage + ajout colonnes, on garde l'historique |
+| 3 | Statut matériel | **Flags stockés** sur `Materiel`, mis à jour à chaque transition |
+| 4 | Réservations | **Pas de chevauchement** — contrainte `dateDebut/dateFin` exclusive |
+| 5 | Pôle EDF | **= Groupe** (référentiel `GROUPE` existant) |
+| 6 | Réservation → Mouvement | **Action manuelle** — un agent doit activer explicitement |
+
+---
 
 ## 1. Vocabulaire métier
 
 | Terme | Définition |
 |-------|-----------|
-| **Mouvement** | Opération qui modifie la localisation, l'entreprise détentrice, le responsable ou le statut d'un matériel pour une période donnée. Toujours associé à une plage temporelle (date envoi → date retour ou clôture). |
-| **Réservation** | Intention future d'utiliser un matériel à une période donnée. N'a aucun effet immédiat sur le matériel. Plusieurs réservations parallèles possibles sur un même matériel. |
-| **Détenteur** | Entreprise qui possède **physiquement** le matériel à un instant T (≠ propriétaire qui ne change pas). |
-| **Responsable** | Agent EDF référent du matériel à un instant T. |
-| **Convention** | Document signé obligatoire pour les prêts externes. |
-| **Pôle** | Unité interne EDF pour les prêts internes (à clarifier — nouveau référentiel ?). |
+| **Mouvement** | Opération tracée qui modifie la localisation, le détenteur, le responsable ou le statut d'un ou plusieurs matériels. |
+| **Réservation** | Blocage exclusif d'un créneau futur sur un matériel. Pas de chevauchement autorisé. Conversion manuelle en mouvement. |
+| **Détenteur** | Entreprise qui possède **physiquement** le matériel à un instant T (≠ propriétaire, toujours EDF). |
+| **Bon de transport** | Document de suivi logistique joint au colis lors de l'expédition. |
+| **Convention** | Contrat signé obligatoire pour les prêts externes. |
+| **Certificat d'étalonnage** | Document émis par l'entreprise d'étalonnage, intégré au retour. |
 
 ## 2. Les 4 types de mouvements
 
-| Type | Détenteur change ? | Site/adresse | Statut matériel | Document | Retour |
-|------|--------------------|---------------|------------------|-----------|--------|
-| **TRANSFERT_SITE** | Non (EDF reste détenteur) | Oui | EN_TRANSIT → puis NORMAL | — | Pas de retour (changement définitif) |
-| **ETALONNAGE** | Oui (entreprise étalonneur) | Oui | EN_ETALONNAGE | Certificat (au retour) | Oui — solde + intégration certificat + maj `dateEtalonnage` |
-| **PRET_EXTERNE** | Oui (société titulaire) | Oui (souvent) | EN_PRET | Convention obligatoire | Oui — date estimée à suivre |
-| **PRET_INTERNE** | Non (EDF) | Site/responsable changent | EN_PRET_INTERNE | — | Oui — entre pôles |
+| Type | Détenteur change ? | Site change ? | Statut matériel | Documents | Retour ? |
+|------|--------------------|---------------|-----------------|-----------|----------|
+| **TRANSFERT_SITE** | Non (reste EDF) | Oui | EN_TRANSIT → normal | Bon de transport, photo colis | Non (définitif) |
+| **ETALONNAGE** | Oui (entreprise étalonneur) | Oui | EN_ETALONNAGE | Bon transport + certificat retour | Oui |
+| **PRET_EXTERNE** | Oui (société titulaire) | Oui | EN_PRET | Convention obligatoire + bon transport | Oui |
+| **PRET_INTERNE** | Non (reste EDF) | Oui (groupe change) | EN_PRET_INTERNE | Bon transport | Oui |
 
-**Observation clé** : ces 4 opérations partagent une structure commune (origine, destination, dates, lignes multi-matériel). Un modèle unifié `Mouvement` avec un type discriminant a du sens.
+## 3. Modèle de données
 
-## 3. Modèle de données proposé
+### 3.1 `Mouvement` (extension de `DemandeEnvoi`)
 
-### 3.1 `Mouvement` (modèle unifié, multi-matériel)
+La table `demandes_envoi` existante sera renommée `mouvements` et étendue :
 
 ```
-Mouvement
-├── id, numero (généré: MV-AAAA-NNNNN)
-├── type : TRANSFERT_SITE | ETALONNAGE | PRET_EXTERNE | PRET_INTERNE
-├── statut : BROUILLON | PLANIFIE | EN_TRANSIT | ARRIVE | EN_COURS
-│             | RETOUR_DEMANDE | RETOUR_EN_TRANSIT | CLOTURE | ANNULE
+Mouvement (ex demandes_envoi)
 │
-├── Origine (snapshot avant) :
+├── Identité
+│   ├── id, numero (existant, format: MV-AAAA-NNNNN)
+│   ├── type : TRANSFERT_SITE | ETALONNAGE | PRET_EXTERNE | PRET_INTERNE
+│   └── statut (voir §4 pour la machine à états complète)
+│
+├── Origine (snapshot au moment de l'envoi)
 │   ├── siteOrigineCode
-│   ├── detenteurOrigineCode (= toujours EDF dans la pratique)
 │   └── responsableOrigineId
 │
-├── Destination :
-│   ├── siteDestinationCode (si transfert/prêt interne)
-│   ├── detenteurDestinationCode (si étalonnage/prêt externe)
-│   ├── adresseLibre (si l'adresse n'est pas dans un référentiel)
+├── Destination
+│   ├── siteDestinationCode          → référentiel Sites
+│   ├── entrepriseDestinationCode    → référentiel Entreprises (étalonnage/prêt externe)
+│   ├── groupeDestinationCode        → référentiel GROUPE (prêt interne)
+│   ├── adresseDestination (texte libre si hors référentiel)
 │   ├── contact, contactTelephone
-│   └── responsableDestinationId (optionnel)
+│   └── responsableDestinationId     → Agent (optionnel)
 │
-├── Dates :
-│   ├── dateSouhaitee
-│   ├── dateEnvoi
-│   ├── dateReceptionDestination
-│   ├── dateRetourEstimee (étalonnage / prêt)
-│   └── dateRetourEffective
+├── Dates
+│   ├── dateSouhaitee                (date demandée par le demandeur)
+│   ├── dateValidation               (validation du mouvement)
+│   ├── dateEnvoi                    (validation magasin envoi)
+│   ├── dateReception                (validation magasin réception)
+│   ├── dateRetourEstimee            (prêt / étalonnage)
+│   ├── dateRetourEnvoi              (magasin valide retour parti)
+│   ├── dateRetourReception          (magasin valide retour reçu)
+│   └── dateCloture
 │
-├── Métadonnées :
-│   ├── motif, urgence, justificationUrgence
+├── Métadonnées
+│   ├── motif, commentaire
+│   ├── urgence, justificationUrgence
 │   ├── convention (bool, requis si PRET_EXTERNE)
-│   ├── conventionFichierId (lien Fichier)
-│   ├── certificatFichierId (lien Fichier, étalonnage)
+│   ├── souscriptionAssurance (bool)
 │   ├── produitsChimiques (bool)
-│   └── commentaire
+│   └── commentaireRetour
+│
+├── Validation magasin
+│   ├── validePar                    → Agent (qui a validé la demande)
+│   ├── expediteurId                 → Agent (magasin envoi)
+│   └── receptionneurId              → Agent (magasin réception)
 │
 ├── Lignes : MouvementLigne[] (1..N matériels)
+├── Fichiers : via Fichier(entityType="MOUVEMENT")
 │
-├── Liens :
-│   ├── demandeurId (Agent)
-│   ├── reservationId? (si issu d'une réservation)
-│   └── createdById, updatedById, ...
+├── Liens
+│   ├── demandeurId                  → Agent (celui qui fait la demande)
+│   ├── reservationOrigineId?        → Reservation (si issu d'une réservation)
+│   └── createdById, updatedById
 │
 └── Audit : createdAt, updatedAt
 ```
 
-### 3.2 `MouvementLigne` (un matériel par ligne)
+### 3.2 `MouvementLigne` (ex `DemandeEnvoiLigne`)
 
 ```
 MouvementLigne
 ├── id
 ├── mouvementId
 ├── materielId
-├── etatDepart  (snapshot état au départ)
-├── etatRetour  (au retour)
-├── commentaireDepart, commentaireRetour
-└── photosDepartIds[], photosRetourIds[]  (ou via Fichier.context)
+│
+├── Snapshot départ (rempli à l'envoi)
+│   ├── etatDepart           (état matériel au moment du départ)
+│   └── commentaireDepart
+│
+├── Snapshot retour (rempli à la réception retour, si applicable)
+│   ├── etatRetour
+│   └── commentaireRetour
+│
+└── Photos : via Fichier(entityType="MOUVEMENT_LIGNE", context="PHOTO_DEPART"|"PHOTO_RETOUR")
 ```
 
 ### 3.3 `Reservation`
 
 ```
 Reservation
-├── id, materielId, demandeurId
-├── dateDebut, dateFin
+├── id
+├── materielId               → Materiel
+├── demandeurId              → Agent
+├── dateDebut, dateFin       (créneau exclusif — pas de chevauchement)
 ├── motif
-├── typePrevu : MouvementType (pré-typage indicatif)
-├── statut : CONFIRMEE | ANNULEE | HONOREE
-├── mouvementId? (rempli quand convertie en mouvement)
-└── commentaire
+├── typePrevu                : MouvementType (indicatif)
+├── statut                   : CONFIRMEE | ANNULEE | HONOREE
+├── mouvementId?             → Mouvement (rempli à l'activation manuelle)
+├── commentaire
+└── createdAt, updatedAt
 ```
 
-### 3.4 Statut "actuel" du matériel : calculé ou stocké ?
+**Contrainte** : `UNIQUE(materielId, dateDebut, dateFin)` + vérification serveur qu'aucune réservation CONFIRMEE ne chevauche.
 
-**Recommandation** : calcul à la volée via vue/requête depuis le mouvement actif.
-- Avantages : impossible d'avoir un état incohérent, pas de double maintenance.
-- Inconvénient : requête plus complexe pour l'affichage liste.
-- Compromis : champ `etatActuel` dénormalisé sur `Materiel`, mis à jour par les transitions de mouvement.
+### 3.4 Flags stockés sur `Materiel`
 
-À débattre.
+Les champs existants sur `Materiel` restent et sont **mis à jour automatiquement** par les transitions de mouvement :
 
-## 4. Workflows (états → transitions)
+| Champ | Mis à jour par |
+|-------|----------------|
+| `site` | TRANSFERT_SITE → clôture |
+| `entreprise` (détenteur) | ETALONNAGE / PRET_EXTERNE → envoi / retour |
+| `enPret` | PRET_EXTERNE / PRET_INTERNE → envoi / retour |
+| `motifPret` | PRET_* → envoi |
+| `dateRetourPret` | PRET_* → envoi (= dateRetourEstimee) |
+| `enTransit` | Tout mouvement → envoi / réception |
+| `dateEtalonnage` | ETALONNAGE → clôture (intégration certificat) |
+| `dateProchainEtalonnage` | ETALONNAGE → clôture (recalculé) |
+| `responsableId` | Si changement de responsable à la clôture |
 
-### Transfert site
+## 4. Machine à états — Workflow complet
+
+Chaque mouvement suit un flux avec des **points de contrôle obligatoires** (validation, photos, documents).
+
+### 4.1 Leg Aller (tous types)
+
 ```
-BROUILLON → PLANIFIE → EN_TRANSIT → ARRIVE → CLOTURE
-                                      └→ ANNULE
-```
-À CLOTURE : `Materiel.site` mis à jour vers `siteDestinationCode`.
-
-### Étalonnage
-```
-BROUILLON → PLANIFIE → EN_TRANSIT → ARRIVE (chez étalonneur)
-         → EN_COURS (en cours d'étalonnage)
-         → RETOUR_EN_TRANSIT (retour vers EDF)
-         → [intégration certificat + maj dateEtalonnage / validiteEtalonnage]
-         → CLOTURE
-```
-
-### Prêt (externe et interne)
-```
-BROUILLON → PLANIFIE → EN_TRANSIT → ARRIVE
-         → EN_COURS (en prêt)
-         → [alerte si dateRetourEstimee approche / dépassée]
-         → RETOUR_DEMANDE (rappel envoyé)
-         → RETOUR_EN_TRANSIT
-         → CLOTURE
+  BROUILLON
+      │  (demandeur soumet)
+      ▼
+  SOUMISE
+      │  (validation par rôle habilité)
+      ▼
+  VALIDEE
+      │  (préparation : photo colis + bon de transport obligatoire)
+      ▼
+  PRETE_A_EXPEDIER
+      │  (magasin valide le départ : expediteurId + dateEnvoi)
+      ▼
+  EN_TRANSIT
+      │  (magasin destination valide l'arrivée : receptionneurId + dateReception)
+      ▼
+  RECUE
 ```
 
-## 5. Liens avec l'existant
+### 4.2 Après réception — dépend du type
 
-### `DemandeEnvoi` actuel
-Le modèle existant `DemandeEnvoi` couvre partiellement le concept de mouvement, mais :
-- Champs orientés "envoi" uniquement, pas "retour"
-- Pas de notion de détenteur change vs site change
-- Pas de lien avec étalonnage / prêt
-- Statuts génériques
+**TRANSFERT_SITE** :
+```
+  RECUE → CLOTUREE
+  (Materiel.site mis à jour, Materiel.enTransit = false)
+```
 
-**Deux options** :
-- **A. Étendre `DemandeEnvoi`** → renommer en `Mouvement`, ajouter colonnes manquantes, garder la table.
-- **B. Nouveau modèle `Mouvement`** → migration des données, dépréciation progressive de `DemandeEnvoi`.
+**ETALONNAGE** :
+```
+  RECUE → EN_COURS (en étalonnage chez le prestataire)
+        → RETOUR_PRET (photo colis retour + bon transport retour)
+        → RETOUR_EN_TRANSIT (magasin étalonneur valide départ retour)
+        → RETOUR_RECUE (magasin EDF valide réception retour)
+        → [upload certificat + saisie nouvelles dates étalonnage]
+        → CLOTUREE
+```
 
-> Recommandation : **Option A** (plus pragmatique, on garde l'historique). Renommage table + ajout colonnes via migration.
+**PRET_EXTERNE / PRET_INTERNE** :
+```
+  RECUE → EN_COURS (en prêt)
+        → [suivi dateRetourEstimee, alertes si dépassement]
+        → RETOUR_PRET (retour préparé)
+        → RETOUR_EN_TRANSIT (emprunteur valide départ retour)
+        → RETOUR_RECUE (magasin EDF valide réception retour)
+        → CLOTUREE
+```
 
-### Champs `Materiel` à déprécier
-- `enPret`, `motifPret`, `dateRetourPret` → portés par le mouvement actif
-- `enTransit` → portés par le statut du mouvement
-- Décision : garder en lecture (calculés via mouvement) ou supprimer ?
+### 4.3 Annulation
 
-### Fichiers
-- `Fichier.context` peut prendre les valeurs : `CONVENTION`, `CERTIFICAT_ETALONNAGE`, `BON_LIVRAISON`, `PHOTO_DEPART`, `PHOTO_RETOUR`, `GENERAL`.
-- Lien direct `Fichier.mouvementId` (nouveau) ou via `entityType="MOUVEMENT"`.
+```
+BROUILLON | SOUMISE | VALIDEE → ANNULEE (à tout moment avant expédition)
+EN_TRANSIT et après → pas d'annulation possible, il faut gérer le retour
+```
+
+### 4.4 Points de contrôle obligatoires par transition
+
+| Transition | Obligatoire | Qui |
+|------------|-------------|-----|
+| BROUILLON → SOUMISE | Au moins 1 ligne matériel + destination renseignée | Demandeur |
+| SOUMISE → VALIDEE | Validation explicite | GESTIONNAIRE_MAGASIN ou ADMIN |
+| VALIDEE → PRETE_A_EXPEDIER | Photo colis + bon de transport uploadé | Demandeur ou magasin |
+| PRETE_A_EXPEDIER → EN_TRANSIT | Validation départ | GESTIONNAIRE_MAGASIN |
+| EN_TRANSIT → RECUE | Validation arrivée | GESTIONNAIRE_MAGASIN (site destination) |
+| RECUE → EN_COURS | Automatique (étalonnage/prêt) | — |
+| EN_COURS → RETOUR_PRET | Photo colis retour | Détenteur ou magasin |
+| RETOUR_PRET → RETOUR_EN_TRANSIT | Validation départ retour | GESTIONNAIRE_MAGASIN |
+| RETOUR_EN_TRANSIT → RETOUR_RECUE | Validation arrivée retour | GESTIONNAIRE_MAGASIN |
+| RETOUR_RECUE → CLOTUREE | Étalonnage : certificat obligatoire. Prêt : vérification état. | GESTIONNAIRE_MAGASIN |
+
+## 5. Fichiers liés aux mouvements
+
+Les fichiers utilisent le système `Fichier` existant avec `entityType` et `context` :
+
+| Fichier | entityType | context | Quand |
+|---------|-----------|---------|-------|
+| Photo colis aller | `MOUVEMENT` | `PHOTO_COLIS_ENVOI` | Avant expédition |
+| Bon de transport aller | `MOUVEMENT` | `BON_TRANSPORT_ENVOI` | Avant expédition |
+| Photo colis retour | `MOUVEMENT` | `PHOTO_COLIS_RETOUR` | Avant expédition retour |
+| Bon de transport retour | `MOUVEMENT` | `BON_TRANSPORT_RETOUR` | Avant expédition retour |
+| Convention (prêt externe) | `MOUVEMENT` | `CONVENTION` | À la soumission |
+| Certificat étalonnage | `MOUVEMENT` | `CERTIFICAT_ETALONNAGE` | À la clôture |
+| Photo départ matériel | `MOUVEMENT_LIGNE` | `PHOTO_DEPART` | À l'envoi, par matériel |
+| Photo retour matériel | `MOUVEMENT_LIGNE` | `PHOTO_RETOUR` | Au retour, par matériel |
 
 ## 6. Calendrier matériel
 
-Vue timeline par matériel :
-- Bandes horizontales colorées par type de mouvement (passé / présent / futur)
-- Réservations affichées en hachuré
-- Plusieurs réservations parallèles possibles → alignées verticalement
-- Blocage automatique si chevauchement ? **À confirmer**.
+Vue timeline par matériel affichant :
+- **Mouvements passés** : bandes grisées
+- **Mouvement actif** : bande colorée (bleu = transfert, orange = étalonnage, violet = prêt externe, vert = prêt interne)
+- **Réservations futures** : bandes hachurées (pas de chevauchement possible)
+- Clic sur une réservation → bouton "Convertir en mouvement" (action manuelle)
 
-## 7. Permissions (à clarifier)
+## 7. Permissions
 
-| Action | Rôle suggéré |
-|--------|--------------|
-| Créer transfert site | GESTIONNAIRE_MAGASIN |
-| Créer envoi étalonnage | REFERENT_MATERIEL |
-| Créer prêt externe | REFERENT_LOGISTIQUE |
-| Créer prêt interne | REFERENT_MATERIEL ou tout agent ? |
-| Créer réservation | Tout agent connecté ? |
-| Valider/clôturer mouvement | GESTIONNAIRE_MAGASIN ou ADMIN |
+| Action | Rôles autorisés |
+|--------|-----------------|
+| Créer mouvement (brouillon) | Tout agent connecté |
+| Soumettre pour validation | Demandeur |
+| Valider une demande | GESTIONNAIRE_MAGASIN, ADMIN |
+| Préparer colis (photo + bon) | Demandeur, GESTIONNAIRE_MAGASIN |
+| Valider expédition | GESTIONNAIRE_MAGASIN |
+| Valider réception | GESTIONNAIRE_MAGASIN (site destination) |
+| Clôturer | GESTIONNAIRE_MAGASIN, ADMIN |
+| Annuler | Demandeur (si BROUILLON/SOUMISE), ADMIN (si VALIDEE) |
+| Créer réservation | Tout agent connecté |
+| Activer réservation → mouvement | Demandeur de la réservation |
 
-## 8. Questions ouvertes (à trancher avant de coder)
+## 8. Questions ouvertes restantes
 
-### Modèle
-1. **Option A ou B** pour `DemandeEnvoi` ? (extension vs nouveau modèle)
-2. Garder les flags `enPret`/`enTransit` sur `Materiel` ou tout calculer depuis le mouvement actif ?
-3. Multi-matériel : un mouvement peut-il être mono-ligne, ou toujours multi-ligne (comme aujourd'hui `DemandeEnvoi`) ?
-4. Comment représenter un **pôle** EDF ? Nouveau référentiel `POLE` ? Champ sur `Agent` ? Sur `Site` ?
+### Workflow
+1. La **validation** (SOUMISE → VALIDEE) est-elle toujours nécessaire ? Ou certains types peuvent passer directement ?
+2. Pour les prêts internes (entre groupes) : le workflow est-il aussi strict (photo colis + bon transport) ou plus allégé ?
+3. Quand le certificat d'étalonnage est intégré, saisit-on manuellement les nouvelles dates ou les extrait-on du fichier ?
 
 ### Réservations
-5. Les réservations chevauchantes sont-elles **autorisées** sans contrainte, ou faut-il un **arbitrage** (priorité, demande de validation) ?
-6. Conversion réservation → mouvement : **automatique** à date début, ou **manuelle** par un référent ?
-7. Une réservation peut-elle porter sur plusieurs matériels (panier) ou un seul ?
+4. Une réservation porte sur **un seul matériel** ou peut-on réserver un panier ?
+5. Durée max d'une réservation ? Ou pas de limite ?
 
-### Workflow étalonnage
-8. Au retour d'étalonnage, l'intégration du certificat met-elle automatiquement à jour `Materiel.dateEtalonnage` et `dateProchainEtalonnage` ?
-9. Si l'étalonnage révèle un défaut → bascule automatique en `LEGER_DEFAUT` / `HS` ?
-
-### Workflow prêt
-10. Quelle alerte avant la `dateRetourEstimee` ? J-7, J-1, J0, J+X (si retard) ?
-11. Le canal d'alerte : in-app uniquement, mail, les deux ?
-12. Convention : upload libre ou template à compléter dans l'app ?
+### Alertes retour
+6. Quels seuils d'alerte pour les retards ? J-7, J-1, J0 (échu), J+7 (retard) ?
+7. Canal : in-app uniquement pour l'instant ?
 
 ### Migration
-13. Faut-il convertir les `DemandeEnvoi` existantes en `Mouvement` ? Ou seulement nouvelles ?
-14. Comment traiter les matériels actuellement marqués `enPret=true` sans mouvement ?
+8. Les `DemandeEnvoi` existantes : toutes migrées en TRANSFERT_SITE ? Ou on distingue selon le `type` existant ?
+9. Les matériels avec `enPret=true` sans mouvement associé : on crée un mouvement rétroactif ou on nettoie le flag ?
 
-### Permissions
-15. Validation/approbation : un mouvement passe directement de PLANIFIE à EN_TRANSIT, ou nécessite une approbation par un autre rôle ?
-16. Qui peut **annuler** un mouvement, et à quelle étape ?
+## 9. Phases d'implémentation
 
-## 9. Phases d'implémentation suggérées
-
-| # | Contenu | Dépendances |
+| # | Contenu | PRs estimées |
 |---|---------|-------------|
-| **P1** | Modèle `Mouvement` + types/statuts + CRUD basique + liste | — |
-| **P2** | Workflow `TRANSFERT_SITE` (le plus simple, sert de référence) | P1 |
-| **P3** | Workflow `ETALONNAGE` + intégration certificat au retour | P1 |
-| **P4** | Workflow `PRET_EXTERNE` + convention obligatoire | P1 |
-| **P5** | Workflow `PRET_INTERNE` (variant de P4) + référentiel pôle | P4 |
-| **P6** | `Reservation` + calendrier matériel | P1 |
-| **P7** | Conversion réservation → mouvement | P6 |
-| **P8** | Statuts matériel calculés (suppression flags) + alertes retour | P2..P5 |
-| **P9** | Migration `DemandeEnvoi` (si Option A → renommage; si B → migration data) | P1 |
+| **P1** | Migration schema : renommer `DemandeEnvoi` → `Mouvement`, ajouter colonnes, nouveaux statuts | 1 PR |
+| **P2** | Backend `MouvementsService` : CRUD + machine à états (transitions avec contrôles) | 1 PR |
+| **P3** | Frontend : Liste mouvements + formulaire création (type → champs conditionnels) | 1 PR |
+| **P4** | Workflow TRANSFERT_SITE complet : formulaire multi-étapes, upload photos/bon, validations magasin | 1-2 PRs |
+| **P5** | Workflow ETALONNAGE : variante avec certificat retour + maj dates matériel | 1 PR |
+| **P6** | Workflow PRET_EXTERNE : variante avec convention + suivi date retour | 1 PR |
+| **P7** | Workflow PRET_INTERNE : variante allégée avec groupe destination | 1 PR |
+| **P8** | Modèle `Reservation` + calendrier matériel + activation manuelle | 1-2 PRs |
+| **P9** | Alertes retour (in-app) + indicateurs KPI mouvements | 1 PR |
+| **P10** | Nettoyage : migration données existantes + suppression ancien code `DemandeEnvoi` | 1 PR |
 
-Chaque phase = 1 PR. P1 et P2 sont prérequis avant tout le reste.
+**P1 → P3** sont les fondations. P4 est le premier workflow complet (référence pour les suivants).
 
-## 10. Non-objectifs (out of scope pour cette itération)
+## 10. Non-objectifs (hors scope cette itération)
 
-- Géolocalisation / scan QR à la réception
+- Notifications mail / SMS
+- Scan QR à la réception
 - Signature électronique des conventions
-- Notifications mail (in-app suffit dans un premier temps)
-- Bons de livraison générés automatiquement
-- Suivi multi-étapes du transit (la Poste, transporteur, etc.)
+- Génération automatique de bons de livraison
+- Tracking transporteur (la Poste, etc.)
+- Gestion de stock (entrées/sorties quantitatives)
