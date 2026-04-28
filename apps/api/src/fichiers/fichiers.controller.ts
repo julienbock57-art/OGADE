@@ -74,15 +74,15 @@ export class FichiersController {
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
   ) {
-    const fichier = await this.fichiersService.findOne(id);
-    const filePath = this.fichiersService.getFilePath(fichier.blobKey);
+    const fileData = await this.fichiersService.getFileData(id);
 
     res.set({
-      'Content-Type': fichier.mimeType || 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${fichier.nomOriginal || fichier.blobKey}"`,
+      'Content-Type': fileData.mimeType,
+      'Content-Disposition': `attachment; filename="${fileData.nomOriginal}"`,
+      'Content-Length': String(fileData.data.length),
     });
 
-    res.sendFile(filePath);
+    res.end(fileData.data);
   }
 
   @Get('entity/:entityType/:entityId')

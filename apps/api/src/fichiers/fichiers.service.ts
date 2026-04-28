@@ -1,22 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EvenementsService } from '../evenements/evenements.service';
-import * as fs from 'fs';
-import * as path from 'path';
 import { randomUUID } from 'crypto';
-
-const UPLOADS_DIR = path.resolve(__dirname, '..', '..', 'uploads');
 
 @Injectable()
 export class FichiersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly evenements: EvenementsService,
-  ) {
-    if (!fs.existsSync(UPLOADS_DIR)) {
-      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-    }
-  }
+  ) {}
 
   async upload(
     file: Express.Multer.File,
@@ -28,15 +20,13 @@ export class FichiersService {
     demandeEnvoiId?: number,
   ) {
     const blobKey = `${randomUUID()}-${file.originalname}`;
-    const filePath = path.join(UPLOADS_DIR, blobKey);
-
-    fs.writeFileSync(filePath, file.buffer);
 
     const fichier = await this.prisma.fichier.create({
       data: {
         entityType,
         entityId,
         blobKey,
+        blobData: Buffer.from(file.buffer),
         nomOriginal: file.originalname,
         mimeType: file.mimetype,
         tailleOctets: file.size,
@@ -68,7 +58,23 @@ export class FichiersService {
   }
 
   async findOne(id: number) {
-    const fichier = await this.prisma.fichier.findUnique({ where: { id } });
+    const fichier = await this.prisma.fichier.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        entityType: true,
+        entityId: true,
+        blobKey: true,
+        nomOriginal: true,
+        mimeType: true,
+        tailleOctets: true,
+        typeFichier: true,
+        context: true,
+        demandeEnvoiId: true,
+        uploadedById: true,
+        uploadedAt: true,
+      },
+    });
     if (!fichier) {
       throw new NotFoundException(`Fichier #${id} not found`);
     }
@@ -81,25 +87,44 @@ export class FichiersService {
     return this.prisma.fichier.findMany({
       where,
       orderBy: { uploadedAt: 'desc' },
-      include: { uploadedBy: { select: { id: true, nom: true, prenom: true } } },
+      select: {
+        id: true,
+        entityType: true,
+        entityId: true,
+        blobKey: true,
+        nomOriginal: true,
+        mimeType: true,
+        tailleOctets: true,
+        typeFichier: true,
+        context: true,
+        demandeEnvoiId: true,
+        uploadedById: true,
+        uploadedAt: true,
+        uploadedBy: { select: { id: true, nom: true, prenom: true } },
+      },
     });
   }
 
-  getFilePath(blobKey: string): string {
-    const filePath = path.join(UPLOADS_DIR, blobKey);
-    if (!fs.existsSync(filePath)) {
-      throw new NotFoundException('Physical file not found');
+  async getFileData(id: number): Promise<{ data: Buffer; mimeType: string; nomOriginal: string }> {
+    const fichier = await this.prisma.fichier.findUnique({
+      where: { id },
+      select: { blobData: true, mimeType: true, nomOriginal: true, blobKey: true },
+    });
+    if (!fichier) {
+      throw new NotFoundException(`Fichier #${id} not found`);
     }
-    return filePath;
+    if (!fichier.blobData) {
+      throw new NotFoundException('File data not found in database');
+    }
+    return {
+      data: Buffer.from(fichier.blobData),
+      mimeType: fichier.mimeType || 'application/octet-stream',
+      nomOriginal: fichier.nomOriginal || fichier.blobKey,
+    };
   }
 
   async remove(id: number, userId?: number) {
     const fichier = await this.findOne(id);
-    const filePath = path.join(UPLOADS_DIR, fichier.blobKey);
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
 
     await this.prisma.fichier.delete({ where: { id } });
 
