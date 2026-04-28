@@ -1,14 +1,36 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EvenementsService } from '../evenements/evenements.service';
 import type { CreateMaterielInput, UpdateMaterielInput } from '@ogade/shared';
 
 const materielInclude = {
   responsable: { select: { id: true, nom: true, prenom: true } },
 };
 
+const TRACKED_FIELDS = [
+  'reference', 'libelle', 'etat', 'typeMateriel', 'numeroSerie',
+  'localisation', 'site', 'description', 'dateEtalonnage',
+  'dateProchainEtalonnage', 'modele', 'typeTraducteur', 'typeEND',
+  'groupe', 'fournisseur', 'validiteEtalonnage', 'soumisVerification',
+  'enPret', 'motifPret', 'dateRetourPret', 'completude',
+  'informationVerifiee', 'produitsChimiques', 'commentaires',
+  'entreprise', 'responsableId', 'commentaireEtat',
+  'commentairesCompletude', 'numeroFIEC', 'enTransit', 'lotChaine',
+  'complementsLocalisation', 'proprietaire',
+];
+
+function normalize(v: any): string | number | boolean | null {
+  if (v === undefined || v === null) return null;
+  if (v instanceof Date) return v.toISOString();
+  return v;
+}
+
 @Injectable()
 export class MaterielsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly evenements: EvenementsService,
+  ) {}
 
   async findAll(params: {
     page: number;
@@ -111,26 +133,86 @@ export class MaterielsService {
   }
 
   async create(data: CreateMaterielInput, userId?: number) {
-    return this.prisma.materiel.create({
+    const materiel = await this.prisma.materiel.create({
       data: { ...data, createdById: userId ?? null },
       include: materielInclude,
     });
+
+    const changedFields: Record<string, { old: any; new: any }> = {};
+    for (const field of TRACKED_FIELDS) {
+      const val = normalize((materiel as any)[field]);
+      if (val !== null) {
+        changedFields[field] = { old: null, new: val };
+      }
+    }
+
+    await this.evenements.create({
+      entityType: 'MATERIEL',
+      entityId: materiel.id,
+      eventType: 'CREATED',
+      payload: { changedFields, summary: 'Création de la fiche' },
+      acteurId: userId,
+    });
+
+    return materiel;
   }
 
   async update(id: number, data: UpdateMaterielInput, userId?: number) {
-    await this.findOne(id);
-    return this.prisma.materiel.update({
+    const before = await this.findOne(id);
+
+    const materiel = await this.prisma.materiel.update({
       where: { id },
       data: { ...data, updatedById: userId ?? null },
       include: materielInclude,
     });
+
+    const changedFields: Record<string, { old: any; new: any }> = {};
+    for (const field of TRACKED_FIELDS) {
+      if (!(field in data)) continue;
+      const oldVal = normalize((before as any)[field]);
+      const newVal = normalize((materiel as any)[field]);
+      if (oldVal !== newVal) {
+        changedFields[field] = { old: oldVal, new: newVal };
+      }
+    }
+
+    if (Object.keys(changedFields).length > 0) {
+      const count = Object.keys(changedFields).length;
+      await this.evenements.create({
+        entityType: 'MATERIEL',
+        entityId: materiel.id,
+        eventType: 'UPDATED',
+        payload: {
+          changedFields,
+          summary: `${count} champ${count > 1 ? 's' : ''} modifié${count > 1 ? 's' : ''}`,
+        },
+        acteurId: userId,
+      });
+    }
+
+    return materiel;
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: number, userId?: number) {
     await this.findOne(id);
-    return this.prisma.materiel.update({
+    const materiel = await this.prisma.materiel.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
+
+    await this.evenements.create({
+      entityType: 'MATERIEL',
+      entityId: id,
+      eventType: 'DELETED',
+      payload: { summary: 'Suppression de la fiche' },
+      acteurId: userId,
+    });
+
+    return materiel;
+  }
+
+  async findHistorique(materielId: number) {
+    await this.findOne(materielId);
+    return this.evenements.findByEntity('MATERIEL', materielId);
   }
 }

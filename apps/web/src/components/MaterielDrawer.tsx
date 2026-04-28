@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import type { Materiel } from "@ogade/shared";
+import { useQuery } from "@tanstack/react-query";
+import type { Materiel, Evenement } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 
@@ -214,6 +215,189 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="field-label">{label}</span>
       <span className="field-value">{children}</span>
     </div>
+  );
+}
+
+// ─── FIELD LABEL MAP ──────────────────────────────────────────────────────
+const FIELD_LABELS: Record<string, string> = {
+  reference: "Référence",
+  libelle: "Libellé",
+  etat: "État",
+  typeMateriel: "Type de matériel",
+  numeroSerie: "Numéro de série",
+  localisation: "Localisation",
+  site: "Site",
+  description: "Description",
+  dateEtalonnage: "Date d'étalonnage",
+  dateProchainEtalonnage: "Prochaine échéance",
+  modele: "Modèle",
+  typeTraducteur: "Type traducteur",
+  typeEND: "Type d'END",
+  groupe: "Groupe",
+  fournisseur: "Fournisseur",
+  validiteEtalonnage: "Validité (mois)",
+  soumisVerification: "Soumis à vérification",
+  enPret: "En prêt",
+  motifPret: "Motif du prêt",
+  dateRetourPret: "Date retour prêt",
+  completude: "Complétude",
+  informationVerifiee: "Information vérifiée",
+  produitsChimiques: "Produits chimiques",
+  commentaires: "Commentaires",
+  entreprise: "Entreprise",
+  responsableId: "Responsable",
+  commentaireEtat: "Commentaire état",
+  commentairesCompletude: "Commentaire complétude",
+  numeroFIEC: "N° FIEC",
+  enTransit: "En transit",
+  lotChaine: "Lot / Chaîne",
+  complementsLocalisation: "Compléments localisation",
+  proprietaire: "Propriétaire",
+};
+
+const EVENT_TITLES: Record<string, string> = {
+  CREATED: "Création de la fiche",
+  UPDATED: "Modification",
+  DELETED: "Suppression de la fiche",
+};
+
+const EVENT_DOT_COLORS: Record<string, string> = {
+  CREATED: "emerald",
+  UPDATED: "accent",
+  DELETED: "rose",
+};
+
+function formatFieldValue(v: any): string {
+  if (v === null || v === undefined) return "—";
+  if (v === true) return "Oui";
+  if (v === false) return "Non";
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T/.test(v)) {
+    return new Date(v).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  }
+  return String(v);
+}
+
+// ─── HISTORIQUE TAB ───────────────────────────────────────────────────────
+function HistoriqueTab({ materielId }: { materielId: number }) {
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const { data: events, isLoading } = useQuery<Evenement[]>({
+    queryKey: ["materiels", materielId, "historique"],
+    queryFn: () => api.get(`/materiels/${materielId}/historique`),
+  });
+
+  const fmtEvt = (d: string | Date) =>
+    new Date(d).toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  if (isLoading) {
+    return (
+      <DrawerSection title="Historique des modifications & mouvements">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "16px 0", color: "var(--ink-3)", fontSize: 13 }}>
+          <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+          Chargement...
+        </div>
+      </DrawerSection>
+    );
+  }
+
+  if (!events || events.length === 0) {
+    return (
+      <DrawerSection title="Historique des modifications & mouvements">
+        <p style={{ fontSize: 13, color: "var(--ink-3)", margin: 0 }}>Aucun historique disponible.</p>
+      </DrawerSection>
+    );
+  }
+
+  return (
+    <DrawerSection title="Historique des modifications & mouvements">
+      <div className="timeline">
+        {events.map((evt) => {
+          const title = EVENT_TITLES[evt.eventType] ?? evt.eventType;
+          const dotColor = EVENT_DOT_COLORS[evt.eventType] ?? "neutral";
+          const acteur = evt.acteur;
+          const payload = evt.payload;
+          const changedFields = payload?.changedFields;
+          const fieldCount = changedFields ? Object.keys(changedFields).length : 0;
+          const isExpanded = expandedId === evt.id;
+          const hasDetails = fieldCount > 0;
+
+          let meta = acteur ? `${acteur.prenom} ${acteur.nom}` : "Système";
+          if (evt.eventType === "UPDATED" && fieldCount > 0) {
+            meta += ` · ${fieldCount} champ${fieldCount > 1 ? "s" : ""} modifié${fieldCount > 1 ? "s" : ""}`;
+          } else if (evt.eventType === "CREATED") {
+            meta += " · Saisie initiale";
+          }
+
+          const dotStyle =
+            dotColor === "accent"
+              ? { background: "var(--accent)", boxShadow: "0 0 0 1.5px var(--accent)" }
+              : dotColor === "rose"
+                ? { background: "var(--rose)", boxShadow: "0 0 0 1.5px var(--rose)" }
+                : undefined;
+
+          return (
+            <div key={evt.id} className="timeline-item done">
+              <div className="timeline-dot" style={dotStyle} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <div className="timeline-title">{title}</div>
+                  {hasDetails && (
+                    <button
+                      className="obtn"
+                      style={{ fontSize: 10, padding: "2px 8px", minHeight: 0 }}
+                      onClick={() => setExpandedId(isExpanded ? null : evt.id)}
+                    >
+                      {isExpanded ? "Masquer" : "Détails"}
+                    </button>
+                  )}
+                </div>
+                <div className="timeline-meta">
+                  {fmtEvt(evt.occurredAt)} · {meta}
+                </div>
+                {isExpanded && changedFields && (
+                  <div style={{ marginTop: 10, background: "var(--bg-sunken)", borderRadius: 8, border: "1px solid var(--line)", overflow: "hidden" }}>
+                    <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid var(--line)" }}>
+                          <th style={{ textAlign: "left", padding: "6px 10px", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--ink-3)" }}>Champ</th>
+                          {evt.eventType === "UPDATED" && (
+                            <th style={{ textAlign: "left", padding: "6px 10px", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--ink-3)" }}>Avant</th>
+                          )}
+                          <th style={{ textAlign: "left", padding: "6px 10px", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--ink-3)" }}>
+                            {evt.eventType === "UPDATED" ? "Après" : "Valeur initiale"}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(changedFields).map(([field, diff]) => (
+                          <tr key={field} style={{ borderBottom: "1px solid var(--line-2)" }}>
+                            <td style={{ padding: "5px 10px", fontWeight: 500, color: "var(--ink)" }}>{FIELD_LABELS[field] ?? field}</td>
+                            {evt.eventType === "UPDATED" && (
+                              <td style={{ padding: "5px 10px", color: "var(--rose)", textDecoration: diff.old !== null ? "line-through" : undefined }}>{formatFieldValue(diff.old)}</td>
+                            )}
+                            <td style={{ padding: "5px 10px", color: "var(--emerald)", fontWeight: 500 }}>{formatFieldValue(diff.new)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </DrawerSection>
   );
 }
 
@@ -577,36 +761,7 @@ export default function MaterielDrawer({
           )}
 
           {/* ── Tab: Historique ── */}
-          {tab === "historique" && (
-            <DrawerSection title="Historique des modifications & mouvements">
-              <div className="timeline">
-                {[
-                  {
-                    t: fmtTime(m.updatedAt),
-                    title: "Information vérifiée",
-                    meta: `${resp ? `${resp.prenom} ${resp.nom}` : "—"} · vérification annuelle`,
-                    state: "done",
-                  },
-                  {
-                    t: fmtTime(m.createdAt),
-                    title: "Création de la fiche",
-                    meta: `Saisie initiale${resp ? ` par ${resp.prenom} ${resp.nom}` : ""}`,
-                    state: "done",
-                  },
-                ].map((a, i) => (
-                  <div key={i} className={`timeline-item ${a.state}`}>
-                    <div className="timeline-dot" />
-                    <div>
-                      <div className="timeline-title">{a.title}</div>
-                      <div className="timeline-meta">
-                        {a.t} · {a.meta}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </DrawerSection>
-          )}
+          {tab === "historique" && <HistoriqueTab materielId={m.id} />}
 
           {/* ── Tab: QR code ── */}
           {tab === "qr" && (
