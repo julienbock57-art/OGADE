@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import QrScannerModal from "@/components/QrScannerModal";
 
 function Icon({ name, size = 14 }: { name: string; size?: number }) {
   const paths: Record<string, string> = {
@@ -15,6 +16,7 @@ function Icon({ name, size = 14 }: { name: string; size?: number }) {
     cal:      "M4 5h12v12H4z M4 8h12 M7 3v4 M13 3v4",
     flask:    "M8 3h4 M9 3v5l-4 8a2 2 0 0 0 2 3h6a2 2 0 0 0 2-3l-4-8V3",
     map:      "M3 5l5-2 4 2 5-2v12l-5 2-4-2-5 2z M8 3v12 M12 5v12",
+    qrscan:   "M3 7V4a1 1 0 0 1 1-1h3 M13 3h3a1 1 0 0 1 1 1v3 M17 13v3a1 1 0 0 1-1 1h-3 M7 17H4a1 1 0 0 1-1-1v-3 M7 7h2v2H7z M11 7h2v2h-2z M7 11h2v2H7z M12 12h1v1h-1z",
     settings: "M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M16 10a6 6 0 0 1-.1 1l2 1.5-2 3.4-2.3-1a6 6 0 0 1-1.7 1l-.3 2.5h-3.2l-.3-2.5a6 6 0 0 1-1.7-1l-2.3 1-2-3.4 2-1.5a6 6 0 0 1 0-2l-2-1.5 2-3.4 2.3 1a6 6 0 0 1 1.7-1L8.4 2h3.2l.3 2.5a6 6 0 0 1 1.7 1l2.3-1 2 3.4-2 1.5a6 6 0 0 1 .1 1z",
     logout:   "M14 10l3 0M14 10l-2-2m2 2l-2 2 M10 14v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1",
     chevl:    "M12.5 15.83L6.67 10l5.83-5.83",
@@ -60,6 +62,7 @@ export default function MainLayout() {
   const location = useLocation();
   const { user, logout, authConfig } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem("ogade_sidebar") === "collapsed"; } catch { return false; }
   });
@@ -177,6 +180,7 @@ export default function MainLayout() {
           <div className="flex-1" />
 
           <div className="flex items-center gap-2">
+            <button type="button" className="icon-btn" title="Scanner un QR code" onClick={() => setShowScanner(true)}><Icon name="qrscan" size={14} /></button>
             <button type="button" className="icon-btn"><Icon name="settings" size={14} /></button>
           </div>
         </header>
@@ -186,6 +190,8 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+
+      {showScanner && <QrScannerModal onClose={() => setShowScanner(false)} />}
     </div>
   );
 
