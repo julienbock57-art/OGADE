@@ -34,6 +34,7 @@ const navSections = [
       { to: "/materiels", label: "Matériels END", icon: "list" },
       { to: "/maquettes", label: "Maquettes", icon: "box" },
       { to: "/demandes-envoi", label: "Envois & retours", icon: "truck" },
+      { to: "/localisation", label: "Localisation", icon: "map" },
       { to: "/agents", label: "Agents", icon: "user" },
     ],
   },
@@ -177,6 +178,7 @@ export default function MainLayout() {
               {location.pathname.startsWith("/materiels") && "Gestion du matériel"}
               {location.pathname.startsWith("/maquettes") && "Maquettes"}
               {location.pathname.startsWith("/demandes") && "Envois & retours"}
+              {location.pathname.startsWith("/localisation") && "Localisation des actifs"}
               {location.pathname.startsWith("/agents") && "Agents"}
               {location.pathname.startsWith("/admin") && "Administration"}
             </b>
