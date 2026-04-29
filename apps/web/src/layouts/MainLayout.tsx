@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import QrScannerModal from "@/components/QrScannerModal";
+import ChatWidget from "@/components/ChatWidget";
 
 function Icon({ name, size = 14 }: { name: string; size?: number }) {
   const paths: Record<string, string> = {
@@ -192,6 +193,7 @@ export default function MainLayout() {
       </div>
 
       {showScanner && <QrScannerModal onClose={() => setShowScanner(false)} />}
+      <ChatWidget />
     </div>
   );
 

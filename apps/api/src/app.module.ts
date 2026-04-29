@@ -10,6 +10,7 @@ import { QrcodeModule } from './qrcode/qrcode.module';
 import { ReferentielsModule } from './referentiels/referentiels.module';
 import { SitesModule } from './sites/sites.module';
 import { EntreprisesModule } from './entreprises/entreprises.module';
+import { ChatModule } from './chat/chat.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -25,6 +26,7 @@ import { HealthController } from './health.controller';
     ReferentielsModule,
     SitesModule,
     EntreprisesModule,
+    ChatModule,
   ],
   controllers: [HealthController],
 })
