@@ -223,20 +223,20 @@ async function seedReferentiels() {
 
 async function seedSites() {
   const sites = [
-    { code: 'PARIS_DQI', label: 'DQI Paris', adresse: '22-30 avenue de Wagram', codePostal: '75008', ville: 'Paris' },
-    { code: 'LYON_BTN', label: 'BTN Lyon', adresse: '154 avenue Thiers', codePostal: '69006', ville: 'Lyon' },
-    { code: 'MARSEILLE', label: 'CNPE Marseille', adresse: 'Zone industrielle de Fos', codePostal: '13270', ville: 'Fos-sur-Mer' },
-    { code: 'SAINT_DENIS', label: 'Saint-Denis', adresse: '1 place Samuel de Champlain', codePostal: '92210', ville: 'Saint-Denis' },
-    { code: 'CHINON', label: 'CNPE Chinon', adresse: 'BP 80', codePostal: '37420', ville: 'Avoine' },
-    { code: 'GRAVELINES', label: 'CNPE Gravelines', adresse: 'BP 149', codePostal: '59820', ville: 'Gravelines' },
-    { code: 'CATTENOM', label: 'CNPE Cattenom', adresse: 'BP 41', codePostal: '57570', ville: 'Cattenom' },
-    { code: 'FLAMANVILLE', label: 'CNPE Flamanville', adresse: 'BP 4', codePostal: '50340', ville: 'Les Pieux' },
+    { code: 'PARIS_DQI', label: 'DQI Paris', adresse: '22-30 avenue de Wagram', codePostal: '75008', ville: 'Paris', latitude: 48.8778, longitude: 2.2980 },
+    { code: 'LYON_BTN', label: 'BTN Lyon', adresse: '154 avenue Thiers', codePostal: '69006', ville: 'Lyon', latitude: 45.7668, longitude: 4.8655 },
+    { code: 'MARSEILLE', label: 'CNPE Marseille', adresse: 'Zone industrielle de Fos', codePostal: '13270', ville: 'Fos-sur-Mer', latitude: 43.4247, longitude: 4.8948 },
+    { code: 'SAINT_DENIS', label: 'Saint-Denis', adresse: '1 place Samuel de Champlain', codePostal: '92210', ville: 'Saint-Denis', latitude: 48.8927, longitude: 2.2378 },
+    { code: 'CHINON', label: 'CNPE Chinon', adresse: 'BP 80', codePostal: '37420', ville: 'Avoine', latitude: 47.2300, longitude: 0.1700 },
+    { code: 'GRAVELINES', label: 'CNPE Gravelines', adresse: 'BP 149', codePostal: '59820', ville: 'Gravelines', latitude: 51.0151, longitude: 2.1087 },
+    { code: 'CATTENOM', label: 'CNPE Cattenom', adresse: 'BP 41', codePostal: '57570', ville: 'Cattenom', latitude: 49.4066, longitude: 6.2197 },
+    { code: 'FLAMANVILLE', label: 'CNPE Flamanville', adresse: 'BP 4', codePostal: '50340', ville: 'Les Pieux', latitude: 49.5390, longitude: -1.8814 },
   ];
 
   for (const site of sites) {
     await prisma.site.upsert({
       where: { code: site.code },
-      update: { label: site.label, adresse: site.adresse, codePostal: site.codePostal, ville: site.ville },
+      update: { label: site.label, adresse: site.adresse, codePostal: site.codePostal, ville: site.ville, latitude: site.latitude, longitude: site.longitude },
       create: site,
     });
   }

@@ -311,6 +311,8 @@ model Site {
   pays       String? @default("France")
   telephone  String?
   email      String?
+  latitude   Float?
+  longitude  Float?
   actif      Boolean @default(true)
 
   @@map("ref_sites")

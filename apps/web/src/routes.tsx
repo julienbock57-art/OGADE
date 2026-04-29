@@ -18,6 +18,7 @@ import AdminReferentielTypePage from "@/pages/AdminReferentielTypePage";
 import AdminSitesPage from "@/pages/AdminSitesPage";
 import AdminEntreprisesPage from "@/pages/AdminEntreprisesPage";
 import AdminAgentsPage from "@/pages/AdminAgentsPage";
+import LocalisationPage from "@/pages/LocalisationPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading, authConfig } = useAuth();
@@ -69,6 +70,7 @@ export function AppRoutes() {
           path="/demandes-envoi/:id"
           element={<DemandeEnvoiDetailPage />}
         />
+        <Route path="/localisation" element={<LocalisationPage />} />
         <Route path="/agents" element={<AgentsListPage />} />
         <Route path="/admin/referentiels" element={<AdminReferentielsPage />} />
         <Route path="/admin/referentiels/:type" element={<AdminReferentielTypePage />} />

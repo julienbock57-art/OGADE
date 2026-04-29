@@ -18,6 +18,11 @@ import { SitesService } from './sites.service';
 export class SitesController {
   constructor(private readonly service: SitesService) {}
 
+  @Get('map-data')
+  async getMapData() {
+    return this.service.getMapData();
+  }
+
   @Get()
   async findAll() {
     return this.service.findAll();
