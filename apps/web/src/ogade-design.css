@@ -422,3 +422,10 @@ tr.row-selected td { border-bottom-color: var(--accent-line); }
   box-shadow: 0 0 0 3px var(--rose-soft);
 }
 .field-error { font-size: 11px; color: var(--rose); margin-top: 4px; }
+
+/* Sidebar responsive: hide grid column on mobile */
+@media (max-width: 1023px) {
+  .min-h-screen[style*="grid-template-columns"] {
+    grid-template-columns: 0px 1fr !important;
+  }
+}
