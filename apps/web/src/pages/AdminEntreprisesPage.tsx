@@ -88,7 +88,7 @@ export default function AdminEntreprisesPage() {
   const mutError = createMut.error || updateMut.error;
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 40 }}>
+    <div style={{ padding: "22px 28px 40px" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -122,6 +122,7 @@ export default function AdminEntreprisesPage() {
           </select>
           {!showForm && (
             <button
+              type="button"
               onClick={() => { setShowForm(true); setEditingId(null); setForm(empty); }}
               className="obtn accent"
             >
@@ -277,11 +278,12 @@ export default function AdminEntreprisesPage() {
                     </td>
                     <td style={{ ...tdStyle, textAlign: "right" }}>
                       <button
+                        type="button"
                         onClick={() => startEdit(ent)}
                         style={{
                           appearance: "none", border: "none", background: "none",
                           padding: 6, borderRadius: 7, color: "var(--ink-3)",
-                          cursor: "default", display: "inline-flex", transition: "color 0.12s, background 0.12s",
+                          cursor: "pointer", display: "inline-flex", transition: "color 0.12s, background 0.12s",
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = "var(--accent-ink)";
