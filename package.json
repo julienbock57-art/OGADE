@@ -36,6 +36,7 @@
     ]
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "jose": "^6.2.2"
   }
 }
