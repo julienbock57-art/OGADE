@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 
@@ -17,6 +17,10 @@ function Icon({ name, size = 14 }: { name: string; size?: number }) {
     map:      "M3 5l5-2 4 2 5-2v12l-5 2-4-2-5 2z M8 3v12 M12 5v12",
     settings: "M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M16 10a6 6 0 0 1-.1 1l2 1.5-2 3.4-2.3-1a6 6 0 0 1-1.7 1l-.3 2.5h-3.2l-.3-2.5a6 6 0 0 1-1.7-1l-2.3 1-2-3.4 2-1.5a6 6 0 0 1 0-2l-2-1.5 2-3.4 2.3 1a6 6 0 0 1 1.7-1L8.4 2h3.2l.3 2.5a6 6 0 0 1 1.7 1l2.3-1 2 3.4-2 1.5a6 6 0 0 1 .1 1z",
     logout:   "M14 10l3 0M14 10l-2-2m2 2l-2 2 M10 14v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1",
+    chevl:    "M12.5 15.83L6.67 10l5.83-5.83",
+    chevr:    "M7.5 4.17L13.33 10l-5.83 5.83",
+    menu:     "M4 5h12M4 10h12M4 15h12",
+    x:        "M5 5l10 10M15 5L5 15",
   };
   const d = paths[name] || "";
   return (
@@ -49,10 +53,25 @@ const navSections = [
   },
 ];
 
+const SIDEBAR_EXPANDED = 220;
+const SIDEBAR_COLLAPSED = 56;
+
 export default function MainLayout() {
   const location = useLocation();
   const { user, logout, authConfig } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem("ogade_sidebar") === "collapsed"; } catch { return false; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem("ogade_sidebar", collapsed ? "collapsed" : "expanded"); } catch {}
+  }, [collapsed]);
+
+  // Close mobile sidebar on navigation
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -60,94 +79,61 @@ export default function MainLayout() {
   };
 
   const authRequired = authConfig?.microsoftAuth || authConfig?.localAuth;
+  const sidebarWidth = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
 
   return (
-    <div className="grid min-h-screen" style={{ gridTemplateColumns: "220px 1fr" }}>
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
+    <div className="min-h-screen" style={{ display: "grid", gridTemplateColumns: `${sidebarWidth}px 1fr`, transition: "grid-template-columns 0.2s ease" }}>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30"
+          style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(2px)" }}
+          onClick={() => setMobileOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
       <aside
-        className="fixed lg:static inset-y-0 left-0 z-40 flex flex-col transition-transform duration-200 lg:translate-x-0"
         style={{
-          width: 220,
+          width: sidebarWidth,
           background: "var(--bg-panel)",
           borderRight: "1px solid var(--line)",
-          padding: "18px 14px",
-          gap: 4,
+          padding: collapsed ? "18px 8px" : "18px 14px",
           height: "100vh",
           position: "sticky",
           top: 0,
-          transform: sidebarOpen ? undefined : undefined,
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          transition: "width 0.2s ease, padding 0.2s ease",
+          overflow: "hidden",
+          zIndex: 40,
+        }}
+        className="hidden lg:flex"
+      >
+        {renderSidebarContent(false)}
+      </aside>
+
+      {/* Mobile sidebar (slide-over) */}
+      <aside
+        className="lg:hidden"
+        style={{
+          position: "fixed",
+          inset: "0 auto 0 0",
+          width: SIDEBAR_EXPANDED,
+          background: "var(--bg-panel)",
+          borderRight: "1px solid var(--line)",
+          padding: "18px 14px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          zIndex: 40,
+          transform: mobileOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.25s ease",
         }}
       >
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-[10px] px-1.5 pb-4 mb-2" style={{ borderBottom: "1px solid var(--line-2)" }} onClick={() => setSidebarOpen(false)}>
-          <div
-            className="w-[30px] h-[30px] rounded-lg grid place-items-center text-white font-bold text-[13px]"
-            style={{
-              background: "linear-gradient(135deg, var(--accent) 0%, oklch(0.55 0.20 320) 100%)",
-              boxShadow: "0 1px 0 rgba(255,255,255,.3) inset, 0 1px 2px rgba(0,0,0,.15)",
-            }}
-          >
-            O
-          </div>
-          <div>
-            <div className="font-bold text-[14px] tracking-[0.02em]" style={{ color: "var(--ink)" }}>OGADE</div>
-            <div className="text-[10px] tracking-[0.06em] uppercase" style={{ color: "var(--ink-3)" }}>Matériel END</div>
-          </div>
-        </Link>
-
-        {/* Nav sections */}
-        <nav className="flex-1 flex flex-col gap-1 overflow-y-auto">
-          {navSections.map((section) => (
-            <div key={section.label}>
-              <div className="nav-sect">{section.label}</div>
-              {section.items.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`nav-item ${isActive(item.to) ? "active" : ""}`}
-                >
-                  <Icon name={item.icon} />
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          ))}
-        </nav>
-
-        {/* Footer — user */}
-        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid var(--line-2)" }}>
-          <div className="flex items-center gap-[10px] p-1.5 rounded-lg hover:bg-[var(--bg-sunken)] transition-colors">
-            <span
-              className="w-7 h-7 rounded-full grid place-items-center text-[11px] font-semibold text-white shrink-0"
-              style={{ background: "oklch(0.70 0.15 275)", boxShadow: "0 0 0 2px white, 0 0 0 3px var(--line-2)" }}
-            >
-              {(user?.prenom?.[0] ?? "U") + (user?.nom?.[0] ?? "")}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="text-[12.5px] font-medium truncate" style={{ color: "var(--ink)" }}>
-                {user ? `${user.prenom} ${user.nom}` : "Utilisateur"}
-              </div>
-              <div className="text-[10.5px] truncate" style={{ color: "var(--ink-3)" }}>
-                {user?.roles?.[0] ?? user?.email ?? ""}
-              </div>
-            </div>
-            {authRequired && (
-              <button
-                onClick={logout}
-                className="icon-btn"
-                style={{ padding: 5, border: 0 }}
-                title="Déconnexion"
-              >
-                <Icon name="logout" size={13} />
-              </button>
-            )}
-          </div>
-        </div>
+        {renderSidebarContent(true)}
       </aside>
 
       {/* Main */}
@@ -161,14 +147,18 @@ export default function MainLayout() {
             borderBottom: "1px solid var(--line)",
           }}
         >
+          {/* Mobile menu button */}
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 -ml-2"
-            style={{ color: "var(--ink-2)" }}
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden"
+            style={{
+              appearance: "none", border: "none", background: "none",
+              padding: 6, marginLeft: -6, color: "var(--ink-2)", cursor: "pointer",
+              display: "flex",
+            }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6}>
-              <path d="M4 5h12M4 10h12M4 15h12" />
-            </svg>
+            <Icon name="menu" size={18} />
           </button>
 
           <div className="text-[12px]" style={{ color: "var(--ink-3)" }}>
@@ -187,7 +177,7 @@ export default function MainLayout() {
           <div className="flex-1" />
 
           <div className="flex items-center gap-2">
-            <button className="icon-btn"><Icon name="settings" size={14} /></button>
+            <button type="button" className="icon-btn"><Icon name="settings" size={14} /></button>
           </div>
         </header>
 
@@ -198,4 +188,139 @@ export default function MainLayout() {
       </div>
     </div>
   );
+
+  function renderSidebarContent(isMobile: boolean) {
+    const showLabels = isMobile || !collapsed;
+
+    return (
+      <>
+        {/* Brand + collapse toggle */}
+        <div
+          className="flex items-center pb-4 mb-2"
+          style={{ borderBottom: "1px solid var(--line-2)", gap: 10, paddingLeft: collapsed && !isMobile ? 2 : 6, paddingRight: collapsed && !isMobile ? 2 : 6 }}
+        >
+          <Link to="/" className="flex items-center gap-[10px]" style={{ flex: 1, minWidth: 0, textDecoration: "none" }}>
+            <div
+              className="grid place-items-center text-white font-bold text-[13px] shrink-0"
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: "linear-gradient(135deg, var(--accent) 0%, oklch(0.55 0.20 320) 100%)",
+                boxShadow: "0 1px 0 rgba(255,255,255,.3) inset, 0 1px 2px rgba(0,0,0,.15)",
+              }}
+            >
+              O
+            </div>
+            {showLabels && (
+              <div style={{ overflow: "hidden", whiteSpace: "nowrap" }}>
+                <div className="font-bold text-[14px] tracking-[0.02em]" style={{ color: "var(--ink)" }}>OGADE</div>
+                <div className="text-[10px] tracking-[0.06em] uppercase" style={{ color: "var(--ink-3)" }}>Matériel END</div>
+              </div>
+            )}
+          </Link>
+
+          {/* Collapse/expand toggle (desktop only) */}
+          {!isMobile && (
+            <button
+              type="button"
+              onClick={() => setCollapsed((c) => !c)}
+              title={collapsed ? "Déplier le menu" : "Replier le menu"}
+              style={{
+                appearance: "none", border: "none", background: "none",
+                padding: 4, borderRadius: 6, color: "var(--ink-3)",
+                cursor: "pointer", display: "flex", flexShrink: 0,
+                transition: "color 0.12s, background 0.12s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--ink)"; e.currentTarget.style.background = "var(--bg-sunken)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--ink-3)"; e.currentTarget.style.background = "none"; }}
+            >
+              <Icon name={collapsed ? "chevr" : "chevl"} size={14} />
+            </button>
+          )}
+
+          {/* Close button (mobile only) */}
+          {isMobile && (
+            <button
+              type="button"
+              onClick={() => setMobileOpen(false)}
+              style={{
+                appearance: "none", border: "none", background: "none",
+                padding: 4, borderRadius: 6, color: "var(--ink-3)",
+                cursor: "pointer", display: "flex", flexShrink: 0,
+              }}
+            >
+              <Icon name="x" size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Nav sections */}
+        <nav className="flex-1 flex flex-col gap-1 overflow-y-auto">
+          {navSections.map((section) => (
+            <div key={section.label}>
+              {showLabels ? (
+                <div className="nav-sect">{section.label}</div>
+              ) : (
+                <div style={{ height: 8 }} />
+              )}
+              {section.items.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={`nav-item ${isActive(item.to) ? "active" : ""}`}
+                  title={collapsed && !isMobile ? item.label : undefined}
+                  style={collapsed && !isMobile ? { justifyContent: "center", padding: "7px 0" } : undefined}
+                >
+                  <Icon name={item.icon} />
+                  {showLabels && item.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        {/* Footer — user */}
+        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: "1px solid var(--line-2)" }}>
+          <div
+            className="flex items-center rounded-lg hover:bg-[var(--bg-sunken)] transition-colors"
+            style={{ padding: collapsed && !isMobile ? "6px 0" : 6, gap: 10, justifyContent: collapsed && !isMobile ? "center" : undefined }}
+          >
+            <span
+              className="grid place-items-center text-[11px] font-semibold text-white shrink-0"
+              style={{
+                width: 28, height: 28, borderRadius: "50%",
+                background: "oklch(0.70 0.15 275)",
+                boxShadow: "0 0 0 2px white, 0 0 0 3px var(--line-2)",
+              }}
+            >
+              {(user?.prenom?.[0] ?? "U") + (user?.nom?.[0] ?? "")}
+            </span>
+            {showLabels && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12.5px] font-medium truncate" style={{ color: "var(--ink)" }}>
+                    {user ? `${user.prenom} ${user.nom}` : "Utilisateur"}
+                  </div>
+                  <div className="text-[10.5px] truncate" style={{ color: "var(--ink-3)" }}>
+                    {user?.roles?.[0] ?? user?.email ?? ""}
+                  </div>
+                </div>
+                {authRequired && (
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="icon-btn"
+                    style={{ padding: 5, border: 0 }}
+                    title="Déconnexion"
+                  >
+                    <Icon name="logout" size={13} />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 }
