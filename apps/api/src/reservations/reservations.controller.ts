@@ -70,6 +70,7 @@ export class ReservationsController {
 
   @Get()
   async findAll(
+    @CurrentUser() user: RequestUser | null,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
     @Query('statut') statut?: string,
@@ -80,18 +81,25 @@ export class ReservationsController {
     @Query('search') search?: string,
     @Query('dateMin') dateMin?: string,
     @Query('dateMax') dateMax?: string,
+    @Query('mes') mes?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
+    const mineFlag = mes === 'true' || mes === '1';
     return this.service.findAll({
       ...pagination,
       statut: statut || undefined,
       type: type || undefined,
       materielId: materielId ? parseInt(materielId, 10) : undefined,
-      demandeurId: demandeurId ? parseInt(demandeurId, 10) : undefined,
+      demandeurId: mineFlag && user?.agentId
+        ? user.agentId
+        : demandeurId
+          ? parseInt(demandeurId, 10)
+          : undefined,
       period:
         period === 'actuelles' ||
         period === 'venir' ||
-        period === 'passees'
+        period === 'passees' ||
+        period === 'aujourdhui'
           ? period
           : undefined,
       search: search || undefined,
