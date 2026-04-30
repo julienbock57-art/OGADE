@@ -210,6 +210,20 @@ model Defaut {
   detecteParId Int?     @map("detecte_par_id")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  // Per-defect dimensions (from PowerApps + design brief)
+  longueur   Float?  @map("longueur")
+  largeur    Float?  @map("largeur")
+  profondeur Float?  @map("profondeur")
+  diametre   Float?  @map("diametre")
+  cote       String? @map("cote")
+  certifie   Boolean @default(false) @map("certifie")
+  /// X coordinate (0..100) on the schematic plan
+  posX       Float?  @map("pos_x")
+  /// Y coordinate (0..100) on the schematic plan
+  posY       Float?  @map("pos_y")
+  /// Hex/oklch color override for the dot on the plan
+  couleur    String? @map("couleur")
+
   maquette   Maquette @relation(fields: [maquetteId], references: [id], onDelete: Cascade)
   detectePar Agent?   @relation("defaut_detecteur", fields: [detecteParId], references: [id])
 
