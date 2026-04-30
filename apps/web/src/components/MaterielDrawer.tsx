@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Materiel, Evenement, Fichier } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
+import ReservationModal from "@/components/ReservationModal";
 
 // ─── LOCAL ICON COMPONENT ──────────────────────────────────────────────────
 const iconPaths: Record<string, string> = {
@@ -21,6 +22,11 @@ const iconPaths: Record<string, string> = {
   edit:    "M12 4l4 4-8 8H4v-4l8-8z",
   cart:    "M3 4h2l2 9h10l2-7H7 M8 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M16 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
   dots:    "M5 10h.01M10 10h.01M15 10h.01",
+  star:    "M10 3l2.3 4.6 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2L2.5 8.4l5.2-.8L10 3z",
+  plus:    "M10 4v12M4 10h12",
+  swap:    "M5 7h11l-3-3 M15 13H4l3 3",
+  truck:   "M3 6h10v9H3z M13 9h4l2 3v3h-6 M6 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M15 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
+  flask2:  "M8 3h4 M9 3v5l-4 8a2 2 0 0 0 2 3h6a2 2 0 0 0 2-3l-4-8V3",
 };
 
 function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
@@ -717,16 +723,144 @@ function PhotoLightbox({
   );
 }
 
+// ─── RESERVATIONS TAB ─────────────────────────────────────────────────────
+const RES_TYPE_META: Record<string, { label: string; couleur: string; icon: string }> = {
+  TRANSFERT_SITE: { label: "Transfert site", couleur: "sky", icon: "swap" },
+  ETALONNAGE: { label: "Étalonnage", couleur: "violet", icon: "flask2" },
+  PRET_EXTERNE: { label: "Prêt externe", couleur: "amber", icon: "truck" },
+  PRET_INTERNE: { label: "Prêt interne", couleur: "emerald", icon: "swap" },
+  AUTRE: { label: "Autre", couleur: "neutral", icon: "star" },
+};
+
+function ReservationsTab({
+  materiel,
+  onCreate,
+  onEdit,
+}: {
+  materiel: Materiel;
+  onCreate: () => void;
+  onEdit: (r: any) => void;
+}) {
+  type Res = {
+    id: number;
+    numero: string;
+    dateDebut: string | Date;
+    dateFin: string | Date;
+    type: string;
+    statut: string;
+    motif?: string | null;
+    demandeur?: { prenom: string; nom: string } | null;
+  };
+
+  const { data, isLoading } = useQuery<Res[]>({
+    queryKey: ["materiel-reservations", materiel.id],
+    queryFn: () =>
+      api
+        .get<{ data: Res[] }>("/reservations", {
+          materielId: materiel.id,
+          pageSize: 50,
+        })
+        .then((p) => p.data),
+  });
+
+  const fmt = (d: string | Date) =>
+    new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const today = new Date();
+
+  if (isLoading) {
+    return (
+      <DrawerSection title="Réservations">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 0", color: "var(--ink-3)", fontSize: 13 }}>
+          <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid var(--accent-soft)", borderTopColor: "var(--accent)", animation: "spin 0.7s linear infinite" }} />
+          Chargement...
+        </div>
+      </DrawerSection>
+    );
+  }
+
+  const rows = data ?? [];
+  return (
+    <DrawerSection title="Réservations">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <p style={{ margin: 0, fontSize: 12.5, color: "var(--ink-3)" }}>
+          {rows.length === 0
+            ? "Aucune réservation enregistrée pour ce matériel."
+            : `${rows.length} réservation${rows.length > 1 ? "s" : ""} sur ce matériel`}
+        </p>
+        <button className="obtn accent sm" onClick={onCreate} type="button">
+          <Icon name="plus" size={11} />
+          Réserver
+        </button>
+      </div>
+      {rows.length > 0 && (
+        <div className="vstack" style={{ gap: 8 }}>
+          {rows.map((r) => {
+            const t = RES_TYPE_META[r.type] ?? RES_TYPE_META.AUTRE;
+            const debut = new Date(r.dateDebut);
+            const fin = new Date(r.dateFin);
+            const inProgress =
+              debut <= today && fin >= today && r.statut === "CONFIRMEE";
+            return (
+              <div key={r.id} className="mchip" style={{ alignItems: "flex-start", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
+                  <span className="mchip-id">{r.numero}</span>
+                  <span className={`type-badge ${t.couleur}`}>
+                    <Icon name={t.icon} size={10} />
+                    {t.label}
+                  </span>
+                  {r.statut === "CONFIRMEE" && inProgress && (
+                    <span className="pill c-amber pulse"><span className="dot" />En cours</span>
+                  )}
+                  {r.statut === "CONFIRMEE" && !inProgress && (
+                    <span className="pill c-sky"><span className="dot" />Confirmée</span>
+                  )}
+                  {r.statut === "HONOREE" && (
+                    <span className="pill c-emerald"><span className="dot" />Honorée</span>
+                  )}
+                  {r.statut === "ANNULEE" && (
+                    <span className="pill c-neutral"><span className="dot" />Annulée</span>
+                  )}
+                  <span style={{ flex: 1 }} />
+                  {r.statut === "CONFIRMEE" && (
+                    <button
+                      className="obtn ghost sm"
+                      onClick={() => onEdit(r)}
+                      type="button"
+                    >
+                      <Icon name="edit" size={11} />
+                      Modifier
+                    </button>
+                  )}
+                </div>
+                <div className="mchip-meta">
+                  Du {fmt(debut)} au {fmt(fin)}
+                  {r.demandeur ? ` · ${r.demandeur.prenom} ${r.demandeur.nom}` : ""}
+                </div>
+                {r.motif && (
+                  <p style={{ margin: 0, fontSize: 12, color: "var(--ink-2)", lineHeight: 1.45 }}>
+                    {r.motif}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </DrawerSection>
+  );
+}
+
 // ─── TAB TYPE ──────────────────────────────────────────────────────────────
-type TabId = "infos" | "pj" | "photos" | "etat" | "historique" | "qr";
+type TabId = "infos" | "pj" | "photos" | "etat" | "historique" | "qr" | "reservations";
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: "infos",      label: "Infos",            icon: "eye"     },
-  { id: "pj",         label: "Pièces jointes",   icon: "clip"    },
-  { id: "photos",     label: "Photos",           icon: "photo"   },
-  { id: "etat",       label: "État · Complétude",icon: "alert"   },
-  { id: "historique", label: "Historique",        icon: "history" },
-  { id: "qr",         label: "QR code",          icon: "qr"      },
+  { id: "infos",        label: "Infos",            icon: "eye"     },
+  { id: "pj",           label: "Pièces jointes",   icon: "clip"    },
+  { id: "photos",       label: "Photos",           icon: "photo"   },
+  { id: "etat",         label: "État · Complétude",icon: "alert"   },
+  { id: "reservations", label: "Réservations",     icon: "star"    },
+  { id: "historique",   label: "Historique",        icon: "history" },
+  { id: "qr",           label: "QR code",          icon: "qr"      },
 ];
 
 // ─── MAIN COMPONENT ────────────────────────────────────────────────────────
@@ -742,6 +876,8 @@ export default function MaterielDrawer({
   mode?: "drawer" | "page";
 }) {
   const [tab, setTab] = useState<TabId>(initialTab);
+  const [reservationModalOpen, setReservationModalOpen] = useState(false);
+  const [editingReservation, setEditingReservation] = useState<any | null>(null);
   const isPage = mode === "page";
 
   useEffect(() => {
@@ -1035,6 +1171,15 @@ export default function MaterielDrawer({
             </>
           )}
 
+          {/* ── Tab: Réservations ── */}
+          {tab === "reservations" && (
+            <ReservationsTab
+              materiel={m}
+              onCreate={() => { setEditingReservation(null); setReservationModalOpen(true); }}
+              onEdit={(r) => { setEditingReservation(r); setReservationModalOpen(true); }}
+            />
+          )}
+
           {/* ── Tab: Historique ── */}
           {tab === "historique" && <HistoriqueTab materielId={m.id} />}
 
@@ -1073,14 +1218,28 @@ export default function MaterielDrawer({
     </>
   );
 
+  const reservationModal = reservationModalOpen ? (
+    <ReservationModal
+      onClose={() => { setReservationModalOpen(false); setEditingReservation(null); }}
+      initialMateriel={editingReservation ? null : m}
+      reservation={editingReservation}
+    />
+  ) : null;
+
   if (isPage) {
-    return <div className="materiel-page-view">{content}</div>;
+    return (
+      <>
+        <div className="materiel-page-view">{content}</div>
+        {reservationModal}
+      </>
+    );
   }
 
   return (
     <>
       <div className="drawer-backdrop" onClick={onClose} />
       <div className="drawer">{content}</div>
+      {reservationModal}
     </>
   );
 }

@@ -12,6 +12,7 @@ import MaquetteFormPage from "@/pages/MaquetteFormPage";
 import DemandesEnvoiListPage from "@/pages/DemandesEnvoiListPage";
 import DemandeEnvoiDetailPage from "@/pages/DemandeEnvoiDetailPage";
 import DemandeEnvoiFormPage from "@/pages/DemandeEnvoiFormPage";
+import ReservationsListPage from "@/pages/ReservationsListPage";
 import AgentsListPage from "@/pages/AgentsListPage";
 import AdminReferentielsPage from "@/pages/AdminReferentielsPage";
 import AdminReferentielTypePage from "@/pages/AdminReferentielTypePage";
@@ -70,6 +71,7 @@ export function AppRoutes() {
           path="/demandes-envoi/:id"
           element={<DemandeEnvoiDetailPage />}
         />
+        <Route path="/reservations" element={<ReservationsListPage />} />
         <Route path="/localisation" element={<LocalisationPage />} />
         <Route path="/agents" element={<AgentsListPage />} />
         <Route path="/admin/referentiels" element={<AdminReferentielsPage />} />

@@ -446,3 +446,124 @@ tr.row-selected td { border-bottom-color: var(--accent-line); }
     grid-template-columns: 0px 1fr !important;
   }
 }
+
+/* ─── Reservations / Mouvements design from OGADE.html ─────────── */
+
+/* Type badges (mouvement / réservation type) */
+.type-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1.5px solid transparent;
+  background: var(--bg-sunken); color: var(--ink-2);
+}
+.type-badge.sky     { background: var(--sky-soft);     color: var(--sky); }
+.type-badge.violet  { background: var(--violet-soft);  color: var(--violet); }
+.type-badge.amber   { background: var(--amber-soft);   color: oklch(0.50 0.17 60); }
+.type-badge.emerald { background: var(--emerald-soft); color: var(--emerald); }
+.type-badge.neutral { background: var(--bg-sunken);    color: var(--ink-2); }
+.type-badge.on { box-shadow: 0 0 0 3px color-mix(in oklch, currentColor 12%, transparent); }
+
+/* Pill pulsing dot (en cours) */
+.pill.pulse .dot { animation: opulse 1.5s ease-in-out infinite; }
+@keyframes opulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } }
+
+/* Page head (large titles like /reservations) */
+.page-head { padding: 22px 24px 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+.page-title { font-size: 22px; font-weight: 600; margin: 0; color: var(--ink); letter-spacing: -0.01em; }
+.page-sub   { font-size: 13px; color: var(--ink-3); margin: 2px 0 0; }
+
+/* Toolbar variant used by reservations list */
+.rs-toolbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 12px 24px; display: flex; align-items: center; gap: 10px;
+}
+.rs-toolbar .spacer { flex: 1; }
+
+/* Materiel chip in reservation form (ported from ogade-mv-styles.css) */
+.mchip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px 8px 12px;
+  background: var(--bg-panel); border: 1px solid var(--line);
+  border-radius: 9px;
+}
+.mchip.warn { border-color: oklch(0.85 0.10 60); background: var(--amber-soft); }
+.mchip.ok { border-color: color-mix(in oklch, var(--emerald) 35%, transparent); background: var(--emerald-soft); }
+.mchip-id { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: var(--ink-3); }
+.mchip-lbl { font-weight: 500; font-size: 13px; }
+.mchip-meta { font-size: 11px; color: var(--ink-3); }
+.mchip-warn { font-size: 11px; color: oklch(0.50 0.17 60); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.mchip-ok { font-size: 11px; color: var(--emerald); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.mchip-pick { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.1s; }
+.mchip-pick:hover { background: var(--bg-sunken); }
+
+/* Conflict feedback boxes */
+.conflict-box {
+  background: oklch(0.97 0.04 30); border: 1px solid oklch(0.85 0.10 30);
+  border-radius: 8px; padding: 10px 12px; font-size: 12px;
+  color: oklch(0.45 0.16 30); display: flex; gap: 8px;
+}
+.availability-box {
+  background: var(--emerald-soft);
+  border: 1px solid color-mix(in oklch, var(--emerald) 30%, transparent);
+  border-radius: 8px; padding: 10px 12px;
+  color: var(--emerald); font-size: 12.5px; font-weight: 500;
+  display: flex; gap: 8px; align-items: center;
+}
+
+/* Form input variants used by the design */
+.input, .textarea, .oselect.input {
+  appearance: none; width: 100%; font: inherit; color: inherit;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg-panel);
+  padding: 8px 11px; outline: 0;
+  transition: border-color 0.12s, box-shadow 0.12s;
+  font-size: var(--ui-fs);
+}
+.input:hover, .textarea:hover { border-color: oklch(0.82 0.008 270); }
+.input:focus, .textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+
+/* Reservation list table */
+.rs-table { width: 100%; border-collapse: collapse; font-size: var(--ui-fs); background: var(--bg-panel); }
+.rs-table thead th {
+  padding: 10px var(--pad-x); text-align: left;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ink-3);
+  border-bottom: 1px solid var(--line); white-space: nowrap;
+  background: var(--bg-panel); position: sticky; top: 0;
+}
+.rs-table tbody tr { height: var(--row-h); transition: background 0.1s; }
+.rs-table tbody tr:hover { background: var(--bg-sunken); }
+.rs-table tbody td { padding: 0 var(--pad-x); border-bottom: 1px solid var(--line-2); vertical-align: middle; }
+.cell-two-line { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.cell-two-line .p { font-weight: 500; color: var(--ink); }
+.cell-two-line .s { font-size: 11px; color: var(--ink-3); }
+.empty-cell { padding: 60px 24px !important; text-align: center; color: var(--ink-3); }
+.empty-cell svg { display: block; margin: 0 auto 8px; opacity: 0.5; }
+
+/* Avatar circle (responsable) */
+.avatar-circle {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--accent); color: white; font-size: 10px; font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Page-tabs (mouvements/réservations switch) */
+.page-tabs {
+  display: flex; gap: 0; padding: 0 24px;
+  background: var(--bg-panel); border-bottom: 1px solid var(--line);
+}
+.page-tab {
+  appearance: none; border: 0; background: transparent;
+  padding: 12px 14px; font-weight: 500; color: var(--ink-3);
+  display: inline-flex; align-items: center; gap: 7px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; font-size: 13px;
+  cursor: pointer; font-family: inherit;
+}
+.page-tab:hover { color: var(--ink); }
+.page-tab.on { color: var(--accent-ink); border-bottom-color: var(--accent); }
