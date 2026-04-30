@@ -11,21 +11,27 @@ import {
   HttpStatus,
   BadRequestException,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Response } from 'express';
 import {
   createMaterielSchema,
   updateMaterielSchema,
   paginationSchema,
 } from '@ogade/shared';
 import { MaterielsService } from './materiels.service';
+import { PdfService } from '../pdf/pdf.service';
 import { CurrentUser, RequestUser } from '../auth/auth.guard';
 
 @ApiTags('Materiels')
 @ApiBearerAuth()
 @Controller('api/v1/materiels')
 export class MaterielsController {
-  constructor(private readonly materielsService: MaterielsService) {}
+  constructor(
+    private readonly materielsService: MaterielsService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   @Get('stats')
   async stats() {
@@ -59,6 +65,23 @@ export class MaterielsController {
   @Get(':id/historique')
   async findHistorique(@Param('id', ParseIntPipe) id: number) {
     return this.materielsService.findHistorique(id);
+  }
+
+  @Get(':id/pdf')
+  async pdf(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    const buffer = await this.pdfService.materielPdf(id);
+    const materiel = await this.materielsService.findOne(id);
+    const safeRef = materiel.reference.replace(/[^a-zA-Z0-9_-]/g, '_');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="OGADE-${safeRef}.pdf"`,
+    );
+    res.end(buffer);
   }
 
   @Get(':id')

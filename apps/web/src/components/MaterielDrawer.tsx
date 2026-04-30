@@ -1050,6 +1050,7 @@ export default function MaterielDrawer({
   const [tab, setTab] = useState<TabId>(initialTab);
   const [reservationModalOpen, setReservationModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<any | null>(null);
+  const [exporting, setExporting] = useState(false);
   const isPage = mode === "page";
 
   useEffect(() => {
@@ -1377,9 +1378,34 @@ export default function MaterielDrawer({
         {/* Footer */}
         <div className="drawer-foot">
           <div className="left">
-            <button type="button" className="obtn ghost">
-              <Icon name="eye" size={13} />
-              Exporter
+            <button
+              type="button"
+              className="obtn ghost"
+              onClick={async () => {
+                if (exporting) return;
+                setExporting(true);
+                try {
+                  const blob = await api.fetchBlob(`/materiels/${m.id}/pdf`);
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `OGADE-${m.reference}.pdf`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                } catch (err) {
+                  alert(
+                    `Erreur lors de l'export PDF : ${(err as Error).message ?? err}`,
+                  );
+                } finally {
+                  setExporting(false);
+                }
+              }}
+              disabled={exporting}
+            >
+              <Icon name="dl" size={13} />
+              {exporting ? "Génération…" : "Exporter PDF"}
             </button>
           </div>
           <div className="right">
