@@ -5,6 +5,7 @@ import type { Materiel, Evenement, Fichier } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 import ReservationModal from "@/components/ReservationModal";
+import GanttCalendar from "@/components/GanttCalendar";
 
 // ─── LOCAL ICON COMPONENT ──────────────────────────────────────────────────
 const iconPaths: Record<string, string> = {
@@ -27,6 +28,7 @@ const iconPaths: Record<string, string> = {
   swap:    "M5 7h11l-3-3 M15 13H4l3 3",
   truck:   "M3 6h10v9H3z M13 9h4l2 3v3h-6 M6 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M15 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
   flask2:  "M8 3h4 M9 3v5l-4 8a2 2 0 0 0 2 3h6a2 2 0 0 0 2-3l-4-8V3",
+  cal:     "M4 5h12v12H4z M4 8h12 M7 3v4 M13 3v4",
 };
 
 function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; stroke?: number }) {
@@ -850,17 +852,187 @@ function ReservationsTab({
   );
 }
 
+// ─── CALENDRIER TAB (per-materiel single-row Gantt) ──────────────────────
+function CalendrierTab({
+  materiel,
+  onCreate,
+  onOpenReservation,
+}: {
+  materiel: Materiel;
+  onCreate: (date: Date) => void;
+  onOpenReservation: (id: number) => void;
+}) {
+  const [view, setView] = useState<"30j" | "90j" | "180j">("90j");
+  const [offset, setOffset] = useState(0);
+
+  const days = view === "30j" ? 30 : view === "90j" ? 90 : 180;
+  const lookback = Math.round(days / 4);
+
+  const startDate = (() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - lookback + offset);
+    return d;
+  })();
+  const endDate = (() => {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + days);
+    return d;
+  })();
+
+  const { data, isLoading } = useQuery<{ data: any[] }>({
+    queryKey: ["materiel-calendar", materiel.id, view, offset],
+    queryFn: () =>
+      api.get("/reservations", {
+        materielId: materiel.id,
+        pageSize: 200,
+        dateMin: startDate.toISOString(),
+        dateMax: endDate.toISOString(),
+      }),
+  });
+
+  const reservations = (data?.data ?? []) as any[];
+
+  const events: import("@/components/GanttCalendar").CalendarEvent[] = [
+    ...reservations
+      .filter((r) => r.statut !== "ANNULEE")
+      .map((r) => ({
+        kind: "reservation" as const,
+        id: r.id,
+        materielId: r.materielId,
+        start: new Date(r.dateDebut),
+        end: new Date(r.dateFin),
+        type: r.type,
+        statut: r.statut,
+        label: r.numero,
+        numero: r.numero,
+      })),
+    ...(materiel.dateProchainEtalonnage
+      ? [{
+          kind: "etalonnage" as const,
+          id: `etl-${materiel.id}`,
+          materielId: materiel.id,
+          date: new Date(materiel.dateProchainEtalonnage),
+          label: "Échéance étalonnage",
+        }]
+      : []),
+  ];
+
+  const fmtRange = () => {
+    const d = startDate.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+    const eDate = new Date(endDate);
+    eDate.setDate(eDate.getDate() - 1);
+    const e = eDate.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+    return `${d} → ${e}`;
+  };
+
+  const RangeNav = (
+    <div className="hstack" style={{ gap: 6, justifyContent: "space-between", flexWrap: "wrap" }}>
+      <div className="hstack" style={{ gap: 6 }}>
+        <button className="obtn sm" onClick={() => setOffset((o) => o - days)} title="Précédent">
+          <span style={{ display: "inline-flex", transform: "rotate(180deg)" }}>
+            <Icon name="chevR" size={11} stroke={2.2} />
+          </span>
+        </button>
+        <button className="obtn sm" onClick={() => setOffset(0)}>Aujourd'hui</button>
+        <button className="obtn sm" onClick={() => setOffset((o) => o + days)} title="Suivant">
+          <Icon name="chevR" size={11} stroke={2.2} />
+        </button>
+        <span style={{ fontSize: 12, color: "var(--ink-2)", marginLeft: 6 }}>
+          {fmtRange()}
+        </span>
+      </div>
+      <div className="seg">
+        {(["30j", "90j", "180j"] as const).map((k) => (
+          <button
+            key={k}
+            className={view === k ? "on" : ""}
+            onClick={() => { setView(k); setOffset(0); }}
+          >
+            {k.replace("j", " j")}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <DrawerSection title="Calendrier matériel">
+      {RangeNav}
+      <div style={{ marginTop: 12 }}>
+        {isLoading ? (
+          <div
+            style={{
+              height: 56,
+              background: "var(--bg-sunken)",
+              borderRadius: 6,
+              animation: "pulse 1.5s infinite",
+            }}
+          />
+        ) : (
+          <GanttCalendar
+            materiels={[
+              {
+                id: materiel.id,
+                reference: materiel.reference,
+                libelle: materiel.libelle,
+                typeMateriel: materiel.typeMateriel ?? null,
+                modele: materiel.modele ?? null,
+                site: materiel.site ?? null,
+                localisation: materiel.localisation ?? null,
+                dateProchainEtalonnage: materiel.dateProchainEtalonnage ?? null,
+                soumisVerification: materiel.soumisVerification,
+              } as any,
+            ]}
+            events={events}
+            startDate={startDate}
+            days={days}
+            compact
+            onEventClick={(ev) => {
+              if (ev.kind === "reservation") onOpenReservation(ev.id);
+            }}
+            onSlotClick={(_m, d) => onCreate(d)}
+          />
+        )}
+      </div>
+      <div className="legend" style={{ marginTop: 12 }}>
+        <span className="legend-item">
+          <span className="legend-swatch hatch" style={{ color: "var(--accent)" }} />
+          Réservation
+        </span>
+        <span className="legend-item" style={{ color: "var(--rose)" }}>
+          <span style={{ display: "inline-block", width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "5px solid var(--rose)" }} />
+          Échéance étalonnage
+        </span>
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: "var(--accent)" }} />
+          Aujourd'hui
+        </span>
+      </div>
+    </DrawerSection>
+  );
+}
+
 // ─── TAB TYPE ──────────────────────────────────────────────────────────────
-type TabId = "infos" | "pj" | "photos" | "etat" | "historique" | "qr" | "reservations";
+type TabId =
+  | "infos"
+  | "pj"
+  | "photos"
+  | "etat"
+  | "reservations"
+  | "calendrier"
+  | "historique"
+  | "qr";
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: "infos",        label: "Infos",            icon: "eye"     },
-  { id: "pj",           label: "Pièces jointes",   icon: "clip"    },
-  { id: "photos",       label: "Photos",           icon: "photo"   },
-  { id: "etat",         label: "État · Complétude",icon: "alert"   },
-  { id: "reservations", label: "Réservations",     icon: "star"    },
+  { id: "infos",        label: "Infos",            icon: "eye"      },
+  { id: "pj",           label: "Pièces jointes",   icon: "clip"     },
+  { id: "photos",       label: "Photos",           icon: "photo"    },
+  { id: "etat",         label: "État · Complétude",icon: "alert"    },
+  { id: "reservations", label: "Réservations",     icon: "star"     },
+  { id: "calendrier",   label: "Calendrier",       icon: "cal"      },
   { id: "historique",   label: "Historique",        icon: "history" },
-  { id: "qr",           label: "QR code",          icon: "qr"      },
+  { id: "qr",           label: "QR code",          icon: "qr"       },
 ];
 
 // ─── MAIN COMPONENT ────────────────────────────────────────────────────────
@@ -1177,6 +1349,19 @@ export default function MaterielDrawer({
               materiel={m}
               onCreate={() => { setEditingReservation(null); setReservationModalOpen(true); }}
               onEdit={(r) => { setEditingReservation(r); setReservationModalOpen(true); }}
+            />
+          )}
+
+          {/* ── Tab: Calendrier ── */}
+          {tab === "calendrier" && (
+            <CalendrierTab
+              materiel={m}
+              onCreate={() => { setEditingReservation(null); setReservationModalOpen(true); }}
+              onOpenReservation={() => {
+                /* For now just open create-modal from drawer; full edit would need to fetch.
+                   The list/timeline below the calendar in `Réservations` tab handles edit. */
+                setTab("reservations");
+              }}
             />
           )}
 
