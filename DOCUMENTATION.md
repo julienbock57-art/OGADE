@@ -978,3 +978,1224 @@ Lectures et tutoriels recommandés (gratuits et bien faits) :
 ---
 
 *Dernière mise à jour : 30 avril 2026 — généré dans la PR #50.*
+
+---
+
+## 13. Fonctions clés expliquées en détail (avec exemples du code OGADE)
+
+> Cette section reprend **chaque langage / librairie utilisé**, et explique les *fonctions clés* qu'on a employées dans OGADE. Chaque sous-section commence par une syntaxe minimale, puis montre **un extrait réel du code OGADE** pour que tu puisses faire le lien.
+>
+> Tableau de bord :
+>
+> | # | Langage / Librairie | Où c'est utilisé dans OGADE |
+> |---|---------------------|------------------------------|
+> | 13.1 | **TypeScript** | Toute la codebase (sauf SQL et YAML) |
+> | 13.2 | **JavaScript runtime** (fetch, Promise, Array, Date) | API client + composants React |
+> | 13.3 | **Prisma schema** (DSL) | `apps/api/prisma/schema.prisma` |
+> | 13.4 | **Prisma client** (TypeScript) | Tous les services NestJS (`*.service.ts`) |
+> | 13.5 | **SQL** | Migrations dans `apps/api/prisma/migrations/` |
+> | 13.6 | **Zod** | `packages/shared/src/schemas/` + côté React (formulaires) |
+> | 13.7 | **React hooks** | Tous les composants `apps/web/src/components/`, `pages/` |
+> | 13.8 | **React Query + react-hook-form** | Toutes les pages liste / form |
+> | 13.9 | **NestJS décorateurs** | Tous les controllers et services backend |
+> | 13.10 | **CSS** (custom properties) | `apps/web/src/ogade-design.css` |
+> | 13.11 | **Dockerfile** | `Dockerfile` à la racine |
+> | 13.12 | **YAML** (GitHub Actions) | `.github/workflows/deploy-azure.yml` |
+
+### 13.1 TypeScript — fonctions clés employées dans OGADE
+
+#### `type` — définir un type personnalisé
+Crée un *alias* qu'on peut réutiliser. C'est juste de la documentation pour le compilateur (zéro coût à l'exécution).
+
+**Syntaxe minimale :**
+```ts
+type Etat = "CORRECT" | "HS";   // union de valeurs autorisées
+type User = { nom: string; age?: number };  // ? = optionnel
+```
+
+**Dans OGADE — `packages/shared/src/types/maquette.ts`** :
+```ts
+export const EtatMaquette = {
+  STOCK: "STOCK",
+  EMPRUNTEE: "EMPRUNTEE",
+  EN_CONTROLE: "EN_CONTROLE",
+  REBUT: "REBUT",
+  EN_REPARATION: "EN_REPARATION",
+  ENVOYEE: "ENVOYEE",
+} as const;
+
+export type EtatMaquette = (typeof EtatMaquette)[keyof typeof EtatMaquette];
+```
+Pourquoi cette astuce ? `as const` fige les valeurs et `(typeof X)[keyof typeof X]` extrait l'union `"STOCK" | "EMPRUNTEE" | ...`. Du coup on peut **utiliser le même nom comme valeur ET comme type** : `EtatMaquette.STOCK` (valeur), `: EtatMaquette` (type).
+
+#### `interface` (alternative à `type`)
+Utilisé dans NestJS pour décrire les requêtes utilisateurs.
+
+**OGADE — `apps/api/src/auth/auth.guard.ts`** :
+```ts
+export interface RequestUser {
+  agentId: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  roles: string[];
+}
+```
+
+#### Generics — fonctions paramétrées par un type
+Permet d'écrire **une fonction** qui marche pour plusieurs types tout en gardant le typage.
+
+**Syntaxe :**
+```ts
+function premier<T>(arr: T[]): T | undefined { return arr[0]; }
+premier<string>(["a"]);  // T = string
+```
+
+**OGADE — `apps/web/src/lib/api.ts`** :
+```ts
+export const api = {
+  get<T>(path: string, params?: Record<string, unknown>): Promise<T> {
+    return apiFetch<T>(`${path}${buildQueryString(params)}`, { method: "GET" });
+  },
+  post<T>(path: string, body: unknown): Promise<T> {
+    return apiFetch<T>(path, { method: "POST", body: JSON.stringify(body) });
+  },
+};
+```
+On l'appelle ainsi : `api.get<Materiel>(...)` → TypeScript sait que la promesse renvoie un `Materiel`.
+
+#### `async` / `await` — code asynchrone lisible
+Au lieu de chaîner `.then()`, on écrit séquentiellement.
+
+**OGADE — `apps/api/src/maquettes/maquettes.service.ts`** :
+```ts
+async findOne(id: number) {
+  const maquette = await this.prisma.maquette.findFirst({
+    where: { id, deletedAt: null },
+    include: MAQUETTE_DETAIL_INCLUDE,
+  });
+  if (!maquette) {
+    throw new NotFoundException(`Maquette #${id} not found`);
+  }
+  return maquette;
+}
+```
+- `async` rend la fonction asynchrone (elle retourne automatiquement une `Promise`).
+- `await` attend que la promesse Prisma se résolve avant de continuer.
+- Si Prisma rejette, l'exception remonte (pas besoin de `try/catch` partout).
+
+#### Optional chaining `?.` & nullish coalescing `??`
+```ts
+user?.nom            // si user existe → user.nom, sinon undefined
+user?.address?.ville // chaîne sécurisée
+m.modele ?? "—"      // si null/undefined → "—" (mais "" reste "")
+```
+
+**OGADE — `apps/web/src/components/MaterielDrawer.tsx`** :
+```tsx
+<Field label="Modèle">{m.modele ?? "—"}</Field>
+<Field label="Responsable">
+  {m.responsable ? `${m.responsable.prenom} ${m.responsable.nom}` : "—"}
+</Field>
+```
+
+#### Décorateurs (`@Get`, `@Body`, `@Injectable`…)
+Une **fonction** précédée de `@` qui ajoute un comportement à une classe ou à une méthode. Très utilisé par NestJS.
+
+**OGADE — `apps/api/src/materiels/materiels.controller.ts`** :
+```ts
+@Controller('api/v1/materiels')
+export class MaterielsController {
+  @Get(':id/pdf')
+  async pdf(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    const buffer = await this.pdfService.materielPdf(id);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.end(buffer);
+  }
+}
+```
+- `@Controller(prefix)` : associe la classe à un préfixe d'URL.
+- `@Get(path)` : déclare la méthode comme handler `GET /prefix/path`.
+- `@Param('id', ParseIntPipe)` : extrait l'`id` d'URL et le convertit en `number`.
+- `@Res()` : injection de l'objet réponse Express bas niveau.
+
+#### Spread `...` & destructuring
+**Syntaxe :**
+```ts
+const { nom, age } = user;        // destructuring objet
+const [premier, ...reste] = arr;  // destructuring tableau
+const copie = { ...obj, age: 31 };// copie + override
+```
+
+**OGADE — `apps/api/src/reservations/reservations.controller.ts`** :
+```ts
+const pagination = paginationSchema.parse({ page, pageSize });
+return this.service.findAll({
+  ...pagination,                                // étale page + pageSize
+  statut: statut || undefined,
+  type: type || undefined,
+  materielId: materielId ? parseInt(materielId, 10) : undefined,
+});
+```
+
+#### Type `Partial<T>`
+Rend tous les champs optionnels. Utile pour les payloads d'update.
+
+**OGADE — `packages/shared/src/schemas/maquette.schema.ts`** :
+```ts
+export const updateMaquetteSchema = createMaquetteSchema.partial().extend({
+  etat: z.enum([...]).optional(),
+});
+```
+`createMaquetteSchema.partial()` (Zod) revient à appliquer `Partial` côté schéma : tous les champs deviennent optionnels.
+
+### 13.2 JavaScript runtime — les fonctions de la "bibliothèque standard"
+
+#### `fetch()` — appel HTTP depuis le navigateur
+La fonction navigateur pour parler à une API. Renvoie une `Promise<Response>`.
+
+**OGADE — `apps/web/src/lib/api.ts`** :
+```ts
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options?.headers as Record<string, string> | undefined),
+    },
+  });
+
+  if (!response.ok) {
+    let message = `Erreur ${response.status}`;
+    try {
+      const body = await response.json();
+      if (body.message) message = body.message;
+    } catch { /* body pas en JSON, on garde le statut */ }
+    throw new Error(message);
+  }
+  if (response.status === 204) return undefined as T;
+  return response.json() as Promise<T>;
+}
+```
+- `response.ok` est `true` si statut 2xx.
+- `response.json()` lit le corps JSON (asynchrone).
+- `204 No Content` → on renvoie `undefined`.
+
+#### `Promise` & `Promise.all`
+Permet d'attendre plusieurs requêtes **en parallèle** (au lieu de les enchaîner).
+
+**OGADE — `apps/api/src/maquettes/maquettes.service.ts`** :
+```ts
+async stats() {
+  const where = { deletedAt: null };
+  const [total, stock, empruntees, transit, asn, hs, enReparation] =
+    await Promise.all([
+      this.prisma.maquette.count({ where }),
+      this.prisma.maquette.count({ where: { ...where, etat: 'STOCK' } }),
+      this.prisma.maquette.count({ where: { ...where, etat: 'EMPRUNTEE' } }),
+      this.prisma.maquette.count({ where: { ...where, enTransit: true } }),
+      this.prisma.maquette.count({ where: { ...where, referenceASN: true } }),
+      this.prisma.maquette.count({ where: { ...where, etat: 'REBUT' } }),
+      this.prisma.maquette.count({ where: { ...where, etat: 'EN_REPARATION' } }),
+    ]);
+  return { total, stock, empruntees, transit, ... };
+}
+```
+Sans `Promise.all`, ces 7 `count` s'exécuteraient en série (~7× plus lent).
+
+#### Méthodes de tableau : `map`, `filter`, `find`, `reduce`, `forEach`
+Toutes **renvoient un nouveau tableau** (sauf `forEach`/`reduce`).
+
+**OGADE — `apps/web/src/components/GanttCalendar.tsx`** :
+```ts
+export function reservationsToEvents(reservations: Reservation[]): CalendarEvent[] {
+  return reservations
+    .filter((r) => r.statut !== "ANNULEE")     // garde celles non annulées
+    .map((r) => ({                              // transforme en CalendarEvent
+      kind: "reservation" as const,
+      id: r.id,
+      materielId: r.materielId,
+      start: new Date(r.dateDebut),
+      end: new Date(r.dateFin),
+      type: r.type,
+      statut: r.statut,
+      label: r.numero,
+      numero: r.numero,
+    }));
+}
+```
+
+**`find`** dans `MaterielsListPage.tsx` :
+```ts
+const typeMatRef = (typesMat ?? []).find((t: any) => t.code === m.typeMateriel);
+```
+
+#### `JSON.stringify` / `JSON.parse`
+**OGADE — `apps/web/src/lib/api.ts`** :
+```ts
+return apiFetch<T>(path, {
+  method: "POST",
+  body: JSON.stringify(body),       // objet JS → string JSON
+});
+// côté serveur, NestJS fait JSON.parse automatiquement
+```
+
+#### `Date` & `toLocaleDateString`
+**OGADE — `apps/web/src/components/MaterielDrawer.tsx`** :
+```ts
+const fmtDate = (d?: string | Date | null): string => {
+  if (!d) return "—";
+  const date = typeof d === "string" ? new Date(d) : d;
+  return date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+```
+`toLocaleDateString("fr-FR", ...)` → `"04 février 2026"`.
+
+#### Calculs de dates en millisecondes
+**OGADE — `apps/web/src/pages/CalendrierPage.tsx`** :
+```ts
+const dayMs = 86400000;             // 24 × 60 × 60 × 1000
+const echeance = new Date(m.dateProchainEtalonnage);
+const jours = Math.round((echeance.getTime() - Date.now()) / dayMs);
+```
+`Date.now()` = ms depuis 1970. La différence entre deux `getTime()` divisée par `86400000` donne un nombre de jours.
+
+#### `URL.createObjectURL` (téléchargement de fichier)
+**OGADE — `apps/web/src/components/MaterielDrawer.tsx`** :
+```ts
+const blob = await api.fetchBlob(`/materiels/${m.id}/pdf`);
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+a.download = `OGADE-${m.reference}.pdf`;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);            // libère la mémoire
+```
+
+#### `Map` & `Set`
+Structures de données plus puissantes que `{}` et `[]`.
+
+**OGADE — `apps/web/src/components/GanttCalendar.tsx`** :
+```ts
+const eventsByMateriel = useMemo(() => {
+  const map = new Map<number, CalendarEvent[]>();
+  materiels.forEach((m) => map.set(m.id, []));
+  events.forEach((ev) => {
+    if (!map.has(ev.materielId)) return;
+    map.get(ev.materielId)!.push(ev);
+  });
+  return map;
+}, [materiels, events]);
+```
+
+**`Set`** dans `MaquetteFormPage.tsx` :
+```ts
+const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
+// ...
+setTriedAdvance((s) => new Set(s).add(step));    // immuable : on crée un nouveau Set
+```
+
+#### Template literals (backticks)
+```ts
+const url = `${API_BASE}/materiels/${id}`;
+const msg = `Erreur ${response.status}`;
+```
+Utilisés **partout** pour construire des URLs, messages, classNames dynamiques.
+
+### 13.3 Prisma schema — DSL pour décrire la base
+
+C'est un *Domain Specific Language* propre à Prisma, écrit dans `apps/api/prisma/schema.prisma`. Mots-clés clés :
+
+| Mot-clé | Rôle |
+|---------|------|
+| `model X { ... }` | Définit une table |
+| `@id` | Clé primaire |
+| `@unique` | Contrainte d'unicité |
+| `@default(...)` | Valeur par défaut |
+| `@map("col_name")` | Renomme la colonne SQL (camelCase ↔ snake_case) |
+| `@@map("table_name")` | Renomme la table SQL |
+| `@@index([...])` | Crée un index |
+| `@relation(...)` | Décrit une relation FK |
+| `?` après le type | Champ nullable |
+| `@updatedAt` | Touch automatique sur update |
+
+**OGADE — `apps/api/prisma/schema.prisma` (extrait Maquette)** :
+```prisma
+model Maquette {
+  id             Int       @id @default(autoincrement())
+  reference      String    @unique
+  libelle        String
+  etat           String    @default("STOCK")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")          // soft delete
+
+  // Foreign keys
+  proprietaireId Int?      @map("proprietaire_id")
+  emprunteurId   Int?      @map("emprunteur_id")
+
+  // Relations (Prisma génère les jointures côté client)
+  proprietaire   Agent?    @relation("maquette_proprietaire",
+                                     fields: [proprietaireId],
+                                     references: [id])
+  emprunteur     Agent?    @relation("maquette_emprunteur",
+                                     fields: [emprunteurId],
+                                     references: [id])
+  defauts        Defaut[]                              // 1-N
+  lignesEnvoi    DemandeEnvoiLigne[] @relation("ligne_maquette")
+
+  @@index([etat])
+  @@map("maquettes")
+}
+```
+
+**Notations clés :**
+- `Int?` = nullable. Sans `?` → NOT NULL en SQL.
+- `@map("created_at")` : on écrit `createdAt` en TypeScript, mais la colonne SQL reste `created_at`.
+- `Defaut[]` : relation 1-N (une maquette a plusieurs défauts). Pas de FK ici, elle est sur l'autre côté.
+- `@relation("nom_relation", fields: [...], references: [...])` : nécessaire dès qu'il y a **plusieurs relations** entre 2 tables (ici Agent ↔ Maquette en a 5 : créateur, modificateur, propriétaire, emprunteur, référent).
+
+**Côté Agent** (l'autre bout des relations) :
+```prisma
+model Agent {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  nom   String
+  prenom String
+  // ...
+  maquettesProprietaire  Maquette[]  @relation("maquette_proprietaire")
+  maquettesEmprunteur    Maquette[]  @relation("maquette_emprunteur")
+  maquettesReferent      Maquette[]  @relation("maquette_referent")
+  // ...
+}
+```
+Chaque relation nommée a son **inverse** sur l'autre modèle.
+
+### 13.4 Prisma client — fonctions clés utilisées
+
+Prisma génère un client TypeScript fortement typé : `prisma.<table>.<action>(...)`.
+
+| Méthode | Rôle |
+|---------|------|
+| `findUnique({ where })` | 1 ligne par clé unique → ou null |
+| `findFirst({ where })` | 1 ligne (filtres composés) |
+| `findMany({ where, orderBy, skip, take, include })` | N lignes |
+| `count({ where })` | Compter |
+| `create({ data })` | Insérer |
+| `update({ where, data })` | Modifier |
+| `delete({ where })` | Supprimer |
+| `upsert(...)` | Insère **ou** met à jour |
+| `$transaction([...])` | Exécute en transaction |
+
+#### `findMany` avec filtres + tri + pagination + include
+
+**OGADE — `apps/api/src/maquettes/maquettes.service.ts`** :
+```ts
+const [data, total] = await Promise.all([
+  this.prisma.maquette.findMany({
+    where,                                  // filtres dynamiques
+    skip,                                   // pagination
+    take: pageSize,
+    orderBy: { createdAt: 'desc' },
+    include: MAQUETTE_LIST_INCLUDE,         // jointures
+  }),
+  this.prisma.maquette.count({ where }),
+]);
+```
+
+#### `where` dynamique
+```ts
+const where: any = { deletedAt: null, AND: [] as any[] };
+if (etat)  where.AND.push({ etat });
+if (site)  where.AND.push({ site });
+if (search) {
+  where.AND.push({
+    OR: [
+      { reference: { contains: search, mode: 'insensitive' } },
+      { libelle:   { contains: search, mode: 'insensitive' } },
+    ],
+  });
+}
+if (where.AND.length === 0) delete where.AND;
+```
+**Opérateurs Prisma utilisés :**
+- `{ contains: x, mode: 'insensitive' }` → `LIKE %x%` insensible à la casse
+- `{ in: [...] }` → `IN`
+- `{ lte: x }`, `{ gte: x }` → `<=`, `>=`
+- `{ not: x }`, `{ AND: [...] }`, `{ OR: [...] }`
+
+#### `include` vs `select`
+- `include: { responsable: true }` → ramène la relation **en plus** des colonnes natives
+- `select: { id: true, nom: true }` → **uniquement** les colonnes listées
+
+**OGADE — `materiels.service.ts`** :
+```ts
+const RESERVATION_INCLUDE = {
+  materiel: { select: { id: true, reference: true, libelle: true } },
+  demandeur: { select: { id: true, nom: true, prenom: true, email: true } },
+  annulePar: { select: { id: true, nom: true, prenom: true } },
+} as const;
+```
+
+#### `_count` (compter une relation sans la charger)
+**OGADE — `maquettes.service.ts`** :
+```ts
+const MAQUETTE_LIST_INCLUDE = {
+  // ...
+  defauts: { select: DEFAUT_SELECT, orderBy: { id: 'asc' as const } },
+  _count: { select: { defauts: true } },   // m._count.defauts → number
+};
+```
+
+#### `create` avec relation imbriquée
+**OGADE — `demandes-envoi.service.ts`** :
+```ts
+return this.prisma.demandeEnvoi.create({
+  data: {
+    ...demandeData,
+    numero,
+    demandeurId,
+    lignes: {                                // crée les lignes en cascade
+      create: lignes.map((ligne) => ({
+        materielId: ligne.materielId ?? null,
+        maquetteId: ligne.maquetteId ?? null,
+        quantite: ligne.quantite,
+      })),
+    },
+  },
+  include: { lignes: true },
+});
+```
+
+#### `update` partiel
+**OGADE — `reservations.service.ts`** :
+```ts
+return this.prisma.reservation.update({
+  where: { id },
+  data: {
+    ...(data.dateDebut !== undefined ? { dateDebut: data.dateDebut } : {}),
+    ...(data.dateFin   !== undefined ? { dateFin:   data.dateFin   } : {}),
+    ...(data.motif     !== undefined ? { motif:     data.motif     } : {}),
+  },
+  include: RESERVATION_INCLUDE,
+});
+```
+Astuce : `...(cond ? { x: y } : {})` permet de **n'écrire la propriété que si elle est présente** dans le payload.
+
+### 13.5 SQL — instructions clés dans nos migrations
+
+Les fichiers SQL d'OGADE vivent dans `apps/api/prisma/migrations/` et sont **rejoués automatiquement** au démarrage du conteneur (`prisma migrate deploy`).
+
+#### `CREATE TABLE` + types courants
+**OGADE — `20260430090000_add_reservations/migration.sql`** :
+```sql
+CREATE TABLE "reservations" (
+  "id"              SERIAL PRIMARY KEY,
+  "numero"          VARCHAR(255) NOT NULL UNIQUE,
+  "materiel_id"     INTEGER NOT NULL REFERENCES "materiels"("id") ON DELETE CASCADE,
+  "demandeur_id"    INTEGER NOT NULL REFERENCES "agents"("id"),
+  "date_debut"      TIMESTAMP NOT NULL,
+  "date_fin"        TIMESTAMP NOT NULL,
+  "type"            VARCHAR(50) NOT NULL DEFAULT 'AUTRE',
+  "statut"          VARCHAR(50) NOT NULL DEFAULT 'CONFIRMEE',
+  "motif"           TEXT,
+  "annule_par_id"   INTEGER REFERENCES "agents"("id"),
+  "annule_le"       TIMESTAMP,
+  "created_at"      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at"      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+- `SERIAL PRIMARY KEY` : entier auto-incrémenté + clé primaire.
+- `REFERENCES "table"("col") ON DELETE CASCADE` : foreign key + suppression en cascade.
+- `DEFAULT CURRENT_TIMESTAMP` : valeur par défaut côté DB.
+
+#### `CREATE INDEX`
+```sql
+CREATE INDEX "reservations_materiel_id_idx" ON "reservations"("materiel_id");
+CREATE INDEX "reservations_statut_idx"      ON "reservations"("statut");
+```
+Un index = structure interne qui rend les `WHERE materiel_id = X` quasi-instantanés.
+
+#### `ALTER TABLE … ADD COLUMN`
+**OGADE — `20260430120000_defaut_extra_fields/migration.sql`** :
+```sql
+ALTER TABLE "defauts" ADD COLUMN "longueur"   DOUBLE PRECISION;
+ALTER TABLE "defauts" ADD COLUMN "largeur"    DOUBLE PRECISION;
+ALTER TABLE "defauts" ADD COLUMN "certifie"   BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE "defauts" ADD COLUMN "pos_x"      DOUBLE PRECISION;
+ALTER TABLE "defauts" ADD COLUMN "couleur"    VARCHAR(64);
+```
+
+#### `INSERT … ON CONFLICT … DO NOTHING` (UPSERT)
+Évite l'erreur quand on insère une ligne déjà présente — utile pour seeder en idempotent.
+
+**OGADE — `20260430140100_maquette_seed_refs_samples/migration.sql`** :
+```sql
+INSERT INTO "referentiels" ("type", "code", "label", "position", "actif")
+VALUES
+  ('TYPE_DEFAUT', 'FISSURE',   'Fissure',   1, TRUE),
+  ('TYPE_DEFAUT', 'POROSITE',  'Porosité',  2, TRUE),
+  ('TYPE_DEFAUT', 'INCLUSION', 'Inclusion', 3, TRUE)
+ON CONFLICT ("type", "code") DO NOTHING;
+```
+
+#### `INSERT` multi-lignes avec colonnes hétérogènes
+Gros bloc `INSERT INTO maquettes (...) VALUES (...), (...), (...)` pour seeder les 3 maquettes test (extrait) :
+```sql
+INSERT INTO "maquettes" (
+  "reference", "libelle", "etat",
+  "site", "type_maquette", "categorie",
+  "longueur", "dn", "epaisseur_paroi", "poids",
+  "reference_asn", "informations_certifiees",
+  "created_at", "updated_at"
+) VALUES
+(
+  'MQ-2026-001', 'Tube primaire DN350', 'STOCK',
+  'CRUAS', 'QUALIFICATION', 'PRIMAIRE',
+  1200, 350, 28, 215,
+  TRUE, TRUE,
+  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+),
+-- … 2 autres lignes …
+ON CONFLICT ("reference") DO NOTHING;
+```
+
+#### `UPDATE` + `WHERE`
+**OGADE — `20260427100000_materiel_powerapps_fields/migration.sql`** :
+```sql
+UPDATE materiels SET etat = 'CORRECT' WHERE etat IN ('DISPONIBLE', 'EN_SERVICE');
+UPDATE materiels SET etat = 'HS'      WHERE etat IN ('EN_REPARATION', 'REBUT');
+```
+
+#### `DELETE` (utilisé pour reseed)
+```sql
+DELETE FROM referentiels WHERE type = 'ETAT_MATERIEL';
+```
+
+### 13.6 Zod — validation et inférence de type
+
+Zod permet à la fois de **valider** un objet à l'exécution **et** d'en dériver son type TypeScript. C'est notre rempart entre l'API et la DB, **et** entre le formulaire React et l'API.
+
+#### Constructeurs de base
+
+| Méthode | Rôle |
+|---------|------|
+| `z.string()` / `z.number()` / `z.boolean()` | Types primitifs |
+| `z.coerce.number()` / `z.coerce.date()` | Convertit la string en number/Date avant validation |
+| `z.enum([...])` | Union de littéraux |
+| `z.object({ ... })` | Objet structuré |
+| `.optional()` / `.nullable()` | Champ optionnel ou nullable |
+| `.default(x)` | Valeur par défaut |
+| `.min(n)` / `.max(n)` | Contraintes |
+| `.refine(fn, msg)` | Validation custom |
+| `.safeParse(x)` | Valide sans lancer d'exception → `{ success, data }` |
+| `z.infer<typeof schema>` | Extrait le type TS associé |
+
+#### Schéma de création
+
+**OGADE — `packages/shared/src/schemas/reservation.schema.ts`** :
+```ts
+export const createReservationSchema = z
+  .object({
+    materielId: z.number().int().positive(),
+    dateDebut: z.coerce.date(),
+    dateFin:   z.coerce.date(),
+    type: z
+      .enum([
+        TypeReservation.TRANSFERT_SITE,
+        TypeReservation.ETALONNAGE,
+        TypeReservation.PRET_EXTERNE,
+        TypeReservation.PRET_INTERNE,
+        TypeReservation.AUTRE,
+      ])
+      .default(TypeReservation.AUTRE),
+    motif: z.string().optional(),
+    commentaire: z.string().optional(),
+  })
+  .refine((d) => d.dateFin >= d.dateDebut, {
+    message: "La date de fin doit être postérieure à la date de début",
+    path: ["dateFin"],
+  });
+
+export type CreateReservationInput = z.infer<typeof createReservationSchema>;
+```
+- `z.coerce.date()` : si on reçoit une string ISO depuis JSON, elle est convertie en `Date`.
+- `.refine(...)` : règle métier croisée (la date de fin doit être ≥ date de début) avec un `path` qui pointe vers le champ pour afficher l'erreur sous le bon input.
+
+#### Utilisation côté backend (NestJS)
+
+**OGADE — `apps/api/src/reservations/reservations.controller.ts`** :
+```ts
+@Post()
+async create(@Body() body: any, @CurrentUser() user: RequestUser | null) {
+  const result = createReservationSchema.safeParse(body);
+  if (!result.success) {
+    throw new BadRequestException(result.error.flatten());
+  }
+  // result.data est typé CreateReservationInput
+  return this.service.create(result.data, user!.agentId);
+}
+```
+- `safeParse` retourne `{ success: true, data }` ou `{ success: false, error }`.
+- `result.error.flatten()` produit une réponse JSON lisible côté client.
+
+#### Utilisation côté frontend (react-hook-form + zodResolver)
+
+**OGADE — `apps/web/src/pages/MaquetteFormPage.tsx`** :
+```ts
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const { register, handleSubmit, formState: { errors } } = useForm<CreateMaquetteInput>({
+  resolver: zodResolver(createMaquetteSchema),
+});
+```
+La validation tourne **avant** la soumission. Si une règle Zod échoue, `errors.<champ>` est rempli automatiquement, et on peut afficher l'erreur dans le JSX.
+
+#### Composition de schémas
+**OGADE — `packages/shared/src/schemas/maquette.schema.ts`** :
+```ts
+export const createMaquetteSchema = z.object(baseFields);
+
+export const updateMaquetteSchema = createMaquetteSchema.partial().extend({
+  etat: z.enum([...]).optional(),
+  emprunteurId: z.number().nullable().optional(),
+  dateEmprunt: z.coerce.date().nullable().optional(),
+});
+```
+- `.partial()` : tous les champs deviennent optionnels (utile pour `PATCH`).
+- `.extend({...})` : ajoute de nouveaux champs.
+
+### 13.7 React hooks — fonctions clés
+
+Un *hook* est une fonction qui commence par `use` et permet d'attacher de l'**état** ou des **effets** à un composant fonction.
+
+#### `useState` — état local
+```tsx
+const [valeur, setValeur] = useState<Type>(valeurInitiale);
+```
+
+**OGADE — `apps/web/src/pages/MaterielsListPage.tsx`** :
+```tsx
+const [search, setSearch] = useState("");
+const [filterEtat, setFilterEtat] = useState("");
+const [filterTypeEnd, setFilterTypeEnd] = useState("");
+const [activeKpi, setActiveKpi] = useState<string | null>(null);
+const [selectedId, setSelectedId] = useState<number | null>(null);
+const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+```
+
+**Setter fonctionnel** (utile quand on dépend de l'ancienne valeur) :
+```tsx
+setExpandedIds((s) => {
+  const n = new Set(s);
+  if (n.has(id)) n.delete(id); else n.add(id);
+  return n;
+});
+```
+
+#### `useEffect` — effet de bord (souscriptions, écouteurs, fetch en bas niveau)
+```tsx
+useEffect(() => {
+  // code à exécuter…
+  return () => { /* cleanup */ };
+}, [deps]);
+```
+
+**OGADE — `apps/web/src/components/MaterielDrawer.tsx`** (Escape ferme le drawer) :
+```tsx
+useEffect(() => {
+  if (isPage || !onClose) return;
+  const handler = (e: KeyboardEvent) => {
+    if (e.key === "Escape") onClose();
+  };
+  window.addEventListener("keydown", handler);
+  return () => window.removeEventListener("keydown", handler);  // cleanup
+}, [onClose, isPage]);
+```
+
+**Génération d'URL d'image (avec libération mémoire)** :
+```tsx
+useEffect(() => {
+  let revoke: string | null = null;
+  api.fetchBlob(`/qrcode/maquette/${id}`).then((blob) => {
+    const url = URL.createObjectURL(blob);
+    revoke = url;
+    setSrc(url);
+  });
+  return () => { if (revoke) URL.revokeObjectURL(revoke); };
+}, [id]);
+```
+
+#### `useMemo` — mémoise un calcul coûteux
+Recalculé **uniquement** si les dépendances changent.
+
+**OGADE — `apps/web/src/components/GanttCalendar.tsx`** :
+```tsx
+const eventsByMateriel = useMemo(() => {
+  const map = new Map<number, CalendarEvent[]>();
+  materiels.forEach((m) => map.set(m.id, []));
+  events.forEach((ev) => {
+    if (!map.has(ev.materielId)) return;
+    map.get(ev.materielId)!.push(ev);
+  });
+  return map;
+}, [materiels, events]);
+```
+Sans `useMemo`, ce calcul tournerait à chaque re-render — coûteux pour un Gantt de 90 jours × 50 matériels.
+
+#### `useCallback` — mémoise une **fonction**
+**OGADE — `MaterielsListPage.tsx`** :
+```tsx
+const toggleExpand = useCallback(
+  (id: number) =>
+    setExpandedIds((s) => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    }),
+  [],
+);
+```
+Utile quand on passe la fonction en prop d'un enfant memoized.
+
+#### `useRef` — référence mutable persistante
+```tsx
+const inputRef = useRef<HTMLInputElement>(null);
+inputRef.current?.focus();
+```
+
+#### Hooks personnalisés OGADE
+
+| Hook | Rôle |
+|------|------|
+| `usePagination` (`apps/web/src/hooks/use-pagination.ts`) | Lit `?page=&pageSize=` dans l'URL et expose `setPage` |
+| `useReferentiel(type)` (`apps/web/src/hooks/use-referentiels.ts`) | Charge un référentiel typé (TYPE_END, MATIERE…) avec cache |
+| `useSites()`, `useEntreprises(type?)` | Sucre syntaxique sur `useReferentiel` pour les listes Sites/Entreprises |
+| `useAuth()` (`apps/web/src/lib/auth.tsx`) | Donne `{ user, login, logout, getAccessToken }` |
+
+#### `useContext` — état global (consommation)
+**OGADE — `apps/web/src/lib/auth.tsx`** :
+```tsx
+const AuthContext = createContext<AuthContextValue>({ user: null, ... });
+
+export function useAuth(): AuthContextValue {
+  return useContext(AuthContext);
+}
+```
+Tout composant peut lire l'utilisateur courant : `const { user } = useAuth();`.
+
+### 13.8 React Query + react-hook-form — fonctions clés
+
+#### `useQuery` — récupérer + cacher
+```ts
+useQuery<T>({ queryKey, queryFn, enabled?, staleTime? })
+```
+
+**OGADE — `apps/web/src/pages/MaterielsListPage.tsx`** :
+```tsx
+const { data, isLoading } = useQuery<PaginatedResult<Materiel>>({
+  queryKey: ["materiels", { ...queryParams, search, etat: filterEtat, scope }],
+  queryFn: () => api.get("/materiels", {
+    ...queryParams,
+    search: search || undefined,
+    etat: filterEtat || undefined,
+    mes: scope === "mes" ? "true" : undefined,
+  }),
+});
+```
+- `queryKey` est un tableau qui sert d'**identifiant de cache**. Si une valeur change → nouvelle requête.
+- `queryFn` retourne une `Promise`.
+
+#### `useMutation` — créer / modifier / supprimer
+```ts
+const m = useMutation({ mutationFn, onSuccess, onError });
+m.mutate(payload);   // lance la requête
+m.isPending          // true tant que ça mouline
+```
+
+**OGADE — `apps/web/src/components/ReservationModal.tsx`** :
+```tsx
+const createMutation = useMutation({
+  mutationFn: (payload: any) => api.post<Reservation>("/reservations", payload),
+  onSuccess: (created) => {
+    invalidateAfterMutation();             // rafraîchit les listes
+    onCreated?.(created);
+    onClose();
+  },
+  onError: (e: any) => setSubmitError(e?.message ?? "Erreur lors de la création"),
+});
+```
+
+#### `useQueryClient().invalidateQueries`
+Marque un cache comme "périmé" → les composants qui l'utilisent re-fetchent.
+
+```tsx
+const qc = useQueryClient();
+
+const invalidateAfterMutation = () => {
+  qc.invalidateQueries({ queryKey: ["reservations"] });
+  qc.invalidateQueries({ queryKey: ["reservations-stats"] });
+  qc.invalidateQueries({ queryKey: ["materiel-reservations"] });
+  qc.invalidateQueries({ queryKey: ["reservation-conflicts"] });
+};
+```
+Tout `queryKey` qui **commence par** ce préfixe est invalidé. Donc `["reservations", { …filtres }]` est aussi rafraîchi.
+
+#### `staleTime: 0` + `refetch()` — forcer la fraîcheur
+**OGADE — `ReservationModal.tsx`** (anti double-réservation) :
+```tsx
+const { data: conflicts = [], refetch: refetchConflicts } = useQuery<Conflict[]>({
+  queryKey: ["reservation-conflicts", mat?.id, debut, fin, reservation?.id],
+  queryFn: () => api.get("/reservations/conflicts", { ... }),
+  enabled: !!mat && !!debut && !!fin,
+  staleTime: 0,                                     // toujours considéré "périmé"
+});
+
+async function handleSubmit() {
+  const fresh = await refetchConflicts();           // re-check synchrone juste avant
+  if (fresh.data && fresh.data.length > 0) {
+    setSubmitError("Conflit avec une réservation existante");
+    return;
+  }
+  createMutation.mutate(payload);
+}
+```
+
+#### `useForm` (react-hook-form) — formulaire React efficace
+```ts
+const {
+  register,                 // câble un input au state
+  handleSubmit,             // wrapper de submit
+  formState: { errors },    // erreurs Zod
+  watch,                    // lit la valeur courante d'un champ
+  reset,                    // recharge avec de nouvelles valeurs
+} = useForm({ resolver: zodResolver(schema), defaultValues: {...} });
+```
+
+**OGADE — `apps/web/src/pages/MaquetteFormPage.tsx`** :
+```tsx
+const { register, handleSubmit, formState: { errors }, watch, reset } =
+  useForm<any>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      reference: "",
+      libelle: "",
+      referenceASN: false,
+      adressePays: "FR",
+    },
+  });
+
+// JSX
+<input type="text" className="oinput mono" {...register("reference")} />
+<select className="oselect" {...register("typeMaquette")}>...</select>
+<textarea className="otextarea" {...register("description")} />
+
+<form onSubmit={handleSubmit(onSubmit)}>...</form>
+```
+
+`{...register("reference")}` injecte automatiquement `name`, `onChange`, `onBlur`, `ref` sur l'input.
+
+#### `reset()` — préremplir le form en édition
+```tsx
+useEffect(() => {
+  if (!isEdit || !existing) return;
+  reset({
+    reference: existing.reference,
+    libelle: existing.libelle,
+    typeMaquette: existing.typeMaquette ?? "",
+    // …
+  });
+}, [existing, isEdit, reset]);
+```
+
+#### `watch()` — lire la valeur en direct (pour conditionner l'affichage)
+```tsx
+const wRef = watch("reference");
+const wLib = watch("libelle");
+{!wRef && <p className="field-error">Champ requis</p>}
+```
+
+### 13.9 NestJS — décorateurs principaux
+
+#### `@Module({...})` — déclare un module
+**OGADE — `apps/api/src/maquettes/maquettes.module.ts`** :
+```ts
+@Module({
+  imports: [EvenementsModule],
+  controllers: [MaquettesController],
+  providers: [MaquettesService],
+  exports: [MaquettesService],
+})
+export class MaquettesModule {}
+```
+- `imports` : les autres modules dont on dépend (leurs `exports` sont injectables ici).
+- `controllers` : qui répond aux requêtes HTTP.
+- `providers` : services injectables.
+- `exports` : ce qu'on expose à d'autres modules.
+
+#### `@Controller(prefix)` — préfixe d'URL
+```ts
+@Controller('api/v1/materiels')
+export class MaterielsController { ... }
+```
+
+#### `@Get`, `@Post`, `@Patch`, `@Delete` — méthodes HTTP
+**OGADE — `apps/api/src/reservations/reservations.controller.ts`** :
+```ts
+@Get('stats')                              // GET /api/v1/reservations/stats
+async stats(@CurrentUser() user) { ... }
+
+@Get(':id')                                // GET /api/v1/reservations/42
+async findOne(@Param('id', ParseIntPipe) id: number) { ... }
+
+@Post()                                    // POST /api/v1/reservations
+@HttpCode(HttpStatus.CREATED)
+async create(@Body() body: any) { ... }
+
+@Patch(':id')                              // PATCH /api/v1/reservations/42
+async update(...) { ... }
+
+@Delete(':id')                             // DELETE /api/v1/reservations/42
+@HttpCode(HttpStatus.NO_CONTENT)
+async remove(@Param('id', ParseIntPipe) id: number) { ... }
+```
+
+#### Décorateurs de paramètres
+
+| Décorateur | Rôle | Exemple |
+|------------|------|---------|
+| `@Param('id')` | Lit un param d'URL | `/users/:id` → `id` |
+| `@Query('search')` | Lit un query param | `?search=foo` |
+| `@Body()` | Body JSON de la requête | `POST {…}` |
+| `@Res()` | Objet réponse Express bas niveau | pour les fichiers binaires |
+| `@CurrentUser()` (custom OGADE) | Utilisateur courant via JWT | injecté par `auth.guard.ts` |
+
+**OGADE — endpoint PDF** :
+```ts
+@Get(':id/pdf')
+async pdf(
+  @Param('id', ParseIntPipe) id: number,
+  @Res() res: Response,
+): Promise<void> {
+  const buffer = await this.pdfService.materielPdf(id);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="OGADE-${id}.pdf"`);
+  res.end(buffer);
+}
+```
+
+#### `@Injectable()` — service ou helper injectable
+**OGADE — `materiels.service.ts`** :
+```ts
+@Injectable()
+export class MaterielsService {
+  constructor(
+    private readonly prisma: PrismaService,    // injection auto
+    private readonly evenements: EvenementsService,
+  ) {}
+}
+```
+NestJS appelle `new MaterielsService(prisma, evenements)` automatiquement. Pas besoin d'instancier à la main.
+
+#### `@Public()` (custom OGADE) — bypass de l'auth
+```ts
+@Public()
+@Post('login')
+login(@Body() body: any) { ... }
+```
+Le `auth.guard.ts` vérifie ce décorateur via `Reflector` : si présent → on laisse passer sans token.
+
+#### Pipes — transformation/validation des params
+- `ParseIntPipe` : convertit un param string en number, sinon 400.
+- `ParseUUIDPipe` (non utilisé ici), etc.
+
+```ts
+@Get(':id')
+findOne(@Param('id', ParseIntPipe) id: number) { ... }
+```
+
+#### Exceptions HTTP toutes prêtes
+
+| Exception | Statut |
+|-----------|--------|
+| `BadRequestException` | 400 |
+| `UnauthorizedException` | 401 |
+| `ForbiddenException` | 403 |
+| `NotFoundException` | 404 |
+| `ConflictException` | 409 |
+
+**OGADE** :
+```ts
+if (!result.success) throw new BadRequestException(result.error.flatten());
+if (!maquette)       throw new NotFoundException(`Maquette #${id} not found`);
+```
+
+### 13.10 CSS — variables et conventions OGADE
+
+#### Variables CSS (custom properties)
+Définies une fois sur `:root`, utilisables partout via `var(...)`.
+
+**OGADE — `apps/web/src/ogade-design.css`** :
+```css
+:root {
+  --bg:        oklch(0.985 0.003 80);
+  --bg-panel:  oklch(1 0 0);
+  --bg-sunken: oklch(0.945 0.005 80);
+  --ink:       oklch(0.22 0.015 270);
+  --ink-3:     oklch(0.55 0.015 270);
+  --line:      oklch(0.90 0.006 270);
+
+  --accent:        oklch(0.55 0.20 275);
+  --accent-soft:   oklch(0.95 0.04 275);
+  --emerald: oklch(0.60 0.16 155);
+  --rose:    oklch(0.62 0.21 20);
+  --amber:   oklch(0.72 0.17 75);
+
+  --row-h: 50px;
+  --pad-x: 12px;
+}
+```
+On utilise `oklch(L C h)` (espace de couleurs perceptuel) plutôt que `hex` pour des nuances harmonieuses.
+
+#### Composants nommés
+**OGADE — bouton générique `obtn`** :
+```css
+.obtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-panel); color: var(--ink-2);
+  font-size: 12.5px; font-weight: 500; cursor: default;
+}
+.obtn:hover { background: var(--bg-sunken); }
+.obtn.accent { background: var(--accent); color: white; border-color: var(--accent); }
+.obtn.ghost  { border-color: transparent; background: transparent; }
+.obtn.sm     { padding: 4px 9px; font-size: 12px; }
+```
+Et côté JSX : `<button className="obtn accent sm">…</button>`.
+
+#### Pills colorés (statuts)
+```css
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 999px;
+  font-size: 11.5px; font-weight: 500;
+}
+.pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.pill.c-emerald { color: var(--emerald); background: var(--emerald-soft); }
+.pill.c-rose    { color: var(--rose);    background: var(--rose-soft); }
+.pill.c-sky     { color: var(--sky);     background: var(--sky-soft); }
+```
+**Côté JSX** :
+```tsx
+<span className="pill c-emerald"><span className="dot" />Correct</span>
+```
+
+#### Custom property dynamique depuis React
+Astuce qu'on utilise pour le Gantt et les marqueurs de défauts :
+```tsx
+<div
+  className="cal-bar reserv sky"
+  style={{
+    left: `${sPct}%`,
+    width: `${ePct - sPct}%`,
+  }}
+/>
+<div
+  className="mq-plan-defect"
+  style={{ ["--def-color" as string]: defautColor(d.typeDefaut) }}
+/>
+```
+
+### 13.11 Dockerfile — commandes principales
+
+| Instruction | Rôle |
+|-------------|------|
+| `FROM image` | Image de base |
+| `WORKDIR /chemin` | Répertoire courant dans l'image |
+| `COPY src dst` | Copie depuis le contexte de build vers l'image |
+| `RUN cmd` | Exécute une commande pendant le build (résultat figé dans une couche) |
+| `ENV NAME=value` | Variable d'environnement |
+| `EXPOSE 8080` | Documente le port (info, pas obligatoire) |
+| `CMD ["sh","start.sh"]` | Commande de démarrage du conteneur |
+| `AS nom` | Multi-stage : nomme un stage |
+| `--from=stage` | Copie depuis un stage précédent |
+
+**OGADE — multi-stage** (recopie commentée) :
+```dockerfile
+# Stage 1 : on installe et on build
+FROM node:20-slim AS builder
+RUN corepack enable                           # active pnpm
+WORKDIR /app
+COPY pnpm-lock.yaml package.json ./           # 1) manifestes (cache)
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+RUN pnpm install --frozen-lockfile            # 2) install (mis en cache)
+COPY . .                                      # 3) reste du code
+RUN pnpm run db:generate
+RUN pnpm run build                            # 4) build TS → JS
+
+# Stage 2 : image finale, légère
+FROM node:20-slim
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=builder /deploy .                 # uniquement l'output du build
+EXPOSE 8080
+CMD ["sh", "start.sh"]                        # prisma migrate deploy + node main.js
+```
+
+### 13.12 YAML — workflow GitHub Actions
+
+YAML = format texte basé sur l'**indentation** (pas d'accolades). Utilisé par GitHub Actions, Docker Compose, Kubernetes…
+
+**OGADE — `.github/workflows/deploy-azure.yml`** :
+```yaml
+name: Deploy to Azure App Service
+on:
+  push:
+    branches: [main]                    # déclencheur
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest              # machine fournie par GitHub
+    permissions:
+      contents: read
+      packages: write                   # pour pousser sur ghcr.io
+
+    steps:
+      - uses: actions/checkout@v4       # clone le repo
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ogade:latest
+            ghcr.io/${{ github.repository_owner }}/ogade:${{ github.sha }}
+```
+
+Concepts YAML :
+- `name:`, `on:`, `jobs:` sont des clés ; l'indentation définit la hiérarchie.
+- `[main]` est un tableau inline.
+- `${{ ... }}` sont des **expressions** GitHub Actions qui interpolent secrets et contexte.
+- `uses: org/action@version` réutilise une action publiée sur le marketplace.
