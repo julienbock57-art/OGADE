@@ -184,6 +184,8 @@ function InfosTab({ m }: { m: Maquette }) {
         <div className="drawer-grid two">
           <Field label="Référence"><span className="mono">{m.reference}</span></Field>
           <Field label="Libellé">{m.libelle}</Field>
+          <Field label="N° de FIEC"><span className="mono">{m.numeroFIEC ?? "—"}</span></Field>
+          <Field label="Référence unique">{m.referenceUnique ?? "—"}</Field>
           <Field label="Type de maquette">{m.typeMaquette ?? "—"}</Field>
           <Field label="Catégorie">{m.categorie ?? "—"}</Field>
           <Field label="Forme">
@@ -212,6 +214,7 @@ function InfosTab({ m }: { m: Maquette }) {
                   ? (allCertifies ? "Oui" : someCertifies ? "Partielles" : "Non")
                   : "—")}
           </Field>
+          <Field label="Produits chimiques">{m.produitsChimiques ? "Oui" : "Non"}</Field>
         </div>
       </PropCard>
 
@@ -233,7 +236,22 @@ function InfosTab({ m }: { m: Maquette }) {
           <Field label="Pôle / Entité">{m.poleEntite ?? "—"}</Field>
           <Field label="Site">{m.site ?? "—"}</Field>
           <Field label="Localisation">{m.localisation ?? "—"}</Field>
+          <Field label="Salle">{m.localisationSalle ?? "—"}</Field>
+          <Field label="Rayonnage">{m.localisationRayonnage ?? "—"}</Field>
+          <Field label="Adresse">
+            {[m.adresseNumVoie, m.adresseNomVoie].filter(Boolean).join(" ") || "—"}
+          </Field>
+          <Field label="Ville">
+            {[m.adresseCodePostal, m.adresseVille].filter(Boolean).join(" ") || "—"}
+          </Field>
+          <Field label="Pays">{m.adressePays ?? "—"}</Field>
+          <Field label="Site (libellé)">{m.adresseSite ?? "—"}</Field>
         </div>
+        {m.complementsLocalisation && (
+          <p style={{ marginTop: 10, fontSize: 12.5, color: "var(--ink-2)", whiteSpace: "pre-wrap" }}>
+            {m.complementsLocalisation}
+          </p>
+        )}
       </PropCard>
 
       <PropCard title="Référent & emprunt" icon="user">
@@ -246,15 +264,27 @@ function InfosTab({ m }: { m: Maquette }) {
               </span>
             ) : "—"}
           </Field>
+          <Field label="Référent maquette">
+            {m.referent ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Avatar nom={m.referent.nom} prenom={m.referent.prenom} size={20} />
+                {m.referent.prenom} {m.referent.nom}
+              </span>
+            ) : "—"}
+          </Field>
           <Field label="Statut">
             <span className={MQ_ETAT_PILL[m.etat]?.cls ?? "pill c-neutral"}>
               <span className="dot" />
               {MQ_ETAT_PILL[m.etat]?.label ?? m.etat}
             </span>
           </Field>
-          {m.etat === "EMPRUNTEE" && m.emprunteur && (
+          <Field label="En transit">{m.enTransit ? "Oui" : "Non"}</Field>
+          {m.etat === "EMPRUNTEE" && (
             <>
-              <Field label="Emprunteur">{m.emprunteur.prenom} {m.emprunteur.nom}</Field>
+              <Field label="Emprunteur">
+                {m.emprunteur ? `${m.emprunteur.prenom} ${m.emprunteur.nom}` : "—"}
+              </Field>
+              <Field label="Emprunteur entreprise">{m.emprunteurEntreprise ?? "—"}</Field>
               <Field label="Date d'emprunt">{fmtDate(m.dateEmprunt)}</Field>
               <Field label="Retour estimé">{fmtDate(m.dateRetour)}</Field>
             </>
@@ -262,13 +292,37 @@ function InfosTab({ m }: { m: Maquette }) {
         </div>
       </PropCard>
 
-      {(m.description || m.commentaires) && (
+      {(m.description || m.vieMaquette || m.historiqueTexte || m.descriptionDefauts || m.commentaires) && (
         <PropCard title="Description & vie" icon="info">
           <div className="vstack" style={{ gap: 10, fontSize: 12.5, lineHeight: 1.55 }}>
             {m.description && (
               <div>
                 <div className="field-label" style={{ marginBottom: 3 }}>Description</div>
                 <div style={{ whiteSpace: "pre-wrap" }}>{m.description}</div>
+              </div>
+            )}
+            {m.descriptionDefauts && (
+              <div>
+                <div className="field-label" style={{ marginBottom: 3 }}>Description des défauts</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{m.descriptionDefauts}</div>
+              </div>
+            )}
+            {m.vieMaquette && (
+              <div>
+                <div className="field-label" style={{ marginBottom: 3 }}>Vie de la maquette</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{m.vieMaquette}</div>
+              </div>
+            )}
+            {m.historiqueTexte && (
+              <div>
+                <div className="field-label" style={{ marginBottom: 3 }}>Historique</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{m.historiqueTexte}</div>
+              </div>
+            )}
+            {m.pieces && (
+              <div>
+                <div className="field-label" style={{ marginBottom: 3 }}>Pièces</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{m.pieces}</div>
               </div>
             )}
             {m.commentaires && (
@@ -281,22 +335,52 @@ function InfosTab({ m }: { m: Maquette }) {
         </PropCard>
       )}
 
-      {!m.horsPatrimoine && m.valeurFinanciere != null && (
-        <PropCard title="Patrimoine" icon="info">
-          <div className="drawer-grid two">
-            <Field label="Valeur initiale">{m.valeurFinanciere.toLocaleString("fr-FR")} €</Field>
-            <Field label="Hors patrimoine">{m.horsPatrimoine ? "Oui" : "Non"}</Field>
-            <Field label="En transit">{m.enTransit ? "Oui" : "Non"}</Field>
-            <Field label="Procédures">
-              {procedures.length > 0 ? (
-                <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 4 }}>
-                  {procedures.map((p) => <span key={p} className="tag mono">{p}</span>)}
-                </span>
-              ) : "—"}
-            </Field>
+      {(m.lienECM || m.lienECMRFF || m.lienPhotos) && (
+        <PropCard title="Liens & ECM" icon="info">
+          <div className="vstack" style={{ gap: 8, fontSize: 12.5 }}>
+            {m.lienECM && (
+              <div><span className="field-label">Lien ECM : </span>
+                <a href={m.lienECM} target="_blank" rel="noopener" style={{ color: "var(--accent)" }}>{m.lienECM}</a>
+              </div>
+            )}
+            {m.lienECMRFF && (
+              <div><span className="field-label">Lien ECM RFF : </span>
+                <a href={m.lienECMRFF} target="_blank" rel="noopener" style={{ color: "var(--accent)" }}>{m.lienECMRFF}</a>
+              </div>
+            )}
+            {m.lienPhotos && (
+              <div><span className="field-label">Photos : </span>
+                <span style={{ whiteSpace: "pre-wrap" }}>{m.lienPhotos}</span>
+              </div>
+            )}
           </div>
         </PropCard>
       )}
+
+      <PropCard title="Patrimoine" icon="info">
+        <div className="drawer-grid two">
+          <Field label="Valeur financière">
+            {m.valeurFinanciere != null ? `${m.valeurFinanciere.toLocaleString("fr-FR")} €` : "—"}
+          </Field>
+          <Field label="Durée de vie">
+            {m.dureeVie != null ? `${m.dureeVie} ans` : "—"}
+          </Field>
+          <Field label="Hors patrimoine">{m.horsPatrimoine ? "Oui" : "Non"}</Field>
+          <Field label="Procédures">
+            {procedures.length > 0 ? (
+              <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 4 }}>
+                {procedures.map((p) => <span key={p} className="tag mono">{p}</span>)}
+              </span>
+            ) : "—"}
+          </Field>
+          {m.amortissement && (
+            <div className="field full">
+              <span className="field-label">Amortissement</span>
+              <span className="field-value" style={{ whiteSpace: "pre-wrap" }}>{m.amortissement}</span>
+            </div>
+          )}
+        </div>
+      </PropCard>
     </div>
   );
 }
@@ -849,23 +933,37 @@ function HistoriqueTab({ m }: { m: Maquette }) {
 
 // ─── COLISAGE TAB ────────────────────────────────────────────────
 function ColisageTab({ m }: { m: Maquette }) {
+  const colisL = m.colisageLongueur ?? null;
+  const colisl = m.colisageLargeur ?? null;
+  const colisH = m.colisageHauteur ?? null;
+  const colisP = m.colisagePoids ?? null;
+  const colisD = m.colisageDescription ?? null;
+  const hasAny = colisL != null || colisl != null || colisH != null || colisP != null || colisD;
+
   return (
     <PropCard title="Caractéristiques de colisage" icon="box">
-      <div className="drawer-grid two">
-        {m.longueur != null && <Field label="Longueur colis">{m.longueur} mm</Field>}
-        {m.largeur != null && <Field label="Largeur colis">{m.largeur} mm</Field>}
-        {m.hauteur != null && <Field label="Hauteur colis">{m.hauteur} mm</Field>}
-        {m.poids != null && <Field label="Poids">{m.poids} kg</Field>}
-        {m.quantite != null && <Field label="Quantité">{m.quantite}</Field>}
-        {m.commentaires && (
-          <div className="field full">
-            <span className="field-label">Description colisage</span>
-            <span className="field-value" style={{ whiteSpace: "pre-wrap" }}>
-              {m.commentaires}
-            </span>
-          </div>
-        )}
-      </div>
+      {!hasAny ? (
+        <p style={{ margin: 0, fontSize: 12.5, color: "var(--ink-3)" }}>
+          Aucune information de colisage renseignée.
+        </p>
+      ) : (
+        <div className="drawer-grid two">
+          <Field label="Longueur colis">{colisL != null ? `${colisL} mm` : "—"}</Field>
+          <Field label="Largeur colis">{colisl != null ? `${colisl} mm` : "—"}</Field>
+          <Field label="Hauteur colis">{colisH != null ? `${colisH} mm` : "—"}</Field>
+          <Field label="Poids colis">{colisP != null ? `${colisP} kg` : "—"}</Field>
+          <Field label="Quantité">{m.quantite ?? "—"}</Field>
+          <Field label="Pièces">
+            <span style={{ whiteSpace: "pre-wrap" }}>{m.pieces ?? "—"}</span>
+          </Field>
+          {colisD && (
+            <div className="field full">
+              <span className="field-label">Description colisage</span>
+              <span className="field-value" style={{ whiteSpace: "pre-wrap" }}>{colisD}</span>
+            </div>
+          )}
+        </div>
+      )}
     </PropCard>
   );
 }

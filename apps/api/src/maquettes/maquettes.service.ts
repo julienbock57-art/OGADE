@@ -35,6 +35,7 @@ const DEFAUT_SELECT = {
 const MAQUETTE_LIST_INCLUDE = {
   proprietaire: { select: AGENT_SELECT },
   emprunteur: { select: AGENT_SELECT },
+  referent: { select: AGENT_SELECT },
   defauts: { select: DEFAUT_SELECT, orderBy: { id: 'asc' as const } },
   _count: { select: { defauts: true } },
 };
