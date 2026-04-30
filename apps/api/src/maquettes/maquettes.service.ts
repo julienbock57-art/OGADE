@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import type { CreateMaquetteInput, UpdateMaquetteInput } from '@ogade/shared';
+import type {
+  CreateMaquetteInput,
+  UpdateMaquetteInput,
+  CreateDefautInput,
+  UpdateDefautInput,
+} from '@ogade/shared';
 
 const AGENT_SELECT = {
   id: true,
@@ -230,5 +235,93 @@ export class MaquettesService {
       },
       include: MAQUETTE_DETAIL_INCLUDE,
     });
+  }
+
+  // ── Defauts CRUD ─────────────────────────────────────────────
+  async listDefauts(maquetteId: number) {
+    await this.findOne(maquetteId);
+    return this.prisma.defaut.findMany({
+      where: { maquetteId },
+      orderBy: { id: 'asc' },
+      select: DEFAUT_SELECT,
+    });
+  }
+
+  async addDefaut(maquetteId: number, data: CreateDefautInput) {
+    await this.findOne(maquetteId);
+    const created = await this.prisma.defaut.create({
+      data: {
+        maquetteId,
+        typeDefaut: data.typeDefaut,
+        position: data.position ?? null,
+        dimension: data.dimension ?? null,
+        description: data.description ?? null,
+        severite: data.severite ?? 'MINEUR',
+        longueur: data.longueur ?? null,
+        largeur: data.largeur ?? null,
+        profondeur: data.profondeur ?? null,
+        diametre: data.diametre ?? null,
+        cote: data.cote ?? null,
+        certifie: data.certifie ?? false,
+        posX: data.posX ?? null,
+        posY: data.posY ?? null,
+        couleur: data.couleur ?? null,
+        detecteLe: data.detecteLe ?? new Date(),
+        detecteParId: data.detecteParId ?? null,
+      },
+      select: DEFAUT_SELECT,
+    });
+    return created;
+  }
+
+  async updateDefaut(
+    maquetteId: number,
+    defautId: number,
+    data: UpdateDefautInput,
+  ) {
+    const existing = await this.prisma.defaut.findFirst({
+      where: { id: defautId, maquetteId },
+    });
+    if (!existing) {
+      throw new NotFoundException(
+        `Défaut #${defautId} introuvable pour la maquette #${maquetteId}`,
+      );
+    }
+    return this.prisma.defaut.update({
+      where: { id: defautId },
+      data: {
+        ...(data.typeDefaut !== undefined ? { typeDefaut: data.typeDefaut } : {}),
+        ...(data.position !== undefined ? { position: data.position } : {}),
+        ...(data.dimension !== undefined ? { dimension: data.dimension } : {}),
+        ...(data.description !== undefined ? { description: data.description } : {}),
+        ...(data.severite !== undefined ? { severite: data.severite } : {}),
+        ...(data.longueur !== undefined ? { longueur: data.longueur } : {}),
+        ...(data.largeur !== undefined ? { largeur: data.largeur } : {}),
+        ...(data.profondeur !== undefined ? { profondeur: data.profondeur } : {}),
+        ...(data.diametre !== undefined ? { diametre: data.diametre } : {}),
+        ...(data.cote !== undefined ? { cote: data.cote } : {}),
+        ...(data.certifie !== undefined ? { certifie: data.certifie } : {}),
+        ...(data.posX !== undefined ? { posX: data.posX } : {}),
+        ...(data.posY !== undefined ? { posY: data.posY } : {}),
+        ...(data.couleur !== undefined ? { couleur: data.couleur } : {}),
+        ...(data.detecteLe !== undefined ? { detecteLe: data.detecteLe } : {}),
+        ...(data.detecteParId !== undefined
+          ? { detecteParId: data.detecteParId }
+          : {}),
+      },
+      select: DEFAUT_SELECT,
+    });
+  }
+
+  async removeDefaut(maquetteId: number, defautId: number) {
+    const existing = await this.prisma.defaut.findFirst({
+      where: { id: defautId, maquetteId },
+    });
+    if (!existing) {
+      throw new NotFoundException(
+        `Défaut #${defautId} introuvable pour la maquette #${maquetteId}`,
+      );
+    }
+    await this.prisma.defaut.delete({ where: { id: defautId } });
   }
 }
