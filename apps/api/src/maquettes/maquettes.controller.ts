@@ -16,6 +16,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import {
   createMaquetteSchema,
   updateMaquetteSchema,
+  createDefautSchema,
+  updateDefautSchema,
   paginationSchema,
 } from '@ogade/shared';
 import { z } from 'zod';
@@ -123,5 +125,46 @@ export class MaquettesController {
   @Post(':id/retourner')
   async retourner(@Param('id', ParseIntPipe) id: number) {
     return this.maquettesService.retourner(id);
+  }
+
+  // ── Defauts CRUD ────────────────────────────────────────────────
+  @Get(':id/defauts')
+  async listDefauts(@Param('id', ParseIntPipe) id: number) {
+    return this.maquettesService.listDefauts(id);
+  }
+
+  @Post(':id/defauts')
+  @HttpCode(HttpStatus.CREATED)
+  async addDefaut(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    const result = createDefautSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.maquettesService.addDefaut(id, result.data);
+  }
+
+  @Patch(':id/defauts/:defautId')
+  async updateDefaut(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('defautId', ParseIntPipe) defautId: number,
+    @Body() body: any,
+  ) {
+    const result = updateDefautSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.maquettesService.updateDefaut(id, defautId, result.data);
+  }
+
+  @Delete(':id/defauts/:defautId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeDefaut(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('defautId', ParseIntPipe) defautId: number,
+  ) {
+    await this.maquettesService.removeDefaut(id, defautId);
   }
 }

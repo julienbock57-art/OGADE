@@ -12,6 +12,7 @@ import {
 } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
+import MaquetteDefautsEditor from "@/components/MaquetteDefautsEditor";
 
 type Agent = { id: number; nom: string; prenom: string; email: string };
 
@@ -29,7 +30,7 @@ function Icon({ name, size = 14, stroke = 1.6 }: { name: string; size?: number; 
   );
 }
 
-const STEPS = ["Identité", "Géométrie", "Localisation", "Vie & patrimoine", "Revue"];
+const BASE_STEPS = ["Identité", "Géométrie", "Localisation", "Vie & patrimoine", "Revue"] as const;
 
 const REQUIRED_PER_STEP: Record<number, string[]> = {
   0: ["reference", "libelle"],
@@ -37,6 +38,7 @@ const REQUIRED_PER_STEP: Record<number, string[]> = {
   2: [],
   3: [],
   4: [],
+  5: [],
 };
 
 export default function MaquetteFormPage() {
@@ -44,6 +46,13 @@ export default function MaquetteFormPage() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // In edit mode we insert a "Défauts" step between "Vie & patrimoine" and "Revue".
+  const STEPS = isEdit
+    ? ["Identité", "Géométrie", "Localisation", "Vie & patrimoine", "Défauts", "Revue"]
+    : (BASE_STEPS as unknown as string[]);
+  const REVIEW_STEP = STEPS.length - 1;
+  const DEFAUTS_STEP = isEdit ? 4 : -1;
 
   const [step, setStep] = useState(0);
   const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
@@ -217,7 +226,7 @@ export default function MaquetteFormPage() {
       setTriedAdvance((s) => new Set(s).add(step));
       return;
     }
-    if (step < STEPS.length - 1) setStep(step + 1);
+    if (step < REVIEW_STEP) setStep(step + 1);
   };
 
   if (isEdit && loadingExisting) {
@@ -463,8 +472,13 @@ export default function MaquetteFormPage() {
               </div>
             )}
 
-            {/* STEP 4 — Revue */}
-            {step === 4 && (
+            {/* STEP — Défauts (edit mode only) */}
+            {isEdit && step === DEFAUTS_STEP && id && (
+              <MaquetteDefautsEditor maquetteId={Number(id)} />
+            )}
+
+            {/* STEP — Revue (last step) */}
+            {step === REVIEW_STEP && (
               <ReviewStep
                 values={watch()}
                 refs={{ typesMq, categories, composants, formes, matieres, typesAssemblage, typesControle, procedures, poles, pays, sites, entreprises, agents }}
@@ -482,7 +496,7 @@ export default function MaquetteFormPage() {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button type="button" className="obtn ghost" onClick={() => navigate(-1)}>Annuler</button>
-              {step < STEPS.length - 1 ? (
+              {step < REVIEW_STEP ? (
                 <button type="button" className="obtn accent" onClick={tryAdvance}>Suivant →</button>
               ) : (
                 <button type="submit" className="obtn accent" disabled={createMutation.isPending || updateMutation.isPending}>
