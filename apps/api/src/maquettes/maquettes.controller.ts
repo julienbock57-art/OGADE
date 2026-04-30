@@ -32,6 +32,11 @@ const empruntBodySchema = z.object({
 export class MaquettesController {
   constructor(private readonly maquettesService: MaquettesService) {}
 
+  @Get('stats')
+  async stats() {
+    return this.maquettesService.stats();
+  }
+
   @Get()
   async findAll(
     @Query('page') page?: string,
@@ -39,14 +44,32 @@ export class MaquettesController {
     @Query('etat') etat?: string,
     @Query('site') site?: string,
     @Query('typeMaquette') typeMaquette?: string,
+    @Query('categorie') categorie?: string,
+    @Query('forme') forme?: string,
+    @Query('matiere') matiere?: string,
+    @Query('referenceASN') referenceASN?: string,
+    @Query('horsPatrimoine') horsPatrimoine?: string,
+    @Query('enTransit') enTransit?: string,
     @Query('search') search?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
+    const parseBool = (v?: string) =>
+      v === 'true' || v === '1'
+        ? true
+        : v === 'false' || v === '0'
+          ? false
+          : undefined;
     return this.maquettesService.findAll({
       ...pagination,
       etat,
       site,
       typeMaquette,
+      categorie,
+      forme,
+      matiere,
+      referenceASN: parseBool(referenceASN),
+      horsPatrimoine: parseBool(horsPatrimoine),
+      enTransit: parseBool(enTransit),
       search,
     });
   }

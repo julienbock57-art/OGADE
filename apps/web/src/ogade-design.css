@@ -711,3 +711,316 @@ tr.row-selected td { border-bottom-color: var(--accent-line); }
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   padding: 12px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
+
+/* ─── Maquettes redesign (from OGADE.html / ogade-mq-styles.css) ─── */
+
+/* Maquette type pill */
+.mq-type {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  padding: 2px 8px; border-radius: 5px;
+  background: var(--violet-soft); color: var(--violet);
+}
+.mq-type.qual { background: var(--sky-soft);     color: var(--sky); }
+.mq-type.ent  { background: var(--emerald-soft); color: var(--emerald); }
+.mq-type.asn  { background: var(--rose-soft);    color: var(--rose); }
+.mq-type.dem  { background: var(--amber-soft);   color: oklch(0.50 0.17 60); }
+
+/* CND chips inline */
+.cnd-chips { display: inline-flex; gap: 3px; flex-wrap: wrap; }
+.cnd-chip {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; font-weight: 600;
+  padding: 1px 6px; border-radius: 4px;
+  background: var(--bg-sunken); color: var(--ink-2);
+  border: 1px solid var(--line);
+}
+
+/* ASN flag */
+.asn-flag {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 1px 5px; border-radius: 3px;
+  background: oklch(0.95 0.04 30); color: oklch(0.45 0.17 30);
+  border: 1px solid oklch(0.85 0.10 30);
+}
+
+/* Forme icon box */
+.forme-box {
+  width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0;
+  background: var(--bg-sunken); border: 1px solid var(--line);
+  display: grid; place-items: center; color: var(--ink-3);
+}
+
+/* Dimensions cell in maquette table */
+.dim-cell { display: flex; flex-direction: column; gap: 1px; font-size: 11.5px; }
+.dim-cell .dim { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.dim-cell .dim b { font-weight: 600; color: var(--ink-2); }
+.dim-cell .dim-meta { font-size: 10.5px; color: var(--ink-3); }
+
+/* Defects subtable */
+.defects-sub {
+  margin-top: 10px;
+  background: var(--bg-panel); border: 1px solid var(--line); border-radius: 9px;
+  overflow: hidden;
+}
+.defects-sub-h {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: var(--bg-sunken); border-bottom: 1px solid var(--line);
+  font-size: 12px; font-weight: 600;
+}
+.defects-sub-h .count {
+  background: var(--accent); color: white;
+  font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
+}
+table.defects {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  background: var(--bg-panel);
+}
+table.defects th {
+  text-align: left; padding: 8px 12px;
+  background: var(--bg-panel);
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-3); border-bottom: 1px solid var(--line);
+}
+table.defects td {
+  padding: 8px 12px; border-bottom: 1px solid var(--line-2);
+  font-variant-numeric: tabular-nums;
+}
+table.defects tr:last-child td { border-bottom: 0; }
+table.defects tr:hover td { background: var(--bg-sunken); }
+table.defects tr.on td { background: var(--accent-soft); }
+
+.defect-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: 11px; font-weight: 600;
+  background: var(--bg-sunken); border: 1px solid var(--line);
+}
+.defect-pill::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--def-color, var(--ink-4));
+}
+
+/* Maquette plan/schema (visual top-down view) */
+.mq-plan-wrap {
+  position: relative;
+  background: linear-gradient(135deg, oklch(0.96 0.005 80), oklch(0.98 0.005 80));
+  border: 1.5px solid var(--line); border-radius: 10px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(135deg, oklch(0.97 0.005 80), oklch(0.99 0.005 80)),
+    repeating-linear-gradient(0deg, var(--line-2) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, var(--line-2) 0 1px, transparent 1px 24px);
+  background-blend-mode: multiply, normal, normal;
+}
+.mq-plan {
+  position: relative;
+  height: 240px;
+  margin: 0 auto;
+}
+.mq-plan-shape {
+  position: absolute; inset: 22px;
+  background: white;
+  border: 2px solid var(--ink-2);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.mq-plan-shape.tube  { border-radius: 999px; }
+.mq-plan-shape.coude {
+  border-radius: 0;
+  background: radial-gradient(circle at 100% 100%, transparent 60%, white 60.5%, white 80%, transparent 80.5%);
+  border: none; box-shadow: none;
+}
+.mq-plan-shape.te::before {
+  content: ''; position: absolute; left: 50%; top: -30%; transform: translateX(-50%);
+  width: 30%; height: 60%;
+  background: white; border: 2px solid var(--ink-2); border-radius: 4px;
+}
+.mq-plan-shape.soudure::before {
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+  transform: translateX(-50%); width: 4px;
+  background: repeating-linear-gradient(0deg, var(--accent) 0 6px, transparent 6px 9px);
+}
+.mq-plan-defect {
+  position: absolute; width: 18px; height: 18px;
+  border-radius: 50%; transform: translate(-50%, -50%);
+  background: var(--def-color, var(--rose));
+  box-shadow: 0 0 0 2px white, 0 0 0 3px var(--def-color, var(--rose)), 0 2px 6px rgba(0,0,0,.2);
+  cursor: pointer;
+  display: grid; place-items: center;
+  color: white; font-size: 9px; font-weight: 700; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  transition: transform 0.15s;
+  z-index: 1;
+}
+.mq-plan-defect:hover, .mq-plan-defect.on {
+  transform: translate(-50%, -50%) scale(1.4); z-index: 2;
+}
+.mq-plan-axes {
+  position: absolute; top: 6px; left: 8px;
+  font-size: 10px; color: var(--ink-3); font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.mq-plan-scale {
+  position: absolute; bottom: 6px; right: 8px;
+  font-size: 10px; color: var(--ink-3); font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: rgba(255,255,255,.7); padding: 1px 6px; border-radius: 3px;
+}
+
+/* Property card used in maquette drawer */
+.prop-card {
+  background: var(--bg-panel); border: 1px solid var(--line);
+  border-radius: 10px; padding: 14px;
+}
+.prop-card .h {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+.prop-card .h .ic { color: var(--accent); }
+.prop-card .h .spacer { flex: 1; }
+.prop-card .h .count {
+  background: var(--accent); color: white;
+  font-size: 10.5px; font-weight: 600; padding: 1px 7px; border-radius: 999px;
+  text-transform: none; letter-spacing: 0;
+}
+
+/* Drawer wide variant for maquettes */
+.drawer.wide { width: min(960px, 96vw); }
+.drawer-title { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.drawer-sub {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 4px; font-size: 12px; color: var(--ink-3);
+  align-items: center;
+}
+.drawer-sub > span { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Maquette tabs (refined) */
+.mq-tabs {
+  display: flex; gap: 2px; padding: 10px 22px 0;
+  background: linear-gradient(to bottom, var(--bg-sunken), var(--bg-panel));
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.mq-tab {
+  appearance: none; border: 0; background: transparent;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 13px 11px;
+  font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  cursor: pointer; font-family: inherit;
+  transition: color .15s, background .15s;
+}
+.mq-tab svg { color: var(--ink-4); transition: color .15s, transform .2s; flex-shrink: 0; }
+.mq-tab:hover { color: var(--ink); background: color-mix(in oklch, var(--accent) 6%, transparent); }
+.mq-tab:hover svg { color: var(--ink-2); }
+.mq-tab.on {
+  color: var(--accent-ink); font-weight: 600;
+  background: var(--bg-panel); border-bottom-color: var(--accent);
+}
+.mq-tab.on svg { color: var(--accent); transform: scale(1.05); }
+.mq-tab-count {
+  display: inline-grid; place-items: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums;
+  background: var(--bg-sunken); color: var(--ink-3);
+  border: 1px solid var(--line); border-radius: 999px; line-height: 1;
+}
+.mq-tab.on .mq-tab-count {
+  background: var(--accent); color: white; border-color: var(--accent);
+}
+
+/* Maquette table list visual (.list class) */
+table.list { width: 100%; border-collapse: collapse; font-size: var(--ui-fs); }
+table.list thead th {
+  text-align: left; padding: 10px var(--pad-x);
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ink-3);
+  background: var(--bg-panel); border-bottom: 1px solid var(--line);
+  white-space: nowrap; position: sticky; top: 0; z-index: 1;
+}
+table.list tbody tr.row { transition: background 0.1s; cursor: pointer; }
+table.list tbody tr.row:hover { background: var(--bg-sunken); }
+table.list tbody tr.row.expanded { background: var(--accent-soft); }
+table.list tbody td {
+  padding: 12px var(--pad-x); border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+table.list .cb-col { width: 32px; }
+table.list .exp-col { width: 30px; }
+table.list .actions-col { width: 50px; }
+table.list tr.expand td {
+  padding: 0; background: var(--bg-sunken);
+  border-bottom: 2px solid var(--line);
+}
+
+/* "muted" + "xs" helpers used by the maquette markup */
+.muted { color: var(--ink-3); }
+.xs { font-size: 11px; }
+
+/* Document link in drawer */
+.doc {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-panel); border: 1px solid var(--line);
+  border-radius: 8px; text-decoration: none; color: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+.doc:hover { border-color: var(--accent-line); background: var(--accent-soft); }
+.doc-icon {
+  width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
+  display: grid; place-items: center;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
+}
+.doc-icon.pdf { background: var(--rose-soft); color: var(--rose); }
+.doc-info { flex: 1; min-width: 0; }
+.doc-name { font-size: 13px; font-weight: 500; }
+.doc-meta { font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Dropzone */
+.dropzone {
+  border: 1.5px dashed var(--line); border-radius: 10px;
+  padding: 22px; text-align: center;
+  background: var(--bg-sunken); color: var(--ink-3);
+}
+.dropzone .a { color: var(--accent); font-weight: 500; cursor: default; }
+.dropzone-mini { padding: 14px; font-size: 12px; }
+
+/* Vertical timeline (historique) */
+.vtimeline { display: flex; flex-direction: column; gap: 0; padding: 4px 4px 4px 0; }
+.vstep { display: grid; grid-template-columns: 28px 1fr; gap: 14px; padding: 8px 0; position: relative; }
+.vstep:not(:last-child)::before { content: ''; position: absolute; left: 13px; top: 26px; bottom: -8px; width: 1.5px; background: var(--line); }
+.vstep.done:not(:last-child)::before { background: var(--emerald); }
+.vstep .vdot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--bg-panel); border: 2px solid var(--line);
+  justify-self: center; margin-top: 4px;
+  display: grid; place-items: center; color: white;
+}
+.vstep.done .vdot { background: var(--emerald); border-color: var(--emerald); }
+.vstep.current .vdot {
+  background: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.vstep .vbody { padding-bottom: 4px; }
+.vstep .vtitle { font-weight: 500; font-size: 13.5px; }
+.vstep .vmeta { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+
+/* Grid override inside maquette drawer-grid two columns */
+.drawer-grid.two { grid-template-columns: 1fr 1fr; }
+.drawer-grid.two .full { grid-column: 1 / -1; }
+
+/* Inline page variant of the maquette drawer */
+.maquette-page-view {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.maquette-page-view .drawer-head { border-radius: 12px 12px 0 0; }
+.maquette-page-view .drawer-body { overflow: visible; flex: 0 0 auto; }
+.maquette-page-view .drawer-foot { border-radius: 0 0 12px 12px; }

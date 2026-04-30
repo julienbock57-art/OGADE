@@ -1,6 +1,49 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateMaquetteInput, UpdateMaquetteInput } from '@ogade/shared';
+
+const AGENT_SELECT = {
+  id: true,
+  nom: true,
+  prenom: true,
+  email: true,
+} as const;
+
+const DEFAUT_SELECT = {
+  id: true,
+  typeDefaut: true,
+  position: true,
+  dimension: true,
+  description: true,
+  severite: true,
+  longueur: true,
+  largeur: true,
+  profondeur: true,
+  diametre: true,
+  cote: true,
+  certifie: true,
+  posX: true,
+  posY: true,
+  couleur: true,
+  detecteLe: true,
+} as const;
+
+const MAQUETTE_LIST_INCLUDE = {
+  proprietaire: { select: AGENT_SELECT },
+  emprunteur: { select: AGENT_SELECT },
+  defauts: { select: DEFAUT_SELECT, orderBy: { id: 'asc' as const } },
+  _count: { select: { defauts: true } },
+};
+
+const MAQUETTE_DETAIL_INCLUDE = {
+  ...MAQUETTE_LIST_INCLUDE,
+  createdBy: { select: AGENT_SELECT },
+  updatedBy: { select: AGENT_SELECT },
+};
 
 @Injectable()
 export class MaquettesService {
@@ -12,9 +55,28 @@ export class MaquettesService {
     etat?: string;
     site?: string;
     typeMaquette?: string;
+    categorie?: string;
+    forme?: string;
+    matiere?: string;
+    referenceASN?: boolean;
+    horsPatrimoine?: boolean;
+    enTransit?: boolean;
     search?: string;
   }) {
-    const { page, pageSize, etat, site, typeMaquette, search } = params;
+    const {
+      page,
+      pageSize,
+      etat,
+      site,
+      typeMaquette,
+      categorie,
+      forme,
+      matiere,
+      referenceASN,
+      horsPatrimoine,
+      enTransit,
+      search,
+    } = params;
     const skip = (page - 1) * pageSize;
 
     const where: any = {
@@ -22,27 +84,27 @@ export class MaquettesService {
       AND: [] as any[],
     };
 
-    if (etat) {
-      where.AND.push({ etat });
-    }
-    if (site) {
-      where.AND.push({ site });
-    }
-    if (typeMaquette) {
-      where.AND.push({ typeMaquette });
-    }
+    if (etat) where.AND.push({ etat });
+    if (site) where.AND.push({ site });
+    if (typeMaquette) where.AND.push({ typeMaquette });
+    if (categorie) where.AND.push({ categorie });
+    if (forme) where.AND.push({ forme });
+    if (matiere) where.AND.push({ matiere });
+    if (referenceASN !== undefined) where.AND.push({ referenceASN });
+    if (horsPatrimoine !== undefined) where.AND.push({ horsPatrimoine });
+    if (enTransit !== undefined) where.AND.push({ enTransit });
     if (search) {
       where.AND.push({
         OR: [
           { reference: { contains: search, mode: 'insensitive' } },
           { libelle: { contains: search, mode: 'insensitive' } },
+          { composant: { contains: search, mode: 'insensitive' } },
+          { matiere: { contains: search, mode: 'insensitive' } },
         ],
       });
     }
 
-    if (where.AND.length === 0) {
-      delete where.AND;
-    }
+    if (where.AND.length === 0) delete where.AND;
 
     const [data, total] = await Promise.all([
       this.prisma.maquette.findMany({
@@ -50,6 +112,7 @@ export class MaquettesService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        include: MAQUETTE_LIST_INCLUDE,
       }),
       this.prisma.maquette.count({ where }),
     ]);
@@ -59,13 +122,39 @@ export class MaquettesService {
       total,
       page,
       pageSize,
-      totalPages: Math.ceil(total / pageSize),
+      totalPages: Math.ceil(total / pageSize) || 1,
+    };
+  }
+
+  async stats() {
+    const where = { deletedAt: null };
+    const [total, stock, empruntees, transit, asn, hs, enReparation] =
+      await Promise.all([
+        this.prisma.maquette.count({ where }),
+        this.prisma.maquette.count({ where: { ...where, etat: 'STOCK' } }),
+        this.prisma.maquette.count({ where: { ...where, etat: 'EMPRUNTEE' } }),
+        this.prisma.maquette.count({ where: { ...where, enTransit: true } }),
+        this.prisma.maquette.count({ where: { ...where, referenceASN: true } }),
+        this.prisma.maquette.count({ where: { ...where, etat: 'REBUT' } }),
+        this.prisma.maquette.count({ where: { ...where, etat: 'EN_REPARATION' } }),
+      ]);
+    return {
+      total,
+      stock,
+      empruntees,
+      transit,
+      empruntesOuTransit: empruntees + transit,
+      asn,
+      hs,
+      enReparation,
+      requalifier: enReparation,
     };
   }
 
   async findOne(id: number) {
     const maquette = await this.prisma.maquette.findFirst({
       where: { id, deletedAt: null },
+      include: MAQUETTE_DETAIL_INCLUDE,
     });
     if (!maquette) {
       throw new NotFoundException(`Maquette #${id} not found`);
@@ -74,11 +163,15 @@ export class MaquettesService {
   }
 
   async create(data: CreateMaquetteInput, userId?: number) {
-    return this.prisma.maquette.create({
+    const created = await this.prisma.maquette.create({
       data: {
         ...data,
         createdById: userId ?? null,
       },
+    });
+    return this.prisma.maquette.findUnique({
+      where: { id: created.id },
+      include: MAQUETTE_DETAIL_INCLUDE,
     });
   }
 
@@ -90,6 +183,7 @@ export class MaquettesService {
         ...data,
         updatedById: userId ?? null,
       },
+      include: MAQUETTE_DETAIL_INCLUDE,
     });
   }
 
@@ -115,6 +209,7 @@ export class MaquettesService {
         emprunteurId,
         dateEmprunt: new Date(),
       },
+      include: MAQUETTE_DETAIL_INCLUDE,
     });
   }
 
@@ -132,6 +227,7 @@ export class MaquettesService {
         emprunteurId: null,
         dateRetour: new Date(),
       },
+      include: MAQUETTE_DETAIL_INCLUDE,
     });
   }
 }
