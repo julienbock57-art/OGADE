@@ -862,7 +862,7 @@ function CalendrierTab({
   onCreate: (date: Date) => void;
   onOpenReservation: (id: number) => void;
 }) {
-  const [view, setView] = useState<"30j" | "90j" | "180j">("90j");
+  const [view, setView] = useState<"30j" | "90j" | "180j">("30j");
   const [offset, setOffset] = useState(0);
 
   const days = view === "30j" ? 30 : view === "90j" ? 90 : 180;
@@ -1199,18 +1199,9 @@ export default function MaterielDrawer({
                   </Field>
                   <Field label="Responsable">
                     {resp ? (
-                      <span className="hstack" style={{ gap: 6 }}>
-                        <span
-                          className="avatar"
-                          style={{
-                            width: 22,
-                            height: 22,
-                            fontSize: 9,
-                            background: "var(--accent)",
-                          }}
-                        >
-                          {resp.prenom?.[0]}
-                          {resp.nom?.[0]}
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                        <span className="avatar-circle" style={{ background: "var(--accent)" }}>
+                          {(resp.prenom?.[0] ?? "") + (resp.nom?.[0] ?? "")}
                         </span>
                         {resp.prenom} {resp.nom}
                       </span>

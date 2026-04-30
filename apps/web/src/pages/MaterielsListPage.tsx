@@ -185,6 +185,7 @@ export default function MaterielsListPage() {
   const [filterCompletude, setFilterCompletude] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeKpi, setActiveKpi] = useState<string | null>(null);
+  const [scope, setScope] = useState<"tous" | "mes">("tous");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [drawerTab, setDrawerTab] = useState<"infos" | "qr">("infos");
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -212,8 +213,8 @@ export default function MaterielsListPage() {
   }, [activeKpi]);
 
   const { data, isLoading } = useQuery<PaginatedResult<Materiel>>({
-    queryKey: ["materiels", { ...queryParams, search, etat: filterEtat, typeEND: filterTypeEnd, typeMateriel: filterTypeMat, site: filterSite, groupe: filterGroupe, completude: filterCompletude, ...kpiFilters }],
-    queryFn: () => api.get("/materiels", { ...queryParams, search: search || undefined, etat: filterEtat || undefined, typeEND: filterTypeEnd || undefined, typeMateriel: filterTypeMat || undefined, site: filterSite || undefined, groupe: filterGroupe || undefined, completude: filterCompletude || undefined, ...kpiFilters }),
+    queryKey: ["materiels", { ...queryParams, search, etat: filterEtat, typeEND: filterTypeEnd, typeMateriel: filterTypeMat, site: filterSite, groupe: filterGroupe, completude: filterCompletude, scope, ...kpiFilters }],
+    queryFn: () => api.get("/materiels", { ...queryParams, search: search || undefined, etat: filterEtat || undefined, typeEND: filterTypeEnd || undefined, typeMateriel: filterTypeMat || undefined, site: filterSite || undefined, groupe: filterGroupe || undefined, completude: filterCompletude || undefined, mes: scope === "mes" ? "true" : undefined, ...kpiFilters }),
   });
 
   const handleKpiClick = useCallback((key: string | null) => {
@@ -283,7 +284,14 @@ export default function MaterielsListPage() {
           <Icon name="filter" size={14} />Filtres
           {activeFilterCount > 0 && <span style={{ background: "white", color: "var(--accent)", borderRadius: 999, padding: "0 6px", fontSize: 11, fontWeight: 600 }}>{activeFilterCount}</span>}
         </button>
-        <div className="seg"><button className="on">Tous</button></div>
+        <div className="seg">
+          <button className={scope === "tous" ? "on" : ""} onClick={() => { setScope("tous"); setPage(1); }}>
+            Tous
+          </button>
+          <button className={scope === "mes" ? "on" : ""} onClick={() => { setScope("mes"); setPage(1); }}>
+            Mes matériels
+          </button>
+        </div>
         <span style={{ flex: 1 }} />
         <span style={{ fontSize: 12, color: "var(--ink-4)", whiteSpace: "nowrap" }}>{data ? `${data.total} résultat${data.total > 1 ? "s" : ""}` : ""}</span>
       </div>

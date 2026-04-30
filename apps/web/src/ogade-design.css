@@ -690,6 +690,20 @@ tr.row-selected td { border-bottom-color: var(--accent-line); }
 .cal-wrap.compact { margin: 0; }
 .cal-wrap.compact .cal-grid { grid-template-columns: 1fr; }
 .cal-wrap.compact .cal-rowhead { display: none; }
+/* Compact: let day columns shrink to fit the available width (drawer ≈ 800px) */
+.cal-wrap.compact .cal-col-head {
+  min-width: 0;
+  padding: 4px 2px;
+  font-size: 9.5px;
+}
+.cal-wrap.compact .cal-col-head .d { font-size: 10px; }
+.cal-wrap.compact .cal-col { padding: 2px 0 0; min-width: 0; }
+.cal-wrap.compact .cal-cols { min-width: 0; }
+.cal-wrap.compact .cal-row { height: 48px; }
+.cal-wrap.compact .cal-bar {
+  top: 10px; height: 24px; padding: 0 4px;
+  font-size: 10px;
+}
 
 /* Calendar tooltip on bar hover */
 .cal-tooltip {

@@ -46,8 +46,9 @@ export class MaterielsService {
     etalonnageEchu?: string;
     echeance30j?: string;
     hsIncomplet?: string;
+    responsableId?: number;
   }) {
-    const { page, pageSize, etat, site, typeEND, typeMateriel, groupe, search, completude, enPret, etalonnageEchu, echeance30j, hsIncomplet } = params;
+    const { page, pageSize, etat, site, typeEND, typeMateriel, groupe, search, completude, enPret, etalonnageEchu, echeance30j, hsIncomplet, responsableId } = params;
     const skip = (page - 1) * pageSize;
 
     const where: any = {
@@ -61,6 +62,7 @@ export class MaterielsService {
     if (typeMateriel) where.AND.push({ typeMateriel });
     if (groupe) where.AND.push({ groupe });
     if (completude) where.AND.push({ completude });
+    if (responsableId) where.AND.push({ responsableId });
     if (enPret === 'true') where.AND.push({ enPret: true });
     if (enPret === 'false') where.AND.push({ enPret: false });
 
