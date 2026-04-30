@@ -78,6 +78,8 @@ export class ReservationsController {
     @Query('demandeurId') demandeurId?: string,
     @Query('period') period?: string,
     @Query('search') search?: string,
+    @Query('dateMin') dateMin?: string,
+    @Query('dateMax') dateMax?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
     return this.service.findAll({
@@ -93,6 +95,8 @@ export class ReservationsController {
           ? period
           : undefined,
       search: search || undefined,
+      dateMin: dateMin ? new Date(dateMin) : undefined,
+      dateMax: dateMax ? new Date(dateMax) : undefined,
     });
   }
 

@@ -51,6 +51,8 @@ export class ReservationsService {
     demandeurId?: number;
     period?: 'actuelles' | 'venir' | 'passees';
     search?: string;
+    dateMin?: Date;
+    dateMax?: Date;
   }) {
     const {
       page,
@@ -61,6 +63,8 @@ export class ReservationsService {
       demandeurId,
       period,
       search,
+      dateMin,
+      dateMax,
     } = params;
     const skip = (page - 1) * pageSize;
     const now = new Date();
@@ -79,6 +83,17 @@ export class ReservationsService {
       where.dateDebut = { gt: now };
     } else if (period === 'passees') {
       where.dateFin = { lt: now };
+    }
+    if (dateMin && dateMax) {
+      // Overlap with [dateMin, dateMax]: dateDebut <= dateMax AND dateFin >= dateMin
+      where.AND = [
+        { dateDebut: { lte: dateMax } },
+        { dateFin: { gte: dateMin } },
+      ];
+    } else if (dateMin) {
+      where.dateFin = { ...(where.dateFin ?? {}), gte: dateMin };
+    } else if (dateMax) {
+      where.dateDebut = { ...(where.dateDebut ?? {}), lte: dateMax };
     }
     if (search) {
       where.OR = [

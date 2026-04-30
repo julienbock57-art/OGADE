@@ -42,6 +42,7 @@ const navSections = [
       { to: "/maquettes", label: "Maquettes", icon: "box" },
       { to: "/demandes-envoi", label: "Envois & retours", icon: "truck" },
       { to: "/reservations", label: "Réservations", icon: "star" },
+      { to: "/calendrier", label: "Calendrier", icon: "cal" },
       { to: "/localisation", label: "Localisation", icon: "map" },
       { to: "/agents", label: "Agents", icon: "user" },
     ],
