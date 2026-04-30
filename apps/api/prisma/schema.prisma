@@ -11,29 +11,31 @@ datasource db {
 // ─── AGENTS & RBAC ──────────────────────────────────────────────
 
 model Agent {
-  id             Int      @id @default(autoincrement())
-  azureAdOid     String?  @unique @map("azure_ad_oid")
-  email          String   @unique
-  nom            String
-  prenom         String
-  passwordHash   String?  @map("password_hash")
-  actif          Boolean  @default(true)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  azureAdOid   String?  @unique @map("azure_ad_oid")
+  email        String   @unique
+  nom          String
+  prenom       String
+  passwordHash String?  @map("password_hash")
+  actif        Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  roles               AgentRole[]
-  evenementsActeur     Evenement[]       @relation("evenement_acteur")
-  demandesEnvoi        DemandeEnvoi[]    @relation("demande_demandeur")
-  fichiersUploades     Fichier[]         @relation("fichier_uploader")
-  maquettesCreees      Maquette[]        @relation("maquette_createur")
-  maquettesMaj         Maquette[]        @relation("maquette_maj")
-  maquettesProprietaire Maquette[]       @relation("maquette_proprietaire")
-  maquettesEmprunteur  Maquette[]        @relation("maquette_emprunteur")
-  materielsCreees      Materiel[]        @relation("materiel_createur")
-  materielsMaj         Materiel[]        @relation("materiel_maj")
-  materielsResponsable Materiel[]        @relation("materiel_responsable")
-  defautsDetectes      Defaut[]          @relation("defaut_detecteur")
-  rolesAccordes        AgentRole[]       @relation("role_granter")
+  roles                  AgentRole[]
+  evenementsActeur       Evenement[]    @relation("evenement_acteur")
+  demandesEnvoi          DemandeEnvoi[] @relation("demande_demandeur")
+  reservationsDemandeur  Reservation[]  @relation("reservation_demandeur")
+  reservationsAnnulateur Reservation[]  @relation("reservation_annulateur")
+  fichiersUploades       Fichier[]      @relation("fichier_uploader")
+  maquettesCreees        Maquette[]     @relation("maquette_createur")
+  maquettesMaj           Maquette[]     @relation("maquette_maj")
+  maquettesProprietaire  Maquette[]     @relation("maquette_proprietaire")
+  maquettesEmprunteur    Maquette[]     @relation("maquette_emprunteur")
+  materielsCreees        Materiel[]     @relation("materiel_createur")
+  materielsMaj           Materiel[]     @relation("materiel_maj")
+  materielsResponsable   Materiel[]     @relation("materiel_responsable")
+  defautsDetectes        Defaut[]       @relation("defaut_detecteur")
+  rolesAccordes          AgentRole[]    @relation("role_granter")
 
   @@map("agents")
 }
@@ -67,33 +69,33 @@ model AgentRole {
 // etat: STOCK | EMPRUNTEE | EN_CONTROLE | REBUT | EN_REPARATION | ENVOYEE
 
 model Maquette {
-  id              Int       @id @default(autoincrement())
-  reference       String    @unique
-  libelle         String
-  etat            String    @default("STOCK")
-  localisation    String?
-  description     String?
-  site            String?
-  typeMaquette    String?   @map("type_maquette")
-  maquetteMereId  Int?      @map("maquette_mere_id")
-  proprietaireId  Int?      @map("proprietaire_id")
-  emprunteurId    Int?      @map("emprunteur_id")
-  dateEmprunt     DateTime? @map("date_emprunt")
-  dateRetour      DateTime? @map("date_retour")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  createdById     Int?      @map("created_by")
-  updatedById     Int?      @map("updated_by")
-  deletedAt       DateTime? @map("deleted_at")
+  id             Int       @id @default(autoincrement())
+  reference      String    @unique
+  libelle        String
+  etat           String    @default("STOCK")
+  localisation   String?
+  description    String?
+  site           String?
+  typeMaquette   String?   @map("type_maquette")
+  maquetteMereId Int?      @map("maquette_mere_id")
+  proprietaireId Int?      @map("proprietaire_id")
+  emprunteurId   Int?      @map("emprunteur_id")
+  dateEmprunt    DateTime? @map("date_emprunt")
+  dateRetour     DateTime? @map("date_retour")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  createdById    Int?      @map("created_by")
+  updatedById    Int?      @map("updated_by")
+  deletedAt      DateTime? @map("deleted_at")
 
   // Classification (PowerApps: Gestion des maquettes)
-  composant       String?   @map("composant")
-  categorie       String?   @map("categorie")
-  forme           String?   @map("forme")
-  typeAssemblage  String?   @map("type_assemblage")
-  matiere         String?   @map("matiere")
-  procedures      String?   @map("procedures")
-  typeControle    String?   @map("type_controle")
+  composant      String? @map("composant")
+  categorie      String? @map("categorie")
+  forme          String? @map("forme")
+  typeAssemblage String? @map("type_assemblage")
+  matiere        String? @map("matiere")
+  procedures     String? @map("procedures")
+  typeControle   String? @map("type_controle")
 
   // Flags
   referenceASN           Boolean @default(false) @map("reference_asn")
@@ -102,28 +104,28 @@ model Maquette {
   enTransit              Boolean @default(false) @map("en_transit")
 
   // Dimensions
-  longueur        Float?    @map("longueur")
-  largeur         Float?    @map("largeur")
-  hauteur         Float?    @map("hauteur")
-  dn              Float?    @map("dn")
-  epaisseurParoi  Float?    @map("epaisseur_paroi")
-  poids           Float?    @map("poids")
-  quantite        Int?      @map("quantite")
+  longueur       Float? @map("longueur")
+  largeur        Float? @map("largeur")
+  hauteur        Float? @map("hauteur")
+  dn             Float? @map("dn")
+  epaisseurParoi Float? @map("epaisseur_paroi")
+  poids          Float? @map("poids")
+  quantite       Int?   @map("quantite")
 
   // Informations complémentaires
-  commentaires     String?   @map("commentaires")
-  poleEntite       String?   @map("pole_entite")
-  entreprise       String?   @map("entreprise")
-  valeurFinanciere Float?    @map("valeur_financiere")
+  commentaires     String? @map("commentaires")
+  poleEntite       String? @map("pole_entite")
+  entreprise       String? @map("entreprise")
+  valeurFinanciere Float?  @map("valeur_financiere")
 
-  maquetteMere    Maquette?  @relation("maquette_hierarchie", fields: [maquetteMereId], references: [id])
-  sousElements    Maquette[] @relation("maquette_hierarchie")
-  proprietaire    Agent?     @relation("maquette_proprietaire", fields: [proprietaireId], references: [id])
-  emprunteur      Agent?     @relation("maquette_emprunteur", fields: [emprunteurId], references: [id])
-  createdBy       Agent?     @relation("maquette_createur", fields: [createdById], references: [id])
-  updatedBy       Agent?     @relation("maquette_maj", fields: [updatedById], references: [id])
-  defauts         Defaut[]
-  lignesEnvoi     DemandeEnvoiLigne[] @relation("ligne_maquette")
+  maquetteMere Maquette?           @relation("maquette_hierarchie", fields: [maquetteMereId], references: [id])
+  sousElements Maquette[]          @relation("maquette_hierarchie")
+  proprietaire Agent?              @relation("maquette_proprietaire", fields: [proprietaireId], references: [id])
+  emprunteur   Agent?              @relation("maquette_emprunteur", fields: [emprunteurId], references: [id])
+  createdBy    Agent?              @relation("maquette_createur", fields: [createdById], references: [id])
+  updatedBy    Agent?              @relation("maquette_maj", fields: [updatedById], references: [id])
+  defauts      Defaut[]
+  lignesEnvoi  DemandeEnvoiLigne[] @relation("ligne_maquette")
 
   @@index([etat])
   @@map("maquettes")
@@ -133,60 +135,61 @@ model Maquette {
 // etat: DISPONIBLE | EN_SERVICE | EN_REPARATION | REBUT | PRETE | ENVOYEE
 
 model Materiel {
-  id              Int       @id @default(autoincrement())
-  reference       String    @unique
-  libelle         String
-  etat            String    @default("CORRECT")
-  typeMateriel    String?   @map("type_materiel")
-  numeroSerie     String?   @map("numero_serie")
-  localisation    String?
-  site            String?
-  description     String?
-  dateEtalonnage  DateTime? @map("date_etalonnage")
+  id                     Int       @id @default(autoincrement())
+  reference              String    @unique
+  libelle                String
+  etat                   String    @default("CORRECT")
+  typeMateriel           String?   @map("type_materiel")
+  numeroSerie            String?   @map("numero_serie")
+  localisation           String?
+  site                   String?
+  description            String?
+  dateEtalonnage         DateTime? @map("date_etalonnage")
   dateProchainEtalonnage DateTime? @map("date_prochain_etalonnage")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  createdById     Int?      @map("created_by")
-  updatedById     Int?      @map("updated_by")
-  deletedAt       DateTime? @map("deleted_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  createdById            Int?      @map("created_by")
+  updatedById            Int?      @map("updated_by")
+  deletedAt              DateTime? @map("deleted_at")
 
   // Classification (PowerApps: Gestion matériel END)
-  modele             String?   @map("modele")
-  typeTraducteur     String?   @map("type_traducteur")
-  typeEND            String?   @map("type_end")
-  groupe             String?   @map("groupe")
-  fournisseur        String?   @map("fournisseur")
+  modele         String? @map("modele")
+  typeTraducteur String? @map("type_traducteur")
+  typeEND        String? @map("type_end")
+  groupe         String? @map("groupe")
+  fournisseur    String? @map("fournisseur")
 
   // Étalonnage
-  validiteEtalonnage Int?      @map("validite_etalonnage")
-  soumisVerification Boolean   @default(false) @map("soumis_verification")
+  validiteEtalonnage Int?    @map("validite_etalonnage")
+  soumisVerification Boolean @default(false) @map("soumis_verification")
 
   // Prêt
-  enPret             Boolean   @default(false) @map("en_pret")
-  motifPret          String?   @map("motif_pret")
-  dateRetourPret     DateTime? @map("date_retour_pret")
+  enPret         Boolean   @default(false) @map("en_pret")
+  motifPret      String?   @map("motif_pret")
+  dateRetourPret DateTime? @map("date_retour_pret")
 
   // Complétude et état
-  completude            String?  @map("completude")
-  informationVerifiee   Boolean  @default(false) @map("information_verifiee")
-  produitsChimiques     Boolean  @default(false) @map("produits_chimiques")
-  commentaires          String?  @map("commentaires")
-  entreprise            String?  @map("entreprise")
+  completude          String? @map("completude")
+  informationVerifiee Boolean @default(false) @map("information_verifiee")
+  produitsChimiques   Boolean @default(false) @map("produits_chimiques")
+  commentaires        String? @map("commentaires")
+  entreprise          String? @map("entreprise")
 
   // New PowerApps fields
-  responsableId             Int?      @map("responsable_id")
-  commentaireEtat           String?   @map("commentaire_etat")
-  commentairesCompletude    String?   @map("commentaires_completude")
-  numeroFIEC                String?   @map("numero_fiec")
-  enTransit                 String?   @default("NON") @map("en_transit")
-  lotChaine                 String?   @map("lot_chaine")
-  complementsLocalisation   String?   @map("complements_localisation")
-  proprietaire              String?   @map("proprietaire")
+  responsableId           Int?    @map("responsable_id")
+  commentaireEtat         String? @map("commentaire_etat")
+  commentairesCompletude  String? @map("commentaires_completude")
+  numeroFIEC              String? @map("numero_fiec")
+  enTransit               String? @default("NON") @map("en_transit")
+  lotChaine               String? @map("lot_chaine")
+  complementsLocalisation String? @map("complements_localisation")
+  proprietaire            String? @map("proprietaire")
 
   createdBy    Agent?              @relation("materiel_createur", fields: [createdById], references: [id])
   updatedBy    Agent?              @relation("materiel_maj", fields: [updatedById], references: [id])
   responsable  Agent?              @relation("materiel_responsable", fields: [responsableId], references: [id])
   lignesEnvoi  DemandeEnvoiLigne[] @relation("ligne_materiel")
+  reservations Reservation[]       @relation("reservation_materiel")
 
   @@index([etat])
   @@map("materiels")
@@ -219,30 +222,30 @@ model Defaut {
 // statut: BROUILLON | ENVOYEE | EN_TRANSIT | RECUE | CLOTUREE | ANNULEE
 
 model DemandeEnvoi {
-  id                Int       @id @default(autoincrement())
-  numero            String    @unique
-  type              String
-  demandeurId       Int       @map("demandeur_id")
-  destinataire      String
-  siteDestinataire  String?   @map("site_destinataire")
-  motif             String?
-  dateSouhaitee     DateTime? @map("date_souhaitee")
-  statut            String    @default("BROUILLON")
-  dateEnvoi         DateTime? @map("date_envoi")
-  dateReception     DateTime? @map("date_reception")
-  commentaire       String?
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  id               Int       @id @default(autoincrement())
+  numero           String    @unique
+  type             String
+  demandeurId      Int       @map("demandeur_id")
+  destinataire     String
+  siteDestinataire String?   @map("site_destinataire")
+  motif            String?
+  dateSouhaitee    DateTime? @map("date_souhaitee")
+  statut           String    @default("BROUILLON")
+  dateEnvoi        DateTime? @map("date_envoi")
+  dateReception    DateTime? @map("date_reception")
+  commentaire      String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   // Champs PowerApps supplémentaires
-  urgence               String?  @map("urgence")
-  justificationUrgence  String?  @map("justification_urgence")
-  contact               String?  @map("contact")
-  contactTelephone      String?  @map("contact_telephone")
-  adresseDestination    String?  @map("adresse_destination")
-  convention            Boolean  @default(false) @map("convention")
-  souscriptionAssurance Boolean  @default(false) @map("souscription_assurance")
-  produitsChimiques     Boolean  @default(false) @map("produits_chimiques")
+  urgence               String? @map("urgence")
+  justificationUrgence  String? @map("justification_urgence")
+  contact               String? @map("contact")
+  contactTelephone      String? @map("contact_telephone")
+  adresseDestination    String? @map("adresse_destination")
+  convention            Boolean @default(false) @map("convention")
+  souscriptionAssurance Boolean @default(false) @map("souscription_assurance")
+  produitsChimiques     Boolean @default(false) @map("produits_chimiques")
 
   demandeur Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   lignes    DemandeEnvoiLigne[]
@@ -266,6 +269,39 @@ model DemandeEnvoiLigne {
   maquette Maquette?    @relation("ligne_maquette", fields: [maquetteId], references: [id])
 
   @@map("demande_envoi_lignes")
+}
+
+// ─── RESERVATIONS ───────────────────────────────────────────────
+// Pré-réservation de matériel pour une période future.
+// statut: CONFIRMEE | HONOREE | ANNULEE
+// type:   TRANSFERT_SITE | ETALONNAGE | PRET_EXTERNE | PRET_INTERNE | AUTRE
+
+model Reservation {
+  id              Int       @id @default(autoincrement())
+  numero          String    @unique
+  materielId      Int       @map("materiel_id")
+  demandeurId     Int       @map("demandeur_id")
+  dateDebut       DateTime  @map("date_debut")
+  dateFin         DateTime  @map("date_fin")
+  type            String    @default("AUTRE")
+  statut          String    @default("CONFIRMEE")
+  motif           String?
+  commentaire     String?
+  annuleParId     Int?      @map("annule_par_id")
+  annuleLe        DateTime? @map("annule_le")
+  motifAnnulation String?   @map("motif_annulation")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  materiel  Materiel @relation("reservation_materiel", fields: [materielId], references: [id], onDelete: Cascade)
+  demandeur Agent    @relation("reservation_demandeur", fields: [demandeurId], references: [id])
+  annulePar Agent?   @relation("reservation_annulateur", fields: [annuleParId], references: [id])
+
+  @@index([materielId])
+  @@index([statut])
+  @@index([dateDebut])
+  @@index([dateFin])
+  @@map("reservations")
 }
 
 // ─── EVENEMENTS (HISTORIQUE) ────────────────────────────────────
@@ -338,22 +374,22 @@ model Entreprise {
 // ─── FICHIERS (METADONNEES BLOB) ────────────────────────────────
 
 model Fichier {
-  id            Int      @id @default(autoincrement())
-  entityType    String   @map("entity_type")
-  entityId      Int      @map("entity_id")
-  blobKey       String   @unique @map("blob_key")
-  blobData      Bytes?   @map("blob_data")
-  nomOriginal   String?  @map("nom_original")
-  mimeType      String?  @map("mime_type")
-  tailleOctets  Int?     @map("taille_octets")
-  typeFichier   String?  @map("type_fichier")
-  context       String?  @map("context")
-  demandeEnvoiId Int?    @map("demande_envoi_id")
-  uploadedById  Int?     @map("uploaded_by")
-  uploadedAt    DateTime @default(now()) @map("uploaded_at")
+  id             Int      @id @default(autoincrement())
+  entityType     String   @map("entity_type")
+  entityId       Int      @map("entity_id")
+  blobKey        String   @unique @map("blob_key")
+  blobData       Bytes?   @map("blob_data")
+  nomOriginal    String?  @map("nom_original")
+  mimeType       String?  @map("mime_type")
+  tailleOctets   Int?     @map("taille_octets")
+  typeFichier    String?  @map("type_fichier")
+  context        String?  @map("context")
+  demandeEnvoiId Int?     @map("demande_envoi_id")
+  uploadedById   Int?     @map("uploaded_by")
+  uploadedAt     DateTime @default(now()) @map("uploaded_at")
 
-  uploadedBy    Agent?        @relation("fichier_uploader", fields: [uploadedById], references: [id])
-  demandeEnvoi  DemandeEnvoi? @relation("fichier_demande", fields: [demandeEnvoiId], references: [id])
+  uploadedBy   Agent?        @relation("fichier_uploader", fields: [uploadedById], references: [id])
+  demandeEnvoi DemandeEnvoi? @relation("fichier_demande", fields: [demandeEnvoiId], references: [id])
 
   @@index([entityType, entityId])
   @@index([demandeEnvoiId])

@@ -41,6 +41,7 @@ const navSections = [
       { to: "/materiels", label: "Matériels END", icon: "list" },
       { to: "/maquettes", label: "Maquettes", icon: "box" },
       { to: "/demandes-envoi", label: "Envois & retours", icon: "truck" },
+      { to: "/reservations", label: "Réservations", icon: "star" },
       { to: "/localisation", label: "Localisation", icon: "map" },
       { to: "/agents", label: "Agents", icon: "user" },
     ],
