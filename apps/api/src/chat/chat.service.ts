@@ -238,11 +238,11 @@ export class ChatService {
       const reply =
         textParts?.map((p) => p.text).join('\n') ?? 'Pas de réponse.';
       return { reply };
-    } catch (err) {
-      this.logger.error(`Gemini error: ${err}`);
+    } catch (err: any) {
+      const detail = err?.message || String(err);
+      this.logger.error(`Gemini error: ${detail}`, err?.stack);
       return {
-        reply:
-          'Désolé, une erreur est survenue. Réessayez dans quelques instants.',
+        reply: `Erreur : ${detail}`,
       };
     }
   }
