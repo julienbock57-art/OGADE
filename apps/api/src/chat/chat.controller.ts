@@ -6,9 +6,7 @@ export class ChatController {
   constructor(private readonly chat: ChatService) {}
 
   @Post()
-  async send(
-    @Body() body: { message: string; history?: { role: string; text: string }[] },
-  ) {
-    return this.chat.chat(body.message, body.history ?? []);
+  async send(@Body() body: { message: string }) {
+    return this.chat.chat(body.message ?? '');
   }
 }

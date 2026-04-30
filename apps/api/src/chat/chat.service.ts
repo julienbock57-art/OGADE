@@ -1,329 +1,338 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenAI, Type } from '@google/genai';
+import { Injectable } from '@nestjs/common';
 import { MaterielsService } from '../materiels/materiels.service';
 import { MaquettesService } from '../maquettes/maquettes.service';
 import { SitesService } from '../sites/sites.service';
 
-const TOOLS: any[] = [
-  {
-    functionDeclarations: [
-      {
-        name: 'search_materiels',
-        description:
-          'Rechercher des matériels/équipements END dans la base OGADE. Utilise des filtres pour affiner la recherche.',
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            search: {
-              type: Type.STRING,
-              description:
-                'Recherche textuelle libre (référence, libellé, modèle, numéro FIEC, fournisseur)',
-            },
-            etat: {
-              type: Type.STRING,
-              description:
-                'État du matériel. Valeurs possibles : DISPONIBLE, EN_SERVICE, HS, PERDU, REFORME, EN_REPARATION',
-            },
-            site: {
-              type: Type.STRING,
-              description: 'Code du site (ex: GRAVELINES, CATTENOM, CNPE_CHOOZ)',
-            },
-            typeEND: {
-              type: Type.STRING,
-              description: 'Type END (ex: UT, RT, PT, MT, ET, VT)',
-            },
-            typeMateriel: {
-              type: Type.STRING,
-              description: 'Type de matériel',
-            },
-            groupe: { type: Type.STRING, description: 'Groupe du matériel' },
-            completude: {
-              type: Type.STRING,
-              description: 'Complétude : COMPLET ou INCOMPLET',
-            },
-            enPret: {
-              type: Type.STRING,
-              description: "true si en prêt, false sinon",
-            },
-            etalonnageEchu: {
-              type: Type.STRING,
-              description: "true pour les matériels dont l'étalonnage est échu",
-            },
-          },
-        },
-      },
-      {
-        name: 'search_maquettes',
-        description:
-          'Rechercher des maquettes dans la base OGADE.',
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            search: {
-              type: Type.STRING,
-              description: 'Recherche textuelle libre (référence, libellé)',
-            },
-            etat: {
-              type: Type.STRING,
-              description: 'État de la maquette',
-            },
-            site: {
-              type: Type.STRING,
-              description: 'Code du site',
-            },
-            typeMaquette: {
-              type: Type.STRING,
-              description: 'Type de maquette',
-            },
-          },
-        },
-      },
-      {
-        name: 'get_materiel_detail',
-        description:
-          "Obtenir les détails complets d'un matériel par son ID.",
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            id: { type: Type.NUMBER, description: 'ID du matériel' },
-          },
-          required: ['id'],
-        },
-      },
-      {
-        name: 'get_maquette_detail',
-        description:
-          "Obtenir les détails complets d'une maquette par son ID.",
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            id: { type: Type.NUMBER, description: 'ID de la maquette' },
-          },
-          required: ['id'],
-        },
-      },
-      {
-        name: 'list_sites',
-        description: 'Lister tous les sites disponibles dans OGADE.',
-        parameters: { type: Type.OBJECT, properties: {} },
-      },
-      {
-        name: 'get_stats_materiels',
-        description:
-          'Obtenir les statistiques globales des matériels (total, échus, en prêt, HS, incomplets).',
-        parameters: { type: Type.OBJECT, properties: {} },
-      },
-    ],
-  },
+type Intent =
+  | { type: 'search_materiels'; filters: SearchFilters }
+  | { type: 'search_maquettes'; filters: SearchFilters }
+  | { type: 'detail_materiel'; id: number }
+  | { type: 'detail_maquette'; id: number }
+  | { type: 'stats' }
+  | { type: 'list_sites' }
+  | { type: 'help' };
+
+interface SearchFilters {
+  search?: string;
+  etat?: string;
+  site?: string;
+  typeEND?: string;
+  enPret?: string;
+  etalonnageEchu?: string;
+  echeance30j?: string;
+  hsIncomplet?: string;
+  completude?: string;
+  typeMaquette?: string;
+}
+
+const TYPE_END_CODES = ['UT', 'RT', 'PT', 'MT', 'ET', 'VT', 'AT', 'LT'];
+
+const ETAT_PATTERNS: Array<[RegExp, string]> = [
+  [/\b(?:hors\s*service|hs)\b/, 'HS'],
+  [/\bperdus?\b/, 'PERDU'],
+  [/\bdisponibles?\b/, 'DISPONIBLE'],
+  [/\ben\s+service\b/, 'EN_SERVICE'],
+  [/\b(?:en\s+)?reparation\b/, 'EN_REPARATION'],
+  [/\breformes?\b/, 'REFORME'],
+  [/\b(?:en\s+)?stock\b/, 'STOCK'],
+  [/\bempruntees?\b/, 'EMPRUNTEE'],
 ];
-
-const SYSTEM_PROMPT = `Tu es l'assistant OGADE, un chatbot spécialisé dans la gestion du matériel END (Examens Non Destructifs) et des maquettes pour EDF.
-
-Tu aides les utilisateurs à :
-- Trouver des matériels ou maquettes en utilisant des filtres
-- Consulter les détails d'un équipement
-- Obtenir des statistiques sur le parc matériel
-- Répondre aux questions sur les sites
-
-Règles :
-- Réponds toujours en français
-- Sois concis et utile
-- Quand tu trouves des résultats, présente-les de manière lisible avec les informations clés (référence, libellé, état, site)
-- Si l'utilisateur cherche quelque chose de vague, utilise la recherche textuelle
-- N'invente jamais de données, utilise uniquement les outils disponibles
-- Si tu ne trouves pas de résultats, dis-le clairement et suggère d'élargir la recherche
-- Quand tu mentionnes un matériel ou une maquette, inclus son ID pour que l'utilisateur puisse y accéder`;
 
 @Injectable()
 export class ChatService {
-  private readonly logger = new Logger(ChatService.name);
-  private ai: GoogleGenAI | null = null;
-
   constructor(
     private readonly materiels: MaterielsService,
     private readonly maquettes: MaquettesService,
     private readonly sites: SitesService,
-  ) {
-    const key = process.env.GEMINI_API_KEY;
-    if (key) {
-      this.ai = new GoogleGenAI({ apiKey: key });
-    } else {
-      this.logger.warn('GEMINI_API_KEY not set — chat disabled');
-    }
+  ) {}
+
+  async chat(message: string): Promise<{ reply: string }> {
+    const intent = await this.parseIntent(message);
+    return this.execute(intent);
   }
 
-  async chat(
-    message: string,
-    history: { role: string; text: string }[],
-  ): Promise<{ reply: string }> {
-    if (!this.ai) {
-      return {
-        reply:
-          "Le chatbot n'est pas configuré. Ajoutez la variable GEMINI_API_KEY pour l'activer.",
-      };
+  private normalize(s: string): string {
+    return s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '');
+  }
+
+  private async parseIntent(message: string): Promise<Intent> {
+    const norm = this.normalize(message);
+
+    if (!norm.trim()) return { type: 'help' };
+
+    if (/\b(aide|help|que peux-tu|que sais-tu|comment)\b/.test(norm) && message.length < 30) {
+      return { type: 'help' };
     }
 
-    const contents = [
-      ...history.map((h) => ({
-        role: h.role === 'user' ? ('user' as const) : ('model' as const),
-        parts: [{ text: h.text }],
-      })),
-      { role: 'user' as const, parts: [{ text: message }] },
-    ];
+    if (/\b(liste\s+(?:des\s+)?sites?|tous\s+les\s+sites?|quels\s+sites?)\b/.test(norm)) {
+      return { type: 'list_sites' };
+    }
+
+    const isMaquette = /\bmaquettes?\b/.test(norm);
+    const isMateriel = /\b(materiels?|equipements?|appareils?|instruments?)\b/.test(norm);
+
+    const idMatch = message.match(/#(\d{1,7})\b/);
+    if (idMatch) {
+      const id = parseInt(idMatch[1], 10);
+      if (isMaquette) return { type: 'detail_maquette', id };
+      return { type: 'detail_materiel', id };
+    }
+
+    if (/\b(combien|nombre|total|stats?|statistiques?)\b/.test(norm) && !this.hasSpecificFilters(norm, message)) {
+      return { type: 'stats' };
+    }
+
+    const filters = await this.extractFilters(message, norm);
+
+    if (isMaquette) return { type: 'search_maquettes', filters };
+    return { type: 'search_materiels', filters };
+  }
+
+  private hasSpecificFilters(norm: string, original: string): boolean {
+    for (const t of TYPE_END_CODES) {
+      if (new RegExp(`\\b${t.toLowerCase()}\\b`).test(norm)) return true;
+    }
+    for (const [pattern] of ETAT_PATTERNS) {
+      if (pattern.test(norm)) return true;
+    }
+    if (/"[^"]+"|«[^»]+»/.test(original)) return true;
+    return false;
+  }
+
+  private async extractFilters(message: string, norm: string): Promise<SearchFilters> {
+    const filters: SearchFilters = {};
+
+    for (const t of TYPE_END_CODES) {
+      if (new RegExp(`\\b${t.toLowerCase()}\\b`).test(norm)) {
+        filters.typeEND = t;
+        break;
+      }
+    }
+
+    for (const [pattern, etat] of ETAT_PATTERNS) {
+      if (pattern.test(norm)) {
+        filters.etat = etat;
+        break;
+      }
+    }
+
+    if (/\b(en\s+pret|pretes?|emprunte)\b/.test(norm)) {
+      filters.enPret = 'true';
+    }
+
+    if (/\b(etalonnage\s+(echu|expire|perime)|expire|perime)\b/.test(norm)) {
+      filters.etalonnageEchu = 'true';
+    }
+
+    if (/\b(echeance\s+30|30\s*jours?|bientot\s+expire)\b/.test(norm)) {
+      filters.echeance30j = 'true';
+    }
+
+    if (/\bincomplets?\b/.test(norm)) {
+      filters.completude = 'INCOMPLET';
+    }
 
     try {
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        contents,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          tools: TOOLS,
-        },
-      });
-
-      let candidate = response.candidates?.[0];
-      if (!candidate) return { reply: 'Pas de réponse du modèle.' };
-
-      let maxIter = 5;
-      while (maxIter-- > 0) {
-        const functionCalls = candidate.content?.parts?.filter(
-          (p) => p.functionCall,
-        );
-        if (!functionCalls || functionCalls.length === 0) break;
-
-        const functionResponses: Array<{
-          role: 'user';
-          parts: Array<{
-            functionResponse: { name: string; response: any };
-          }>;
-        }> = [];
-
-        for (const part of functionCalls) {
-          const call = part.functionCall!;
-          const result = await this.executeTool(
-            call.name!,
-            (call.args as Record<string, any>) ?? {},
-          );
-          functionResponses.push({
-            role: 'user',
-            parts: [
-              {
-                functionResponse: {
-                  name: call.name!,
-                  response: result,
-                },
-              },
-            ],
-          });
+      const sites = await this.sites.findAll();
+      for (const site of sites) {
+        const labelNorm = this.normalize(site.label || '');
+        const codeNorm = this.normalize(site.code);
+        if (labelNorm && norm.includes(labelNorm)) {
+          filters.site = site.code;
+          break;
         }
-
-        const followUp = await this.ai.models.generateContent({
-          model: 'gemini-2.0-flash',
-          contents: [
-            ...contents,
-            candidate.content!,
-            ...functionResponses,
-          ],
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            tools: TOOLS,
-          },
-        });
-
-        candidate = followUp.candidates?.[0];
-        if (!candidate) return { reply: 'Pas de réponse du modèle.' };
+        if (codeNorm && new RegExp(`\\b${codeNorm}\\b`).test(norm)) {
+          filters.site = site.code;
+          break;
+        }
       }
+    } catch {}
 
-      const textParts = candidate.content?.parts?.filter((p) => p.text);
-      const reply =
-        textParts?.map((p) => p.text).join('\n') ?? 'Pas de réponse.';
-      return { reply };
-    } catch (err: any) {
-      const detail = err?.message || String(err);
-      this.logger.error(`Gemini error: ${detail}`, err?.stack);
-      return {
-        reply: `Erreur : ${detail}`,
-      };
+    const quoted = message.match(/"([^"]+)"|«\s*([^»]+)\s*»/);
+    if (quoted) {
+      filters.search = (quoted[1] || quoted[2]).trim();
+    } else {
+      const fiec = message.match(/FIEC[\s:\-]*(\S+)/i);
+      if (fiec) filters.search = fiec[1];
+      else {
+        const ref = message.match(/\b(?:ref(?:erence)?)\s*[:\-]?\s*(\S+)/i);
+        if (ref) filters.search = ref[1];
+      }
     }
+
+    return filters;
   }
 
-  private async executeTool(
-    name: string,
-    args: Record<string, any>,
-  ): Promise<any> {
-    switch (name) {
+  private async execute(intent: Intent): Promise<{ reply: string }> {
+    switch (intent.type) {
+      case 'help':
+        return { reply: this.helpMessage() };
+
+      case 'list_sites': {
+        const sites = await this.sites.findAll();
+        if (sites.length === 0) return { reply: 'Aucun site enregistré.' };
+        const list = sites
+          .map((s) => `• **${s.code}** — ${s.label}${s.ville ? ` (${s.ville})` : ''}`)
+          .join('\n');
+        return { reply: `🗺️ **${sites.length} sites disponibles :**\n\n${list}` };
+      }
+
+      case 'stats': {
+        const s = await this.materiels.stats();
+        return {
+          reply:
+            `📊 **Statistiques matériels :**\n\n` +
+            `• Total : ${s.total}\n` +
+            `• Étalonnages échus : ${s.echus}\n` +
+            `• Échéance < 30 jours : ${s.prochains}\n` +
+            `• En prêt : ${s.enPret}\n` +
+            `• HS / Perdus : ${s.hs}\n` +
+            `• Incomplets : ${s.incomplets}`,
+        };
+      }
+
+      case 'detail_materiel': {
+        try {
+          const m: any = await this.materiels.findOne(intent.id);
+          return { reply: this.formatMaterielDetail(m) };
+        } catch {
+          return { reply: `❌ Matériel #${intent.id} introuvable.` };
+        }
+      }
+
+      case 'detail_maquette': {
+        try {
+          const m: any = await this.maquettes.findOne(intent.id);
+          return { reply: this.formatMaquetteDetail(m) };
+        } catch {
+          return { reply: `❌ Maquette #${intent.id} introuvable.` };
+        }
+      }
+
       case 'search_materiels': {
         const result = await this.materiels.findAll({
           page: 1,
           pageSize: 10,
-          search: args.search,
-          etat: args.etat,
-          site: args.site,
-          typeEND: args.typeEND,
-          typeMateriel: args.typeMateriel,
-          groupe: args.groupe,
-          completude: args.completude,
-          enPret: args.enPret,
-          etalonnageEchu: args.etalonnageEchu,
+          ...intent.filters,
         });
+        if (result.total === 0) {
+          return {
+            reply:
+              `Aucun matériel ne correspond à votre recherche.\n\n` +
+              `Critères détectés : ${this.formatFilters(intent.filters)}\n\n` +
+              `Essayez d'élargir les critères ou tapez "aide".`,
+          };
+        }
+        const list = result.data
+          .map(
+            (m: any) =>
+              `• **${m.reference}** — ${m.libelle}\n  _${m.etat || '–'} | ${m.site || '–'}${m.typeEND ? ` | ${m.typeEND}` : ''} | ID #${m.id}_`,
+          )
+          .join('\n');
+        const more =
+          result.total > 10 ? `\n\n_… et ${result.total - 10} autre(s) résultat(s)_` : '';
         return {
-          total: result.total,
-          materiels: result.data.map((m: any) => ({
-            id: m.id,
-            reference: m.reference,
-            libelle: m.libelle,
-            etat: m.etat,
-            site: m.site,
-            typeEND: m.typeEND,
-            typeMateriel: m.typeMateriel,
-            modele: m.modele,
-            fournisseur: m.fournisseur,
-            enPret: m.enPret,
-          })),
+          reply: `🔍 **${result.total} matériel${result.total > 1 ? 's' : ''} trouvé${result.total > 1 ? 's' : ''}** _(${this.formatFilters(intent.filters)})_ :\n\n${list}${more}`,
         };
       }
+
       case 'search_maquettes': {
         const result = await this.maquettes.findAll({
           page: 1,
           pageSize: 10,
-          search: args.search,
-          etat: args.etat,
-          site: args.site,
-          typeMaquette: args.typeMaquette,
+          search: intent.filters.search,
+          etat: intent.filters.etat,
+          site: intent.filters.site,
+          typeMaquette: intent.filters.typeMaquette,
         });
+        if (result.total === 0) {
+          return {
+            reply:
+              `Aucune maquette ne correspond à votre recherche.\n\n` +
+              `Critères : ${this.formatFilters(intent.filters)}`,
+          };
+        }
+        const list = result.data
+          .map(
+            (m: any) =>
+              `• **${m.reference}** — ${m.libelle}\n  _${m.etat || '–'} | ${m.site || '–'} | ID #${m.id}_`,
+          )
+          .join('\n');
+        const more =
+          result.total > 10 ? `\n\n_… et ${result.total - 10} autre(s) résultat(s)_` : '';
         return {
-          total: result.total,
-          maquettes: result.data.map((m: any) => ({
-            id: m.id,
-            reference: m.reference,
-            libelle: m.libelle,
-            etat: m.etat,
-            site: m.site,
-          })),
+          reply: `🔍 **${result.total} maquette${result.total > 1 ? 's' : ''} trouvée${result.total > 1 ? 's' : ''}** _(${this.formatFilters(intent.filters)})_ :\n\n${list}${more}`,
         };
       }
-      case 'get_materiel_detail': {
-        try {
-          return await this.materiels.findOne(args.id);
-        } catch {
-          return { error: `Matériel #${args.id} non trouvé` };
-        }
-      }
-      case 'get_maquette_detail': {
-        try {
-          return await this.maquettes.findOne(args.id);
-        } catch {
-          return { error: `Maquette #${args.id} non trouvée` };
-        }
-      }
-      case 'list_sites': {
-        return await this.sites.findAll();
-      }
-      case 'get_stats_materiels': {
-        return await this.materiels.stats();
-      }
+
       default:
-        return { error: `Outil inconnu : ${name}` };
+        return { reply: this.helpMessage() };
     }
+  }
+
+  private formatFilters(f: SearchFilters): string {
+    const parts: string[] = [];
+    if (f.search) parts.push(`recherche: "${f.search}"`);
+    if (f.typeEND) parts.push(`type: ${f.typeEND}`);
+    if (f.etat) parts.push(`état: ${f.etat}`);
+    if (f.site) parts.push(`site: ${f.site}`);
+    if (f.enPret === 'true') parts.push('en prêt');
+    if (f.etalonnageEchu === 'true') parts.push('étalonnage échu');
+    if (f.echeance30j === 'true') parts.push('échéance < 30j');
+    if (f.completude === 'INCOMPLET') parts.push('incomplet');
+    return parts.length > 0 ? parts.join(', ') : 'aucun filtre';
+  }
+
+  private formatMaterielDetail(m: any): string {
+    const lines = [`📦 **${m.reference}** — ${m.libelle} _(ID #${m.id})_`];
+    if (m.etat) lines.push(`• État : ${m.etat}`);
+    if (m.typeEND) lines.push(`• Type END : ${m.typeEND}`);
+    if (m.typeMateriel) lines.push(`• Type matériel : ${m.typeMateriel}`);
+    if (m.site) lines.push(`• Site : ${m.site}`);
+    if (m.localisation) lines.push(`• Localisation : ${m.localisation}`);
+    if (m.modele) lines.push(`• Modèle : ${m.modele}`);
+    if (m.fournisseur) lines.push(`• Fournisseur : ${m.fournisseur}`);
+    if (m.numeroSerie) lines.push(`• N° série : ${m.numeroSerie}`);
+    if (m.numeroFIEC) lines.push(`• N° FIEC : ${m.numeroFIEC}`);
+    if (m.enPret) lines.push(`• ⚠️ En prêt`);
+    if (m.dateProchainEtalonnage)
+      lines.push(`• Prochain étalonnage : ${new Date(m.dateProchainEtalonnage).toLocaleDateString('fr-FR')}`);
+    return lines.join('\n');
+  }
+
+  private formatMaquetteDetail(m: any): string {
+    const lines = [`🧩 **${m.reference}** — ${m.libelle} _(ID #${m.id})_`];
+    if (m.etat) lines.push(`• État : ${m.etat}`);
+    if (m.typeMaquette) lines.push(`• Type : ${m.typeMaquette}`);
+    if (m.site) lines.push(`• Site : ${m.site}`);
+    if (m.composant) lines.push(`• Composant : ${m.composant}`);
+    if (m.categorie) lines.push(`• Catégorie : ${m.categorie}`);
+    if (m.matiere) lines.push(`• Matière : ${m.matiere}`);
+    return lines.join('\n');
+  }
+
+  private helpMessage(): string {
+    return (
+      `👋 **Bonjour ! Je suis l'assistant OGADE.**\n\n` +
+      `Je peux vous aider à trouver des matériels et des maquettes. Voici quelques exemples :\n\n` +
+      `**Recherches :**\n` +
+      `• "matériels UT sur Gravelines"\n` +
+      `• "maquettes en stock"\n` +
+      `• "matériels HS"\n` +
+      `• "matériels en prêt"\n` +
+      `• "matériels avec étalonnage échu"\n` +
+      `• "matériels FIEC 12345"\n\n` +
+      `**Détails :**\n` +
+      `• "matériel #42" → fiche détaillée\n` +
+      `• "maquette #15"\n\n` +
+      `**Statistiques :**\n` +
+      `• "combien de matériels"\n` +
+      `• "stats matériels"\n\n` +
+      `**Sites :**\n` +
+      `• "liste des sites"`
+    );
   }
 }
