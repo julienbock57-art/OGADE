@@ -67,9 +67,12 @@ function KpiCard({ label, value, sub, accent, active, onClick }: {
   );
 }
 
+type Period = "actuelles" | "venir" | "passees" | "aujourdhui" | "all";
+
 export default function ReservationsListPage() {
   const qc = useQueryClient();
-  const [period, setPeriod] = useState<"actuelles" | "venir" | "passees" | "all">("actuelles");
+  const [period, setPeriod] = useState<Period>("actuelles");
+  const [mineOnly, setMineOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("");
   const [showCreate, setShowCreate] = useState(false);
@@ -83,13 +86,14 @@ export default function ReservationsListPage() {
   });
 
   const { data, isLoading } = useQuery<PaginatedResult<Reservation>>({
-    queryKey: ["reservations", { period, search, filterType, ...queryParams }],
+    queryKey: ["reservations", { period, mineOnly, search, filterType, ...queryParams }],
     queryFn: () =>
       api.get("/reservations", {
         ...queryParams,
         period: period === "all" ? undefined : period,
         search: search || undefined,
         type: filterType || undefined,
+        mes: mineOnly ? "true" : undefined,
       }),
   });
 
@@ -99,6 +103,8 @@ export default function ReservationsListPage() {
       qc.invalidateQueries({ queryKey: ["reservations"] });
       qc.invalidateQueries({ queryKey: ["reservations-stats"] });
       qc.invalidateQueries({ queryKey: ["materiel-reservations"] });
+      qc.invalidateQueries({ queryKey: ["materiel-calendar"] });
+      qc.invalidateQueries({ queryKey: ["reservation-conflicts"] });
     },
   });
 
@@ -128,28 +134,32 @@ export default function ReservationsListPage() {
             value={stats.actives}
             sub="confirmées en cours / à venir"
             accent="var(--accent)"
-            active={period === "actuelles" && filterType === ""}
-            onClick={() => { setPeriod("actuelles"); setFilterType(""); setPage(1); }}
+            active={period === "actuelles" && filterType === "" && !mineOnly}
+            onClick={() => { setPeriod("actuelles"); setFilterType(""); setMineOnly(false); setPage(1); }}
           />
           <KpiCard
             label="Cette semaine"
             value={stats.cetteSemaine}
             sub="à activer dans 7 jours"
             accent="var(--sky)"
-            active={period === "venir"}
-            onClick={() => { setPeriod("venir"); setPage(1); }}
+            active={period === "venir" && !mineOnly}
+            onClick={() => { setPeriod("venir"); setMineOnly(false); setPage(1); }}
           />
           <KpiCard
             label="À activer aujourd'hui"
             value={stats.aujourdhui}
             sub="démarrent aujourd'hui"
             accent="var(--amber)"
+            active={period === "aujourdhui" && !mineOnly}
+            onClick={() => { setPeriod("aujourdhui"); setMineOnly(false); setPage(1); }}
           />
           <KpiCard
             label="Mes réservations"
             value={stats.mesReservations}
             sub="dont je suis demandeur"
             accent="var(--violet)"
+            active={mineOnly}
+            onClick={() => { setMineOnly((v) => !v); setPage(1); }}
           />
         </div>
       )}

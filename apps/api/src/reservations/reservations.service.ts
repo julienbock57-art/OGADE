@@ -49,7 +49,7 @@ export class ReservationsService {
     type?: string;
     materielId?: number;
     demandeurId?: number;
-    period?: 'actuelles' | 'venir' | 'passees';
+    period?: 'actuelles' | 'venir' | 'passees' | 'aujourdhui';
     search?: string;
     dateMin?: Date;
     dateMax?: Date;
@@ -68,6 +68,10 @@ export class ReservationsService {
     } = params;
     const skip = (page - 1) * pageSize;
     const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const where: any = {};
     if (statut) where.statut = statut;
@@ -83,6 +87,9 @@ export class ReservationsService {
       where.dateDebut = { gt: now };
     } else if (period === 'passees') {
       where.dateFin = { lt: now };
+    } else if (period === 'aujourdhui') {
+      where.statut = where.statut ?? 'CONFIRMEE';
+      where.dateDebut = { gte: startOfDay, lte: endOfDay };
     }
     if (dateMin && dateMax) {
       // Overlap with [dateMin, dateMax]: dateDebut <= dateMax AND dateFin >= dateMin

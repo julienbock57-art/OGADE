@@ -108,8 +108,9 @@ export default function ReservationModal({
     enabled: !mat,
   });
 
-  // Conflict check
-  const { data: conflicts = [] } = useQuery<Conflict[]>({
+  // Conflict check — refetched on every submit to avoid stale cache after a
+  // prior creation in the same session.
+  const { data: conflicts = [], refetch: refetchConflicts } = useQuery<Conflict[]>({
     queryKey: ["reservation-conflicts", mat?.id, debut, fin, reservation?.id],
     queryFn: () =>
       api.get("/reservations/conflicts", {
@@ -119,6 +120,7 @@ export default function ReservationModal({
         ...(reservation?.id ? { excludeId: reservation.id } : {}),
       }),
     enabled: !!mat && !!debut && !!fin && new Date(fin) >= new Date(debut),
+    staleTime: 0,
   });
 
   const durationDays = useMemo(() => {
@@ -131,12 +133,18 @@ export default function ReservationModal({
   const canSubmit =
     !!mat && !!type && datesValid && conflicts.length === 0;
 
+  const invalidateAfterMutation = () => {
+    qc.invalidateQueries({ queryKey: ["reservations"] });
+    qc.invalidateQueries({ queryKey: ["reservations-stats"] });
+    qc.invalidateQueries({ queryKey: ["materiel-reservations"] });
+    qc.invalidateQueries({ queryKey: ["materiel-calendar"] });
+    qc.invalidateQueries({ queryKey: ["reservation-conflicts"] });
+  };
+
   const createMutation = useMutation({
     mutationFn: (payload: any) => api.post<Reservation>("/reservations", payload),
     onSuccess: (created) => {
-      qc.invalidateQueries({ queryKey: ["reservations"] });
-      qc.invalidateQueries({ queryKey: ["reservations-stats"] });
-      qc.invalidateQueries({ queryKey: ["materiel-reservations"] });
+      invalidateAfterMutation();
       onCreated?.(created);
       onClose();
     },
@@ -147,17 +155,24 @@ export default function ReservationModal({
     mutationFn: (payload: any) =>
       api.patch<Reservation>(`/reservations/${reservation!.id}`, payload),
     onSuccess: (updated) => {
-      qc.invalidateQueries({ queryKey: ["reservations"] });
-      qc.invalidateQueries({ queryKey: ["reservations-stats"] });
-      qc.invalidateQueries({ queryKey: ["materiel-reservations"] });
+      invalidateAfterMutation();
       onCreated?.(updated);
       onClose();
     },
     onError: (e: any) => setSubmitError(e?.message ?? "Erreur lors de la mise à jour"),
   });
 
-  function handleSubmit() {
-    if (!canSubmit || !mat || !type) return;
+  async function handleSubmit() {
+    if (!mat || !type || !datesValid) return;
+    setSubmitError(null);
+    // Force a fresh check to prevent stale-cache double-bookings
+    const fresh = await refetchConflicts();
+    if (fresh.data && fresh.data.length > 0) {
+      setSubmitError(
+        "Conflit avec une réservation existante sur la période demandée.",
+      );
+      return;
+    }
     const payload = {
       ...(isEdit ? {} : { materielId: mat.id }),
       dateDebut: new Date(debut).toISOString(),
