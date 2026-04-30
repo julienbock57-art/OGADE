@@ -734,20 +734,24 @@ export default function MaterielDrawer({
   materiel: m,
   onClose,
   initialTab = "infos",
+  mode = "drawer",
 }: {
   materiel: Materiel;
-  onClose: () => void;
+  onClose?: () => void;
   initialTab?: TabId;
+  mode?: "drawer" | "page";
 }) {
   const [tab, setTab] = useState<TabId>(initialTab);
+  const isPage = mode === "page";
 
   useEffect(() => {
+    if (isPage || !onClose) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
+  }, [onClose, isPage]);
 
   const { data: typesEnd }    = useReferentiel("TYPE_END");
   const { data: typesMat }    = useReferentiel("TYPE_MATERIEL");
@@ -795,13 +799,8 @@ export default function MaterielDrawer({
     m.dateProchainEtalonnage &&
     new Date(m.dateProchainEtalonnage) < new Date();
 
-  return (
+  const content = (
     <>
-      {/* Backdrop */}
-      <div className="drawer-backdrop" onClick={onClose} />
-
-      {/* Drawer panel */}
-      <div className="drawer">
         {/* Header */}
         <div className="drawer-head">
           <div style={{ flex: 1 }}>
@@ -838,9 +837,11 @@ export default function MaterielDrawer({
               <span>{refLabel(sites, m.site)}</span>
             </div>
           </div>
-          <button className="icon-btn" onClick={onClose}>
-            <Icon name="x" size={14} />
-          </button>
+          {!isPage && onClose && (
+            <button className="icon-btn" onClick={onClose}>
+              <Icon name="x" size={14} />
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
@@ -1046,26 +1047,40 @@ export default function MaterielDrawer({
         {/* Footer */}
         <div className="drawer-foot">
           <div className="left">
-            <Link
-              to={`/materiels/${m.id}`}
-              className="obtn ghost"
-            >
+            <button type="button" className="obtn ghost">
               <Icon name="eye" size={13} />
               Exporter
-            </Link>
+            </button>
           </div>
           <div className="right">
-            <Link to={`/materiels/${m.id}`} className="obtn">
-              <Icon name="eye" size={13} />
-              Page détail
-            </Link>
+            {!isPage && (
+              <Link to={`/materiels/${m.id}`} className="obtn">
+                <Icon name="eye" size={13} />
+                Page détail
+              </Link>
+            )}
+            {isPage && (
+              <Link to="/materiels" className="obtn">
+                Retour à la liste
+              </Link>
+            )}
             <Link to={`/materiels/${m.id}/edit`} className="obtn accent">
               <Icon name="edit" size={13} />
               Modifier
             </Link>
           </div>
         </div>
-      </div>
+    </>
+  );
+
+  if (isPage) {
+    return <div className="materiel-page-view">{content}</div>;
+  }
+
+  return (
+    <>
+      <div className="drawer-backdrop" onClick={onClose} />
+      <div className="drawer">{content}</div>
     </>
   );
 }
