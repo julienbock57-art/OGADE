@@ -40,6 +40,7 @@ export class MaterielsController {
 
   @Get()
   async findAll(
+    @CurrentUser() user: RequestUser | null,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
     @Query('etat') etat?: string,
@@ -53,12 +54,21 @@ export class MaterielsController {
     @Query('etalonnageEchu') etalonnageEchu?: string,
     @Query('echeance30j') echeance30j?: string,
     @Query('hsIncomplet') hsIncomplet?: string,
+    @Query('responsableId') responsableId?: string,
+    @Query('mes') mes?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
+    const mineFlag = mes === 'true' || mes === '1';
+    const respId = mineFlag && user?.agentId
+      ? user.agentId
+      : responsableId
+        ? parseInt(responsableId, 10)
+        : undefined;
     return this.materielsService.findAll({
       ...pagination,
       etat, site, typeEND, typeMateriel, groupe, search, completude, enPret,
       etalonnageEchu, echeance30j, hsIncomplet,
+      responsableId: respId,
     });
   }
 
