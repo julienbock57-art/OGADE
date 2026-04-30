@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EtatMaquette } from "../types/maquette";
 
-export const createMaquetteSchema = z.object({
+const baseFields = {
   reference: z.string().min(1),
   libelle: z.string().min(1),
   typeMaquette: z.string().optional(),
@@ -20,18 +20,51 @@ export const createMaquetteSchema = z.object({
   horsPatrimoine: z.boolean().optional(),
   informationsCertifiees: z.boolean().optional(),
   enTransit: z.boolean().optional(),
+  produitsChimiques: z.boolean().optional(),
   longueur: z.number().optional(),
   largeur: z.number().optional(),
   hauteur: z.number().optional(),
   dn: z.number().optional(),
   epaisseurParoi: z.number().optional(),
   poids: z.number().optional(),
-  quantite: z.number().optional(),
+  quantite: z.number().int().optional(),
   commentaires: z.string().optional(),
   poleEntite: z.string().optional(),
   entreprise: z.string().optional(),
   valeurFinanciere: z.number().optional(),
-});
+  // Extended PowerApps fields
+  numeroFIEC: z.string().optional(),
+  referenceUnique: z.number().int().optional(),
+  vieMaquette: z.string().optional(),
+  historiqueTexte: z.string().optional(),
+  descriptionDefauts: z.string().optional(),
+  complementsLocalisation: z.string().optional(),
+  lienECM: z.string().optional(),
+  lienECMRFF: z.string().optional(),
+  lienPhotos: z.string().optional(),
+  pieces: z.string().optional(),
+  emprunteurEntreprise: z.string().optional(),
+  referentId: z.number().int().optional(),
+  amortissement: z.string().optional(),
+  dureeVie: z.number().int().optional(),
+  // Colisage
+  colisageLongueur: z.number().optional(),
+  colisageLargeur: z.number().optional(),
+  colisageHauteur: z.number().optional(),
+  colisagePoids: z.number().optional(),
+  colisageDescription: z.string().optional(),
+  // Localisation détaillée
+  localisationSalle: z.string().optional(),
+  localisationRayonnage: z.string().optional(),
+  adresseNumVoie: z.string().optional(),
+  adresseNomVoie: z.string().optional(),
+  adresseCodePostal: z.string().optional(),
+  adresseVille: z.string().optional(),
+  adressePays: z.string().optional(),
+  adresseSite: z.string().optional(),
+};
+
+export const createMaquetteSchema = z.object(baseFields);
 
 export const updateMaquetteSchema = createMaquetteSchema.partial().extend({
   etat: z
