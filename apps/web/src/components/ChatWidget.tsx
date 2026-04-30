@@ -39,11 +39,7 @@ export default function ChatWidget() {
     setLoading(true);
 
     try {
-      const history = updated.slice(1).map((m) => ({ role: m.role === "user" ? "user" : "model", text: m.text }));
-      const res = await api.post<{ reply: string }>("/chat", {
-        message: text,
-        history: history.slice(0, -1),
-      });
+      const res = await api.post<{ reply: string }>("/chat", { message: text });
       setMessages((prev) => [...prev, { role: "assistant", text: res.reply }]);
     } catch {
       setMessages((prev) => [...prev, { role: "assistant", text: "Erreur de connexion. Réessayez." }]);
