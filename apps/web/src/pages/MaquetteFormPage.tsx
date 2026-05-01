@@ -57,6 +57,7 @@ export default function MaquetteFormPage() {
   const [step, setStep] = useState(0);
   const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
   const [mutationError, setMutationError] = useState<Error | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { data: typesMq } = useReferentiel("TYPE_MAQUETTE");
   const { data: categories } = useReferentiel("CATEGORIE");
@@ -199,8 +200,39 @@ export default function MaquetteFormPage() {
     onError: (e: Error) => setMutationError(e),
   });
 
+  const REQUIRED_FIELD_LABELS: Record<string, string> = {
+    reference: "Référence",
+    libelle: "Libellé",
+  };
+
+  const onInvalid = (errs: any) => {
+    const missing = Object.keys(errs)
+      .map((k) => REQUIRED_FIELD_LABELS[k] ?? k)
+      .filter(Boolean);
+    if (missing.length === 0) {
+      setSubmitError(
+        "Le formulaire contient des erreurs. Vérifiez les champs en rouge.",
+      );
+    } else {
+      setSubmitError(
+        `Champ${missing.length > 1 ? "s" : ""} obligatoire${missing.length > 1 ? "s" : ""} manquant${missing.length > 1 ? "s" : ""} : ${missing.join(", ")}.`,
+      );
+    }
+    // Saute à la première étape qui a des erreurs (en pratique : étape 0 Identité)
+    for (let i = 0; i < REVIEW_STEP; i++) {
+      const requiredOnStep = REQUIRED_PER_STEP[i] ?? [];
+      const hasError = requiredOnStep.some((k) => !!errs[k]);
+      if (hasError) {
+        setTriedAdvance((s) => new Set(s).add(i));
+        setStep(i);
+        return;
+      }
+    }
+  };
+
   const onSubmit = (data: any) => {
     setMutationError(null);
+    setSubmitError(null);
     const numericKeys = [
       "longueur", "largeur", "hauteur", "dn", "epaisseurParoi", "poids",
       "quantite", "valeurFinanciere", "dureeVie", "referenceUnique",
@@ -245,6 +277,10 @@ export default function MaquetteFormPage() {
   const isErr = (name: string, required?: boolean) =>
     triedAdvance.has(step) && required && !watch(name);
 
+  const RequiredStar = () => (
+    <span aria-hidden style={{ color: "var(--rose)", marginLeft: 4, fontWeight: 700 }}>*</span>
+  );
+
   const RefSelect = ({ name, options, label, required }: {
     name: string;
     options: Array<{ code: string; label: string }> | undefined;
@@ -252,13 +288,21 @@ export default function MaquetteFormPage() {
     required?: boolean;
   }) => (
     <div className="field">
-      <label className={`field-label ${isErr(name, required) ? "has-error" : ""}`}>{label}{required ? " *" : ""}</label>
-      <select className={`oselect ${isErr(name, required) ? "has-error" : ""}`} {...register(name)}>
+      <label className={`field-label ${isErr(name, required) ? "has-error" : ""}`}>
+        {label}{required && <RequiredStar />}
+      </label>
+      <select
+        className={`oselect ${isErr(name, required) ? "has-error" : ""}`}
+        aria-required={required}
+        aria-invalid={isErr(name, required) || undefined}
+        {...register(name)}
+      >
         <option value="">— Sélectionner —</option>
         {(options ?? []).map((o) => (
           <option key={o.code} value={o.code}>{o.label}</option>
         ))}
       </select>
+      {isErr(name, required) && <p className="field-error">Champ requis</p>}
     </div>
   );
 
@@ -282,10 +326,14 @@ export default function MaquetteFormPage() {
 
   const TextField = ({ name, label, mono, required }: { name: string; label: string; mono?: boolean; required?: boolean }) => (
     <div className="field">
-      <label className={`field-label ${isErr(name, required) ? "has-error" : ""}`}>{label}{required ? " *" : ""}</label>
+      <label className={`field-label ${isErr(name, required) ? "has-error" : ""}`}>
+        {label}{required && <RequiredStar />}
+      </label>
       <input
         type="text"
         className={`oinput ${mono ? "mono" : ""} ${isErr(name, required) ? "has-error" : ""}`}
+        aria-required={required}
+        aria-invalid={isErr(name, required) || undefined}
         {...register(name)}
       />
       {isErr(name, required) && <p className="field-error">Champ requis</p>}
@@ -312,7 +360,7 @@ export default function MaquetteFormPage() {
       onClick={(e) => { if (e.target === e.currentTarget) navigate(-1); }}
     >
       <div className="modal" style={{ maxWidth: 880 }}>
-        <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
           <div className="modal-head">
             <div style={{ flex: 1 }}>
               <h2 className="modal-title">{isEdit ? "Modifier la maquette" : "Nouvelle maquette"}</h2>
@@ -346,9 +394,25 @@ export default function MaquetteFormPage() {
           </div>
 
           <div className="modal-body">
-            {mutationError && (
-              <div style={{ padding: "10px 14px", background: "var(--rose-soft)", border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)", color: "var(--rose)", borderRadius: 8, fontSize: 13 }}>
-                {mutationError.message}
+            {(submitError || mutationError) && (
+              <div
+                role="alert"
+                style={{
+                  padding: "10px 14px",
+                  background: "var(--rose-soft)",
+                  border: "1px solid color-mix(in oklch, var(--rose) 25%, transparent)",
+                  color: "var(--rose)",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 8,
+                }}
+              >
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20" style={{ flexShrink: 0, marginTop: 1 }}>
+                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 7v4m0 2v.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                </svg>
+                <div>{submitError ?? mutationError?.message}</div>
               </div>
             )}
 

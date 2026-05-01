@@ -33,27 +33,42 @@ function Icon({ name, size = 14 }: { name: string; size?: number }) {
   );
 }
 
+// Sidebar layout aligned with OGADE.html design (4 sections, no "Administration" group).
+// Order matches the design : Inventaire → Maquettes → Mouvements → Référentiels.
 const navSections = [
+  {
+    label: "Accueil",
+    items: [{ to: "/", label: "Tableau de bord", icon: "home" }],
+  },
   {
     label: "Inventaire",
     items: [
-      { to: "/", label: "Tableau de bord", icon: "home" },
       { to: "/materiels", label: "Matériels END", icon: "list" },
-      { to: "/maquettes", label: "Maquettes", icon: "box" },
-      { to: "/demandes-envoi", label: "Envois & retours", icon: "truck" },
-      { to: "/reservations", label: "Réservations", icon: "star" },
-      { to: "/calendrier", label: "Calendrier", icon: "cal" },
       { to: "/localisation", label: "Localisation", icon: "map" },
       { to: "/agents", label: "Agents", icon: "user" },
     ],
   },
   {
-    label: "Administration",
+    label: "Maquettes",
     items: [
-      { to: "/admin/referentiels", label: "Référentiels", icon: "settings" },
+      { to: "/maquettes", label: "Toutes les maquettes", icon: "box" },
+    ],
+  },
+  {
+    label: "Mouvements",
+    items: [
+      { to: "/demandes-envoi", label: "Envois & retours", icon: "swap" },
+      { to: "/calendrier", label: "Calendrier matériel", icon: "cal" },
+      { to: "/reservations", label: "Réservations", icon: "star" },
+    ],
+  },
+  {
+    label: "Référentiels",
+    items: [
+      { to: "/admin/referentiels", label: "Types & listes", icon: "settings" },
       { to: "/admin/sites", label: "Sites & groupes", icon: "map" },
       { to: "/admin/entreprises", label: "Entreprises", icon: "flask" },
-      { to: "/admin/agents", label: "Agents autorisés", icon: "star" },
+      { to: "/admin/agents", label: "Agents autorisés", icon: "user" },
     ],
   },
 ];
