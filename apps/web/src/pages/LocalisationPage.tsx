@@ -35,7 +35,7 @@ export default function LocalisationPage() {
   const totalMaquettes = (sites ?? []).reduce((s, x) => s + x.maquetteCount, 0);
 
   return (
-    <div style={{ padding: "22px 28px 40px" }}>
+    <div className="localisation-page" style={{ padding: "22px 28px 40px" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>

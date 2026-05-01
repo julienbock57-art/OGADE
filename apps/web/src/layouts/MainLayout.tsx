@@ -345,6 +345,14 @@ export default function MainLayout() {
               </>
             )}
           </div>
+          {showLabels && (
+            <div
+              className="app-version"
+              title={`Build ${__APP_BUILD_AT__}`}
+            >
+              v{__APP_VERSION__} · {__APP_COMMIT__}
+            </div>
+          )}
         </div>
       </>
     );

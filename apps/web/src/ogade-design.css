@@ -1356,3 +1356,35 @@ table.list tr.expand td {
   min-width: 0;
   overflow-wrap: break-word;
 }
+
+/* ─── Localisation page : empêche Leaflet de passer devant le sidebar ──
+   Leaflet a des z-index internes (jusqu'à 1000 pour les .leaflet-control),
+   ce qui passait devant le sidebar (z-index 40). On crée un nouveau
+   stacking context qui scope tout le z-index de Leaflet à la page. */
+.localisation-page {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
+/* Filet de sécurité supplémentaire : le wrapper Leaflet ne peut pas
+   dépasser le z-index 39 (juste sous le sidebar). */
+.localisation-page .leaflet-container,
+.localisation-page .leaflet-pane,
+.localisation-page .leaflet-control,
+.localisation-page .leaflet-top,
+.localisation-page .leaflet-bottom {
+  z-index: auto !important;
+}
+
+/* ─── Version badge dans le sidebar ─── */
+.app-version {
+  font-size: 10px;
+  color: var(--ink-4);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  padding: 4px 6px;
+  text-align: center;
+  border-top: 1px solid var(--line-2);
+  margin-top: 8px;
+}
