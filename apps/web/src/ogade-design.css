@@ -1216,7 +1216,12 @@ table.list tr.expand td {
 }
 
 @media (max-width: 1023px) {
-  .app-shell { grid-template-columns: 0 1fr !important; }
+  /* Single column on mobile/tablet : le sidebar desktop est `display: none`
+     (Tailwind `hidden`) et le sidebar mobile est `position: fixed`, donc
+     ils ne participent pas au placement grid. Si on garde 2 colonnes
+     (« 0 1fr »), le <main> est auto-placé en col 1 = 0px et son contenu
+     est compressé à gauche. Une seule colonne 1fr = main pleine largeur. */
+  .app-shell { grid-template-columns: 1fr !important; }
 }
 
 /* KPI grid responsive : auto-fit + min 160px → s'adapte tout seul. */
