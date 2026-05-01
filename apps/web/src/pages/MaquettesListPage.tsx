@@ -160,7 +160,7 @@ export default function MaquettesListPage() {
 
       {/* KPIs */}
       {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14, padding: "0 24px 18px" }}>
+        <div className="kpi-grid">
           <KpiCard label="Total" value={stats.total} sub="inventaire complet" accent="var(--accent)" active={activeKpi === null && filterEtat === ""} onClick={() => handleKpi(null)} />
           <KpiCard label="En stock" value={stats.stock} sub={stats.total ? `${Math.round((stats.stock * 100) / stats.total)}% du parc` : ""} accent="var(--emerald)" active={activeKpi === "stock"} onClick={() => handleKpi("stock")} />
           <KpiCard label="Empruntées / transit" value={stats.empruntesOuTransit} sub="engagées sur sites" accent="var(--sky)" active={activeKpi === "empruntees"} onClick={() => handleKpi("empruntees")} />
@@ -201,7 +201,7 @@ export default function MaquettesListPage() {
 
       {showFilters && (
         <div style={{ background: "var(--bg-panel)", borderBottom: "1px solid var(--line)", padding: "12px 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
+          <div className="filter-grid">
             <select value={filterEtat} onChange={(e) => { setFilterEtat(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect">
               <option value="">État — Tous</option>
               {Object.entries(MQ_ETAT_PILL).map(([code, p]) => (

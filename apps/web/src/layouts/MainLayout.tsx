@@ -103,7 +103,10 @@ export default function MainLayout() {
   const sidebarWidth = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
 
   return (
-    <div className="min-h-screen" style={{ display: "grid", gridTemplateColumns: `${sidebarWidth}px 1fr`, transition: "grid-template-columns 0.2s ease" }}>
+    <div
+      className="app-shell"
+      style={{ ["--sidebar-w" as string]: `${sidebarWidth}px` } as React.CSSProperties}
+    >
 
       {/* Mobile overlay */}
       {mobileOpen && (
