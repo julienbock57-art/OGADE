@@ -124,7 +124,6 @@ export default function MainLayout() {
           height: "100vh",
           position: "sticky",
           top: 0,
-          display: "flex",
           flexDirection: "column",
           gap: 4,
           transition: "width 0.2s ease, padding 0.2s ease",
@@ -138,7 +137,7 @@ export default function MainLayout() {
 
       {/* Mobile sidebar (slide-over) */}
       <aside
-        className="lg:hidden"
+        className="flex lg:hidden"
         style={{
           position: "fixed",
           inset: "0 auto 0 0",
@@ -146,7 +145,6 @@ export default function MainLayout() {
           background: "var(--bg-panel)",
           borderRight: "1px solid var(--line)",
           padding: "18px 14px",
-          display: "flex",
           flexDirection: "column",
           gap: 4,
           zIndex: 40,
