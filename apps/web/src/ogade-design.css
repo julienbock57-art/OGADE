@@ -1254,3 +1254,100 @@ table.list tr.expand td {
 
 /* Make .kpi flex children shrink properly */
 .kpi { min-width: 0; }
+
+/* ─── Detail/form 2-col grid responsive ─── */
+.detail-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+@media (max-width: 768px) {
+  .detail-grid-2 { grid-template-columns: 1fr; gap: 12px; }
+}
+
+.detail-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .detail-grid-3 { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+@media (max-width: 380px) {
+  .detail-grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Detail page wrapper (replaces inline maxWidth: 900 + margin auto) */
+.detail-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+@media (max-width: 768px) {
+  .detail-page { max-width: 100%; padding: 0 12px 24px; }
+}
+
+/* Generic responsive escape hatch for inline grids on mobile portrait.
+   Targets the most common patterns we use, regardless of whitespace. */
+@media (max-width: 768px) {
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns: repeat(4"],
+  [style*="grid-template-columns: repeat(5"],
+  [style*="grid-template-columns: repeat(6"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  [style*="max-width: 900"],
+  [style*="max-width: 960"],
+  [style*="max-width: 1000"],
+  [style*="max-width: 1100"],
+  [style*="max-width: 1200"] {
+    max-width: 100% !important;
+  }
+}
+
+/* ─── Topbar responsive ─── */
+@media (max-width: 768px) {
+  /* Réduit padding du topbar (header) */
+  header.flex.items-center[style*="padding: 14px 24px"],
+  header[style*="padding: \"14px 24px\""] {
+    padding: 10px 12px !important;
+  }
+  /* Évite que le breadcrumb prenne 100% et écrase le reste */
+  header > div { min-width: 0; }
+}
+
+/* ─── Buttons obtn responsive ─── */
+@media (max-width: 768px) {
+  /* obtn ghost dans drawer-foot peut wrap */
+  .drawer-foot { flex-direction: column; align-items: stretch; }
+  .drawer-foot > div { display: flex; gap: 6px; flex-wrap: wrap; }
+  .drawer-foot .obtn { width: 100%; justify-content: center; }
+}
+
+/* ─── Wizard steps responsive (modale form) ─── */
+@media (max-width: 768px) {
+  .wizard-steps {
+    gap: 6px;
+  }
+  .wizard-step {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0 2px;
+  }
+  .wizard-step .wlabel { font-size: 10.5px; gap: 4px; }
+  .wizard-step .wlabel .num { width: 16px; height: 16px; font-size: 9.5px; }
+  /* Cache le label texte sur très petit écran, garde juste les pastilles numérotées */
+  @media (max-width: 480px) {
+    .wizard-step .wlabel { font-size: 0; }
+    .wizard-step .wlabel .num { font-size: 9.5px; }
+  }
+}
+
+/* ─── kpi shrink-safe ─── */
+.kpi-label, .kpi-value, .kpi-sub {
+  min-width: 0;
+  overflow-wrap: break-word;
+}

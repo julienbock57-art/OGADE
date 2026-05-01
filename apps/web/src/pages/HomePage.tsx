@@ -312,14 +312,7 @@ export default function HomePage() {
       </div>
 
       {/* KPI grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 14,
-          padding: "18px 24px",
-        }}
-      >
+      <div className="kpi-grid">
         {isLoading ? (
           <>
             <KpiSkeleton />
@@ -366,14 +359,7 @@ export default function HomePage() {
       </div>
 
       {/* Breakdown panels */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 14,
-          padding: "0 24px 18px",
-        }}
-      >
+      <div className="kpi-grid">
         {/* Matériels breakdown */}
         <div
           style={{
@@ -589,11 +575,7 @@ export default function HomePage() {
             Actions rapides
           </div>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 10,
-            }}
+            className="filter-grid"
           >
             {/* New material */}
             <Link
