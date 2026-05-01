@@ -86,7 +86,7 @@ export default function DemandeEnvoiFormPage() {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
+    <div className="detail-page">
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <button
           onClick={() => navigate(-1)}
@@ -119,7 +119,7 @@ export default function DemandeEnvoiFormPage() {
       <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Informations générales */}
         <SectionCard title="Informations générales">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
+          <div className="detail-grid-2">
             <div>
               <label style={labelStyle}>Type de demande *</label>
               <select {...register("type")} className="oselect">
@@ -156,7 +156,7 @@ export default function DemandeEnvoiFormPage() {
 
         {/* Destinataire */}
         <SectionCard title="Destinataire">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px" }}>
+          <div className="detail-grid-2">
             <div>
               <label style={labelStyle}>Nom / Entreprise *</label>
               <input type="text" {...register("destinataire")} className="oinput" placeholder="Nom du destinataire" />
@@ -183,7 +183,7 @@ export default function DemandeEnvoiFormPage() {
 
         {/* Options d'envoi */}
         <SectionCard title="Options d'envoi">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px" }}>
+          <div className="detail-grid-2" style={{ gap: "12px 24px" }}>
             {[
               { id: "convention", name: "convention" as const, label: "Convention existante" },
               { id: "souscriptionAssurance", name: "souscriptionAssurance" as const, label: "Souscription d'une assurance" },

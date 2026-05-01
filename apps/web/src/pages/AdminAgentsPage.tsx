@@ -162,7 +162,7 @@ export default function AdminAgentsPage() {
     agent.roles.some((r) => r.role?.code === roleCode);
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 40 }}>
+    <div className="detail-page">
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

@@ -75,7 +75,7 @@ export default function DemandeEnvoiDetailPage() {
   const pill = statutPill[demande.statut] ?? { cls: "pill c-neutral", label: demande.statut };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 40 }}>
+    <div className="detail-page">
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
@@ -103,7 +103,7 @@ export default function DemandeEnvoiDetailPage() {
         <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
           Informations
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 32px" }}>
+        <div className="detail-grid-2" style={{ gap: "16px 32px" }}>
           <Field label="Numéro">{demande.numero}</Field>
           <Field label="Type">{typeLabel[demande.type] ?? demande.type}</Field>
           <Field label="Statut">

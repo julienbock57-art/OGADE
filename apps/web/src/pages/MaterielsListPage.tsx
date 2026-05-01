@@ -250,7 +250,7 @@ export default function MaterielsListPage() {
   return (
     <div>
       {/* Page header */}
-      <div style={{ padding: "22px 24px 18px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      <div className="page-head">
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0, color: "var(--ink)" }}>Gestion du matériel END</h1>
           <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2, marginBottom: 0 }}>Inventaire, étalonnage, mouvements et traçabilité</p>
