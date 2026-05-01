@@ -265,7 +265,7 @@ export default function MaterielsListPage() {
 
       {/* KPIs */}
       {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, padding: "0 24px 18px" }}>
+        <div className="kpi-grid">
           <KpiCard label="Matériels actifs" value={stats.total} sub="inventaire complet" accent="var(--accent)" active={activeKpi === null} onClick={() => handleKpiClick(null)} />
           <KpiCard label="Étalonnages échus" value={stats.echus} sub="à régulariser" accent="var(--rose)" active={activeKpi === "echus"} onClick={() => handleKpiClick("echus")} />
           <KpiCard label="Échéance < 30 j" value={stats.prochains} sub="à planifier" accent="var(--amber)" active={activeKpi === "prochains"} onClick={() => handleKpiClick("prochains")} />
@@ -299,7 +299,7 @@ export default function MaterielsListPage() {
       {/* Filter panel */}
       {showFilters && (
         <div style={{ background: "var(--bg-panel)", borderBottom: "1px solid var(--line)", padding: "12px 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
+          <div className="filter-grid">
             <select value={filterEtat} onChange={(e) => { setFilterEtat(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">État — Tous</option>{(etats ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
             <select value={filterTypeEnd} onChange={(e) => { setFilterTypeEnd(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Type END — Tous</option>{(typesEnd ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>
             <select value={filterTypeMat} onChange={(e) => { setFilterTypeMat(e.target.value); setActiveKpi(null); setPage(1); }} className="oselect"><option value="">Type matériel — Tous</option>{(typesMat ?? []).map(o => <option key={o.code} value={o.code}>{o.label}</option>)}</select>

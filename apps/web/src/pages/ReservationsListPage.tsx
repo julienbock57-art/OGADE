@@ -128,7 +128,7 @@ export default function ReservationsListPage() {
 
       {/* KPIs */}
       {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, padding: "0 24px 18px" }}>
+        <div className="kpi-grid">
           <KpiCard
             label="Réservations actives"
             value={stats.actives}

@@ -1202,3 +1202,55 @@ table.list tr.expand td {
   .kpi-value { font-size: 20px; }
   .modal-title { font-size: 15px; }
 }
+
+/* ─── App shell + KPI/filter grid utilities (responsive proof) ─── */
+
+/* Parent grid (sidebar + main) — utilisé par MainLayout. Remplace
+   l'attribute selector .min-h-screen[style*="grid-template-columns"]
+   qui pouvait ne pas matcher selon la sérialisation CSS. */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w, 220px) 1fr;
+  transition: grid-template-columns 0.2s ease;
+  min-height: 100vh;
+}
+
+@media (max-width: 1023px) {
+  .app-shell { grid-template-columns: 0 1fr !important; }
+}
+
+/* KPI grid responsive : auto-fit + min 160px → s'adapte tout seul. */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 0 24px 18px;
+}
+@media (max-width: 768px) {
+  .kpi-grid {
+    gap: 8px;
+    padding: 0 12px 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 380px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Filter panel grid — mêmes règles que KPI mais sans padding */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* Make .kpi flex children shrink properly */
+.kpi { min-width: 0; }
