@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import QrScannerModal from "@/components/QrScannerModal";
+import SettingsModal from "@/components/SettingsModal";
 import ChatWidget from "@/components/ChatWidget";
 
 function Icon({ name, size = 14 }: { name: string; size?: number }) {
@@ -81,6 +82,7 @@ export default function MainLayout() {
   const { user, logout, authConfig } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem("ogade_sidebar") === "collapsed"; } catch { return false; }
   });
@@ -200,7 +202,15 @@ export default function MainLayout() {
 
           <div className="flex items-center gap-2">
             <button type="button" className="icon-btn" title="Scanner un QR code" onClick={() => setShowScanner(true)}><Icon name="qrscan" size={14} /></button>
-            <button type="button" className="icon-btn"><Icon name="settings" size={14} /></button>
+            <button
+              type="button"
+              className="icon-btn"
+              title="Paramètres"
+              aria-label="Paramètres"
+              onClick={() => setShowSettings(true)}
+            >
+              <Icon name="settings" size={14} />
+            </button>
           </div>
         </header>
 
@@ -211,6 +221,7 @@ export default function MainLayout() {
       </div>
 
       {showScanner && <QrScannerModal onClose={() => setShowScanner(false)} />}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       <ChatWidget />
     </div>
   );
