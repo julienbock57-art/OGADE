@@ -1,10 +1,25 @@
-import { Controller, Get, Post, Body, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { MicrosoftTokenService } from './microsoft-token.service';
 import { LocalAuthService } from './local-auth.service';
 import { CurrentUser, RequestUser } from './auth.guard';
 import { Public } from './public.decorator';
+
+const userSettingsSchema = z
+  .object({
+    theme: z.enum(['light', 'dark', 'auto']).optional(),
+  })
+  .passthrough();
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -27,6 +42,42 @@ export class AuthController {
     if (!agent) throw new UnauthorizedException();
     const { passwordHash: _, ...safe } = agent;
     return safe;
+  }
+
+  @Get('me/settings')
+  async getSettings(@CurrentUser() user: RequestUser | null) {
+    if (!user) throw new UnauthorizedException();
+    const agent = await this.prisma.agent.findUnique({
+      where: { id: user.agentId },
+      select: { settings: true },
+    });
+    return agent?.settings ?? {};
+  }
+
+  @Patch('me/settings')
+  async updateSettings(
+    @CurrentUser() user: RequestUser | null,
+    @Body() body: any,
+  ) {
+    if (!user) throw new UnauthorizedException();
+    const result = userSettingsSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    const current = await this.prisma.agent.findUnique({
+      where: { id: user.agentId },
+      select: { settings: true },
+    });
+    const merged = {
+      ...((current?.settings as Record<string, any>) ?? {}),
+      ...result.data,
+    };
+    const updated = await this.prisma.agent.update({
+      where: { id: user.agentId },
+      data: { settings: merged },
+      select: { settings: true },
+    });
+    return updated.settings;
   }
 
   @Public()
