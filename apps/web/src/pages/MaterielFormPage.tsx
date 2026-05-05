@@ -872,7 +872,7 @@ export default function MaterielFormPage() {
                 <label
                   className={`field-label ${triedAdvance.has(1) && !wResponsableId ? "has-error" : ""}`}
                 >
-                  Responsable *
+                  Responsable matériel (référent) *
                 </label>
                 <SearchableSelect
                   value={wResponsableId ? String(wResponsableId) : ""}
@@ -881,6 +881,9 @@ export default function MaterielFormPage() {
                   placeholder="Rechercher un agent..."
                   hasError={triedAdvance.has(1) && !wResponsableId}
                 />
+                <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 4 }}>
+                  Cet agent recevra les demandes de prêt/envoi pour validation
+                </p>
                 {triedAdvance.has(1) && !wResponsableId && (
                   <p className="field-error">Champ requis</p>
                 )}

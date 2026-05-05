@@ -70,7 +70,8 @@ export default function DemandeEnvoiFormPage() {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    setValue,
+    formState: { errors, isSubmitting },
   } = useForm<CreateDemandeEnvoiInput>({
     resolver: zodResolver(createDemandeEnvoiSchema),
     defaultValues: {
@@ -81,30 +82,72 @@ export default function DemandeEnvoiFormPage() {
       siteOrigine: "",
       motif: "",
       urgence: "Normal",
+      convention: false,
+      souscriptionAssurance: false,
+      produitsChimiques: false,
       lignes: [],
     },
   });
-  void errors;
 
   const wTypeEnvoi = watch("typeEnvoi");
   const wDestinataire = watch("destinataire");
   const wSiteDestinataire = watch("siteDestinataire");
+  const wMotif = watch("motif");
+  const wDateSouhaitee = watch("dateSouhaitee");
+  const wContact = watch("contact");
 
-  const stepHasErrors = (s: number): boolean => {
-    if (s === 0) return panier.count === 0;
-    if (s === 1) return !wTypeEnvoi;
-    if (s === 2) {
-      if (wTypeEnvoi === TypeEnvoi.INTERNE) return !wSiteDestinataire;
-      return !wDestinataire;
+  // Pour les envois internes (CNPE → CNPE / prêt interne), le destinataire
+  // est déduit du site sélectionné — on le synchronise dans le state.
+  useEffect(() => {
+    const isInterne =
+      wTypeEnvoi === TypeEnvoi.INTERNE || wTypeEnvoi === TypeEnvoi.PRET_INTERNE;
+    if (isInterne && wSiteDestinataire) {
+      const label =
+        sites?.find((s) => s.code === wSiteDestinataire)?.label ?? wSiteDestinataire;
+      if (wDestinataire !== label) {
+        setValue("destinataire", label, { shouldValidate: true });
+      }
     }
-    return false;
+  }, [wTypeEnvoi, wSiteDestinataire, sites, wDestinataire, setValue]);
+
+  type StepError = { field: string; label: string; message: string };
+
+  const stepErrors = (s: number): StepError[] => {
+    const errs: StepError[] = [];
+    if (s === 0 && panier.count === 0) {
+      errs.push({ field: "panier", label: "Panier", message: "Ajoutez au moins un matériel ou une maquette" });
+    }
+    if (s === 1 && !wTypeEnvoi) {
+      errs.push({ field: "typeEnvoi", label: "Type d'envoi", message: "Choisissez un type d'envoi" });
+    }
+    if (s === 2) {
+      const isInterne = wTypeEnvoi === TypeEnvoi.INTERNE || wTypeEnvoi === TypeEnvoi.PRET_INTERNE;
+      if (isInterne && !wSiteDestinataire) {
+        errs.push({ field: "siteDestinataire", label: "Site destinataire", message: "Sélectionnez le site destinataire" });
+      }
+      if (!isInterne && !wDestinataire) {
+        errs.push({ field: "destinataire", label: "Destinataire", message: "Sélectionnez l'entreprise destinataire" });
+      }
+    }
+    if (s === 3) {
+      if (!wMotif || wMotif.trim().length === 0) {
+        errs.push({ field: "motif", label: "Motif", message: "Renseignez le motif de la demande" });
+      }
+      if (!wDateSouhaitee) {
+        errs.push({ field: "dateSouhaitee", label: "Date souhaitée", message: "Renseignez la date souhaitée" });
+      }
+      if (!wContact || wContact.trim().length === 0) {
+        errs.push({ field: "contact", label: "Contact", message: "Renseignez un contact destinataire" });
+      }
+    }
+    return errs;
   };
 
+  const stepHasErrors = (s: number) => stepErrors(s).length > 0;
+
   const tryAdvance = () => {
-    if (stepHasErrors(step)) {
-      setTriedAdvance((s) => new Set(s).add(step));
-      return;
-    }
+    setTriedAdvance((s) => new Set(s).add(step));
+    if (stepHasErrors(step)) return;
     if (step < STEPS.length - 1) setStep(step + 1);
   };
 
@@ -120,14 +163,24 @@ export default function DemandeEnvoiFormPage() {
   });
 
   const onSubmit = (data: CreateDemandeEnvoiInput) => {
-    if (panier.count === 0) {
-      setSubmitError("Le panier est vide — ajoutez au moins un matériel ou une maquette.");
-      setStep(0);
-      return;
+    // Re-vérifie chaque étape avant l'envoi
+    for (let s = 0; s < STEPS.length - 1; s++) {
+      const errs = stepErrors(s);
+      if (errs.length > 0) {
+        setTriedAdvance((set) => new Set(set).add(s));
+        setStep(s);
+        setSubmitError(`Complétez l'étape "${STEPS[s]}" : ${errs.map((e) => e.message).join(", ")}`);
+        return;
+      }
     }
     setSubmitError(null);
+    // Nettoyage des champs date vides (sinon Zod coerce.date() casse)
+    const cleaned: any = { ...data };
+    for (const k of ["dateSouhaitee", "dateRetourEstimee"]) {
+      if (cleaned[k] === "" || cleaned[k] == null) delete cleaned[k];
+    }
     const payload: CreateDemandeEnvoiInput = {
-      ...data,
+      ...cleaned,
       type: typeDemande,
       lignes: panier.items.map((it) =>
         it.kind === "materiel"
@@ -136,6 +189,12 @@ export default function DemandeEnvoiFormPage() {
       ),
     };
     createMutation.mutate(payload);
+  };
+
+  const onInvalid = (formErrors: typeof errors) => {
+    const firstField = Object.keys(formErrors)[0];
+    const msg = (firstField && (formErrors as any)[firstField]?.message) || "Vérifiez les champs requis";
+    setSubmitError(String(msg));
   };
 
   return (
@@ -156,7 +215,7 @@ export default function DemandeEnvoiFormPage() {
       </div>
 
       <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden" }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
           {/* Wizard steps */}
           <div style={{ padding: "14px 22px", borderBottom: "1px solid var(--line)" }}>
             <div className="wizard-steps">
@@ -287,6 +346,9 @@ export default function DemandeEnvoiFormPage() {
                         <option key={s.code} value={s.code}>{s.label}</option>
                       ))}
                     </select>
+                    {triedAdvance.has(2) && !wSiteDestinataire && (
+                      <p className="field-error">Sélectionnez le site destinataire</p>
+                    )}
                   </div>
                 ) : (
                   <div className="field">
@@ -299,24 +361,15 @@ export default function DemandeEnvoiFormPage() {
                         <option key={e.code} value={e.label}>{e.label}</option>
                       ))}
                     </select>
+                    {triedAdvance.has(2) && !wDestinataire && (
+                      <p className="field-error">Sélectionnez l'entreprise destinataire</p>
+                    )}
                   </div>
                 )}
 
                 <div className="field">
                   <label className="field-label">Adresse destination</label>
-                  <input type="text" className="oinput" {...register("adresseDestination")} />
-                </div>
-                <div className="field">
-                  <label className="field-label">Contact (nom)</label>
-                  <input type="text" className="oinput" {...register("contact")} />
-                </div>
-                <div className="field">
-                  <label className="field-label">Téléphone</label>
-                  <input type="tel" className="oinput" {...register("contactTelephone")} />
-                </div>
-                <div className="field">
-                  <label className="field-label">Date souhaitée</label>
-                  <input type="date" className="oinput" {...register("dateSouhaitee")} />
+                  <input type="text" className="oinput" {...register("adresseDestination")} placeholder="Adresse postale (optionnel pour les sites internes)" />
                 </div>
                 <div className="field">
                   <label className="field-label">Date retour estimée</label>
@@ -329,10 +382,39 @@ export default function DemandeEnvoiFormPage() {
             {step === 3 && (
               <div className="vstack" style={{ gap: 12 }}>
                 <div className="field">
-                  <label className="field-label">Motif</label>
-                  <textarea className="otextarea" rows={3} {...register("motif")} />
+                  <label className={`field-label ${triedAdvance.has(3) && !wMotif ? "has-error" : ""}`}>
+                    Motif <span style={{ color: "var(--rose)" }}>*</span>
+                  </label>
+                  <textarea className="otextarea" rows={3} {...register("motif")} placeholder="Précisez le motif de la demande (essai, intervention, étalonnage…)" />
+                  {triedAdvance.has(3) && (!wMotif || wMotif.trim().length === 0) && (
+                    <p className="field-error">Le motif est obligatoire</p>
+                  )}
                 </div>
                 <div className="detail-grid-2">
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wDateSouhaitee ? "has-error" : ""}`}>
+                      Date souhaitée <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="date" className="oinput" {...register("dateSouhaitee")} />
+                    {triedAdvance.has(3) && !wDateSouhaitee && (
+                      <p className="field-error">Renseignez la date souhaitée</p>
+                    )}
+                  </div>
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wContact ? "has-error" : ""}`}>
+                      Contact destinataire <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="text" className="oinput" {...register("contact")} placeholder="Nom du contact" />
+                    {triedAdvance.has(3) && (!wContact || wContact.trim().length === 0) && (
+                      <p className="field-error">Indiquez le contact destinataire</p>
+                    )}
+                  </div>
+                </div>
+                <div className="detail-grid-2">
+                  <div className="field">
+                    <label className="field-label">Téléphone contact</label>
+                    <input type="tel" className="oinput" {...register("contactTelephone")} />
+                  </div>
                   <div className="field">
                     <label className="field-label">Urgence</label>
                     <select className="oselect" {...register("urgence")}>
@@ -397,7 +479,7 @@ export default function DemandeEnvoiFormPage() {
                 <button
                   type="submit"
                   className="obtn accent"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isPending || isSubmitting}
                 >
                   <Icon name="send" size={13} />
                   {createMutation.isPending ? "Envoi…" : "Soumettre la demande"}
@@ -405,6 +487,11 @@ export default function DemandeEnvoiFormPage() {
               )}
             </div>
           </div>
+          {submitError && (
+            <div style={{ padding: "10px 22px 14px", color: "var(--rose)", fontSize: 12.5 }}>
+              {submitError}
+            </div>
+          )}
         </form>
       </div>
 

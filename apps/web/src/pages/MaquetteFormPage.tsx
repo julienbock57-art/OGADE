@@ -496,6 +496,9 @@ export default function MaquetteFormPage() {
                       <option key={a.id} value={a.id}>{a.prenom} {a.nom}</option>
                     ))}
                   </select>
+                  <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 4 }}>
+                    Cet agent recevra les demandes de prêt/envoi pour validation
+                  </p>
                 </div>
                 <div className="field">
                   <label className="field-label">Emprunteur (entreprise)</label>

@@ -114,6 +114,30 @@ export class AgentsController {
     return this.agentsService.update(id, { passwordHash: null });
   }
 
+  @Get(':id/magasinier-sites')
+  async listMagasinierSites(@Param('id', ParseIntPipe) id: number) {
+    return this.agentsService.listMagasinierSites(id);
+  }
+
+  @Post(':id/magasinier-sites')
+  async addMagasinierSite(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { siteCode?: string },
+  ) {
+    if (!body?.siteCode || typeof body.siteCode !== 'string') {
+      throw new BadRequestException('siteCode requis');
+    }
+    return this.agentsService.addMagasinierSite(id, body.siteCode);
+  }
+
+  @Delete(':id/magasinier-sites/:siteCode')
+  async removeMagasinierSite(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('siteCode') siteCode: string,
+  ) {
+    return this.agentsService.removeMagasinierSite(id, siteCode);
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number) {
