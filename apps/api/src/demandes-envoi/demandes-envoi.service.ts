@@ -2,6 +2,47 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateDemandeEnvoiInput, UpdateDemandeEnvoiInput } from '@ogade/shared';
 
+const AGENT_SELECT = {
+  id: true,
+  nom: true,
+  prenom: true,
+  email: true,
+} as const;
+
+const MATERIEL_SELECT = {
+  id: true,
+  reference: true,
+  libelle: true,
+  responsableId: true,
+  responsable: { select: AGENT_SELECT },
+  site: true,
+  typeMateriel: true,
+} as const;
+
+const MAQUETTE_SELECT = {
+  id: true,
+  reference: true,
+  libelle: true,
+  referentId: true,
+  referent: { select: AGENT_SELECT },
+  site: true,
+  typeMaquette: true,
+} as const;
+
+const LIGNE_INCLUDE = {
+  materiel: { select: MATERIEL_SELECT },
+  maquette: { select: MAQUETTE_SELECT },
+  validateur: { select: AGENT_SELECT },
+} as const;
+
+const DEMANDE_DETAIL_INCLUDE = {
+  demandeur: { select: AGENT_SELECT },
+  magasinierEnvoi: { select: AGENT_SELECT },
+  magasinierReception: { select: AGENT_SELECT },
+  magasinierRetour: { select: AGENT_SELECT },
+  lignes: { include: LIGNE_INCLUDE },
+} as const;
+
 @Injectable()
 export class DemandesEnvoiService {
   constructor(private readonly prisma: PrismaService) {}
@@ -30,8 +71,11 @@ export class DemandesEnvoiService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
-          demandeur: { select: { id: true, nom: true, prenom: true, email: true } },
+          demandeur: { select: AGENT_SELECT },
           _count: { select: { lignes: true } },
+          lignes: {
+            select: { id: true, statut: true },
+          },
         },
       }),
       this.prisma.demandeEnvoi.count({ where }),
@@ -49,15 +93,7 @@ export class DemandesEnvoiService {
   async findOne(id: number) {
     const demande = await this.prisma.demandeEnvoi.findUnique({
       where: { id },
-      include: {
-        demandeur: { select: { id: true, nom: true, prenom: true, email: true } },
-        lignes: {
-          include: {
-            materiel: { select: { id: true, reference: true, libelle: true } },
-            maquette: { select: { id: true, reference: true, libelle: true } },
-          },
-        },
-      },
+      include: DEMANDE_DETAIL_INCLUDE,
     });
     if (!demande) {
       throw new NotFoundException(`Demande d'envoi #${id} not found`);
@@ -74,23 +110,17 @@ export class DemandesEnvoiService {
         ...demandeData,
         numero,
         demandeurId,
+        statut: 'BROUILLON',
         lignes: {
           create: lignes.map((ligne) => ({
             materielId: ligne.materielId ?? null,
             maquetteId: ligne.maquetteId ?? null,
             quantite: ligne.quantite,
+            statut: 'EN_ATTENTE',
           })),
         },
       },
-      include: {
-        demandeur: { select: { id: true, nom: true, prenom: true, email: true } },
-        lignes: {
-          include: {
-            materiel: { select: { id: true, reference: true, libelle: true } },
-            maquette: { select: { id: true, reference: true, libelle: true } },
-          },
-        },
-      },
+      include: DEMANDE_DETAIL_INCLUDE,
     });
   }
 
@@ -99,15 +129,7 @@ export class DemandesEnvoiService {
     return this.prisma.demandeEnvoi.update({
       where: { id },
       data,
-      include: {
-        demandeur: { select: { id: true, nom: true, prenom: true, email: true } },
-        lignes: {
-          include: {
-            materiel: { select: { id: true, reference: true, libelle: true } },
-            maquette: { select: { id: true, reference: true, libelle: true } },
-          },
-        },
-      },
+      include: DEMANDE_DETAIL_INCLUDE,
     });
   }
 
@@ -119,11 +141,9 @@ export class DemandesEnvoiService {
         materielId: ligne.materielId ?? null,
         maquetteId: ligne.maquetteId ?? null,
         quantite: ligne.quantite ?? 1,
+        statut: 'EN_ATTENTE',
       },
-      include: {
-        materiel: { select: { id: true, reference: true, libelle: true } },
-        maquette: { select: { id: true, reference: true, libelle: true } },
-      },
+      include: LIGNE_INCLUDE,
     });
   }
 
