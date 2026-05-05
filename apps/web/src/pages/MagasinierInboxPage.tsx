@@ -38,7 +38,7 @@ interface InboxDemande extends DemandeEnvoi {
 }
 
 export default function MagasinierInboxPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const isMagasinier =
     !!user &&
     (user.roles.includes("ADMIN") ||
@@ -58,8 +58,22 @@ export default function MagasinierInboxPage() {
           Magasin
         </h1>
         <p style={{ fontSize: 13, color: "var(--ink-3)" }}>
-          Cette vue est réservée aux gestionnaires de magasin et référents logistique.
+          Cette vue est réservée aux gestionnaires de magasin et référents
+          logistique (rôles requis : ADMIN, GESTIONNAIRE_MAGASIN ou
+          REFERENT_LOGISTIQUE).
         </p>
+        <p style={{ fontSize: 12.5, color: "var(--ink-3)", marginTop: 8 }}>
+          Connecté(e) en tant que <strong>{user?.email ?? "—"}</strong> · rôles
+          détectés : {user?.roles?.length ? user.roles.join(", ") : <em>aucun</em>}
+        </p>
+        <button
+          type="button"
+          className="obtn"
+          style={{ marginTop: 12 }}
+          onClick={() => void refreshUser()}
+        >
+          Recharger les rôles
+        </button>
       </div>
     );
   }
