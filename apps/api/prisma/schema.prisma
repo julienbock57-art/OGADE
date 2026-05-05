@@ -22,22 +22,27 @@ model Agent {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  roles                  AgentRole[]
-  evenementsActeur       Evenement[]    @relation("evenement_acteur")
-  demandesEnvoi          DemandeEnvoi[] @relation("demande_demandeur")
-  reservationsDemandeur  Reservation[]  @relation("reservation_demandeur")
-  reservationsAnnulateur Reservation[]  @relation("reservation_annulateur")
-  fichiersUploades       Fichier[]      @relation("fichier_uploader")
-  maquettesCreees        Maquette[]     @relation("maquette_createur")
-  maquettesMaj           Maquette[]     @relation("maquette_maj")
-  maquettesProprietaire  Maquette[]     @relation("maquette_proprietaire")
-  maquettesEmprunteur    Maquette[]     @relation("maquette_emprunteur")
-  maquettesReferent      Maquette[]     @relation("maquette_referent")
-  materielsCreees        Materiel[]     @relation("materiel_createur")
-  materielsMaj           Materiel[]     @relation("materiel_maj")
-  materielsResponsable   Materiel[]     @relation("materiel_responsable")
-  defautsDetectes        Defaut[]       @relation("defaut_detecteur")
-  rolesAccordes          AgentRole[]    @relation("role_granter")
+  roles                       AgentRole[]
+  evenementsActeur            Evenement[]         @relation("evenement_acteur")
+  demandesEnvoi               DemandeEnvoi[]      @relation("demande_demandeur")
+  demandesMagasinierEnvoi     DemandeEnvoi[]      @relation("demande_magasinier_envoi")
+  demandesMagasinierReception DemandeEnvoi[]      @relation("demande_magasinier_reception")
+  demandesMagasinierRetour    DemandeEnvoi[]      @relation("demande_magasinier_retour")
+  lignesValidees              DemandeEnvoiLigne[] @relation("ligne_validateur")
+  magasinierSites             MagasinierSite[]
+  reservationsDemandeur       Reservation[]       @relation("reservation_demandeur")
+  reservationsAnnulateur      Reservation[]       @relation("reservation_annulateur")
+  fichiersUploades            Fichier[]           @relation("fichier_uploader")
+  maquettesCreees             Maquette[]          @relation("maquette_createur")
+  maquettesMaj                Maquette[]          @relation("maquette_maj")
+  maquettesProprietaire       Maquette[]          @relation("maquette_proprietaire")
+  maquettesEmprunteur         Maquette[]          @relation("maquette_emprunteur")
+  maquettesReferent           Maquette[]          @relation("maquette_referent")
+  materielsCreees             Materiel[]          @relation("materiel_createur")
+  materielsMaj                Materiel[]          @relation("materiel_maj")
+  materielsResponsable        Materiel[]          @relation("materiel_responsable")
+  defautsDetectes             Defaut[]            @relation("defaut_detecteur")
+  rolesAccordes               AgentRole[]         @relation("role_granter")
 
   @@map("agents")
 }
@@ -65,6 +70,22 @@ model AgentRole {
 
   @@id([agentId, roleId])
   @@map("agent_roles")
+}
+
+/// Association magasinier ↔ site EDF.
+/// Un magasinier peut couvrir plusieurs sites ; un site peut avoir
+/// plusieurs magasiniers. Sert au routage des envois pour la validation
+/// d'expédition / réception.
+model MagasinierSite {
+  agentId   Int      @map("agent_id")
+  siteCode  String   @map("site_code")
+  grantedAt DateTime @default(now()) @map("granted_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, siteCode])
+  @@index([siteCode])
+  @@map("magasinier_sites")
 }
 
 // ─── MAQUETTES ──────────────────────────────────────────────────
@@ -121,28 +142,28 @@ model Maquette {
   valeurFinanciere Float?  @map("valeur_financiere")
 
   // PowerApps fields (full brief)
-  numeroFIEC              String?  @map("numero_fiec")
-  referenceUnique         Int?     @unique @map("reference_unique")
-  vieMaquette             String?  @map("vie_maquette")
-  historiqueTexte         String?  @map("historique_texte")
-  descriptionDefauts      String?  @map("description_defauts")
-  complementsLocalisation String?  @map("complements_localisation")
-  lienECM                 String?  @map("lien_ecm")
-  lienECMRFF              String?  @map("lien_ecm_rff")
-  lienPhotos              String?  @map("lien_photos")
-  pieces                  String?  @map("pieces")
-  produitsChimiques       Boolean  @default(false) @map("produits_chimiques")
-  emprunteurEntreprise    String?  @map("emprunteur_entreprise")
-  referentId              Int?     @map("referent_id")
-  amortissement           String?  @map("amortissement")
-  dureeVie                Int?     @map("duree_vie")
+  numeroFIEC              String? @map("numero_fiec")
+  referenceUnique         Int?    @unique @map("reference_unique")
+  vieMaquette             String? @map("vie_maquette")
+  historiqueTexte         String? @map("historique_texte")
+  descriptionDefauts      String? @map("description_defauts")
+  complementsLocalisation String? @map("complements_localisation")
+  lienECM                 String? @map("lien_ecm")
+  lienECMRFF              String? @map("lien_ecm_rff")
+  lienPhotos              String? @map("lien_photos")
+  pieces                  String? @map("pieces")
+  produitsChimiques       Boolean @default(false) @map("produits_chimiques")
+  emprunteurEntreprise    String? @map("emprunteur_entreprise")
+  referentId              Int?    @map("referent_id")
+  amortissement           String? @map("amortissement")
+  dureeVie                Int?    @map("duree_vie")
 
   // Colisage
-  colisageLongueur     Float?  @map("colisage_longueur")
-  colisageLargeur      Float?  @map("colisage_largeur")
-  colisageHauteur      Float?  @map("colisage_hauteur")
-  colisagePoids        Float?  @map("colisage_poids")
-  colisageDescription  String? @map("colisage_description")
+  colisageLongueur    Float?  @map("colisage_longueur")
+  colisageLargeur     Float?  @map("colisage_largeur")
+  colisageHauteur     Float?  @map("colisage_hauteur")
+  colisagePoids       Float?  @map("colisage_poids")
+  colisageDescription String? @map("colisage_description")
 
   // Localisation détaillée
   localisationSalle     String? @map("localisation_salle")
@@ -298,9 +319,38 @@ model DemandeEnvoi {
   souscriptionAssurance Boolean @default(false) @map("souscription_assurance")
   produitsChimiques     Boolean @default(false) @map("produits_chimiques")
 
-  demandeur Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
-  lignes    DemandeEnvoiLigne[]
-  fichiers  Fichier[]           @relation("fichier_demande")
+  // Workflow envoi/réception détaillé
+  /// INTERNE | EXTERNE_TITULAIRE | ETALONNAGE | PRET_INTERNE | PRET_EXTERNE
+  typeEnvoi             String?   @map("type_envoi")
+  /// Site origine (= site du magasinier qui expédie)
+  siteOrigine           String?   @map("site_origine")
+  /// Magasinier qui a expédié
+  magasinierEnvoiId     Int?      @map("magasinier_envoi_id")
+  /// Magasinier qui a réceptionné côté site destinataire (interne uniquement)
+  magasinierReceptionId Int?      @map("magasinier_reception_id")
+  /// Magasinier qui a réceptionné le retour
+  magasinierRetourId    Int?      @map("magasinier_retour_id")
+  /// Date de soumission par le demandeur
+  dateSoumission        DateTime? @map("date_soumission")
+  /// Date de validation globale (toutes lignes validées)
+  dateValidation        DateTime? @map("date_validation")
+  /// Date d'expédition par le magasinier
+  dateExpedition        DateTime? @map("date_expedition")
+  /// Date de retour estimée (étalonnage / prêt)
+  dateRetourEstimee     DateTime? @map("date_retour_estimee")
+  /// Date de récupération au site d'origine (clôture pour envois externes)
+  dateRetour            DateTime? @map("date_retour")
+  /// Date de clôture définitive
+  dateCloture           DateTime? @map("date_cloture")
+  /// Motif d'annulation / refus
+  motifAnnulation       String?   @map("motif_annulation")
+
+  demandeur           Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
+  magasinierEnvoi     Agent?              @relation("demande_magasinier_envoi", fields: [magasinierEnvoiId], references: [id])
+  magasinierReception Agent?              @relation("demande_magasinier_reception", fields: [magasinierReceptionId], references: [id])
+  magasinierRetour    Agent?              @relation("demande_magasinier_retour", fields: [magasinierRetourId], references: [id])
+  lignes              DemandeEnvoiLigne[]
+  fichiers            Fichier[]           @relation("fichier_demande")
 
   @@index([statut])
   @@map("demandes_envoi")
@@ -315,10 +365,29 @@ model DemandeEnvoiLigne {
   recue         Boolean   @default(false)
   dateReception DateTime? @map("date_reception")
 
-  demande  DemandeEnvoi @relation(fields: [demandeId], references: [id], onDelete: Cascade)
-  materiel Materiel?    @relation("ligne_materiel", fields: [materielId], references: [id])
-  maquette Maquette?    @relation("ligne_maquette", fields: [maquetteId], references: [id])
+  // Workflow par ligne (validation par référent, expédition, retour…)
+  /// EN_ATTENTE | VALIDEE | REFUSEE | EXPEDIEE | LIVREE | EN_RETOUR | RECUE_RETOUR | CLOTUREE
+  statut        String    @default("EN_ATTENTE")
+  /// Référent qui a validé/refusé (responsable matériel ou référent maquette)
+  validateurId  Int?      @map("validateur_id")
+  /// Date de validation/refus
+  valideeLe     DateTime? @map("validee_le")
+  /// Motif de refus
+  motifRefus    String?   @map("motif_refus")
+  /// Etat physique au départ (CORRECT/LEGER_DEFAUT/HS) renseigné par le magasinier
+  etatDepart    String?   @map("etat_depart")
+  /// Etat physique à la réception
+  etatReception String?   @map("etat_reception")
+  /// Etat physique au retour
+  etatRetour    String?   @map("etat_retour")
 
+  demande    DemandeEnvoi @relation(fields: [demandeId], references: [id], onDelete: Cascade)
+  materiel   Materiel?    @relation("ligne_materiel", fields: [materielId], references: [id])
+  maquette   Maquette?    @relation("ligne_maquette", fields: [maquetteId], references: [id])
+  validateur Agent?       @relation("ligne_validateur", fields: [validateurId], references: [id])
+
+  @@index([statut])
+  @@index([demandeId, statut])
   @@map("demande_envoi_lignes")
 }
 
