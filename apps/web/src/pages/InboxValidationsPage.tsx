@@ -55,7 +55,7 @@ const urgencePill: Record<string, string> = {
 };
 
 export default function InboxValidationsPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const [refuseFor, setRefuseFor] = useState<number | null>(null);
   const [refuseMotif, setRefuseMotif] = useState("");
@@ -103,8 +103,21 @@ export default function InboxValidationsPage() {
           Validations
         </h1>
         <p style={{ fontSize: 13, color: "var(--ink-3)" }}>
-          Cette vue est réservée aux référents matériels et maquettes.
+          Cette vue est réservée aux référents matériels et maquettes (rôles
+          requis : ADMIN, REFERENT_MATERIEL ou REFERENT_MAQUETTE).
         </p>
+        <p style={{ fontSize: 12.5, color: "var(--ink-3)", marginTop: 8 }}>
+          Connecté(e) en tant que <strong>{user?.email ?? "—"}</strong> · rôles
+          détectés : {user?.roles?.length ? user.roles.join(", ") : <em>aucun</em>}
+        </p>
+        <button
+          type="button"
+          className="obtn"
+          style={{ marginTop: 12 }}
+          onClick={() => void refreshUser()}
+        >
+          Recharger les rôles
+        </button>
       </div>
     );
   }

@@ -30,6 +30,7 @@ type AuthContextValue = {
   loginLocal: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue>({
@@ -40,6 +41,7 @@ const AuthContext = createContext<AuthContextValue>({
   loginLocal: async () => {},
   logout: async () => {},
   getAccessToken: async () => null,
+  refreshUser: async () => {},
 });
 
 const DEV_USER: User = {
@@ -117,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ) {
             const account = (event.payload as AuthenticationResult).account;
             pca.setActiveAccount(account);
-            setUserFromAccount(account);
+            void setUserFromAccount(account);
           }
         });
 
@@ -127,12 +129,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (response?.account) {
             pca.setActiveAccount(response.account);
-            setUserFromAccount(response.account);
+            await setUserFromAccount(response.account);
           } else {
             const accounts = pca.getAllAccounts();
             if (accounts.length > 0) {
               pca.setActiveAccount(accounts[0]);
-              setUserFromAccount(accounts[0]);
+              await setUserFromAccount(accounts[0]);
             }
           }
         } catch {
@@ -149,7 +151,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
-  const setUserFromAccount = (account: AccountInfo) => {
+  const setUserFromAccount = async (account: AccountInfo) => {
+    // Try to fetch the agent (with roles) from the backend using a fresh
+    // Microsoft token. Without this, the front would have an empty `roles`
+    // array even for ADMIN agents, blocking referent / magasinier views.
+    if (msalInstance) {
+      try {
+        const result = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account,
+        });
+        const token = result.idToken;
+        if (token) {
+          const res = await fetch("/api/v1/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const agent = await res.json();
+            setUser({
+              email: agent.email,
+              nom: agent.nom,
+              prenom: agent.prenom,
+              roles:
+                agent.roles?.map((r: { role: { code: string } }) => r.role.code) ?? [],
+            });
+            return;
+          }
+        }
+      } catch {
+        // Fallback handled below
+      }
+    }
+    // Fallback : at least populate name/email from the MSAL claims so the
+    // user can navigate, even if the role enrichment failed.
     const nameParts = (account.name ?? "").split(" ");
     setUser({
       email: account.username,
@@ -191,6 +225,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, [msalReady]);
 
+  const refreshUser = useCallback(async () => {
+    // Re-fetch the agent (with roles) from the backend. Useful when an
+    // admin updates roles for the current user — they can refresh without
+    // logging out / back in.
+    try {
+      const agent = await api.get<{
+        email: string;
+        nom: string;
+        prenom: string;
+        roles?: { role: { code: string } }[];
+      }>("/auth/me");
+      setUser({
+        email: agent.email,
+        nom: agent.nom,
+        prenom: agent.prenom,
+        roles: agent.roles?.map((r) => r.role.code) ?? [],
+      });
+    } catch {
+      // Silently fail; UI keeps the previous state
+    }
+  }, []);
+
   const getAccessToken = useCallback(async (): Promise<string | null> => {
     // Check local JWT first
     const localToken = localStorage.getItem(LOCAL_TOKEN_KEY);
@@ -226,6 +282,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginLocal,
         logout,
         getAccessToken,
+        refreshUser,
       }}
     >
       {children}
