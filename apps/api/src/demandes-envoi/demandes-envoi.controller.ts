@@ -18,6 +18,9 @@ import {
   updateDemandeEnvoiSchema,
   paginationSchema,
   refuseLigneSchema,
+  expedierSchema,
+  receptionnerSchema,
+  receptionnerRetourSchema,
 } from '@ogade/shared';
 import { z } from 'zod';
 import { DemandesEnvoiService } from './demandes-envoi.service';
@@ -166,5 +169,99 @@ export class DemandesEnvoiController {
       throw new BadRequestException(result.error.flatten());
     }
     return this.demandesEnvoiService.refuseLigne(id, ligneId, result.data.motif, user);
+  }
+
+  // ─── Phase 4 : module magasinier ─────────────────────────────
+
+  @Get('magasinier/inbox')
+  async magasinierInbox(
+    @CurrentUser() user: RequestUser | null,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    const pagination = paginationSchema.parse({ page, pageSize });
+    return this.demandesEnvoiService.findMagasinierInbox(user, pagination);
+  }
+
+  @Post(':id/preparer-expedition')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async prepareForShipping(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    return this.demandesEnvoiService.prepareForShipping(id, user);
+  }
+
+  @Post(':id/expedier')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async expedier(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    const result = expedierSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.demandesEnvoiService.expedier(id, result.data, user);
+  }
+
+  @Post(':id/receptionner')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async receptionner(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    const result = receptionnerSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.demandesEnvoiService.receptionner(id, result.data, user);
+  }
+
+  @Post(':id/preparer-retour')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async prepareReturn(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    return this.demandesEnvoiService.prepareReturn(id, user);
+  }
+
+  @Post(':id/receptionner-retour')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async receptionnerRetour(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    const result = receptionnerRetourSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.demandesEnvoiService.receptionnerRetour(id, result.data, user);
+  }
+
+  @Post(':id/cloturer')
+  @Roles('ADMIN', 'GESTIONNAIRE_MAGASIN', 'REFERENT_LOGISTIQUE')
+  @HttpCode(HttpStatus.OK)
+  async cloturer(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) throw new BadRequestException('Authenticated user required');
+    return this.demandesEnvoiService.cloturer(id, user);
   }
 }

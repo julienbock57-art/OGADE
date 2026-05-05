@@ -13,6 +13,7 @@ import DemandesEnvoiListPage from "@/pages/DemandesEnvoiListPage";
 import DemandeEnvoiDetailPage from "@/pages/DemandeEnvoiDetailPage";
 import DemandeEnvoiFormPage from "@/pages/DemandeEnvoiFormPage";
 import InboxValidationsPage from "@/pages/InboxValidationsPage";
+import MagasinierInboxPage from "@/pages/MagasinierInboxPage";
 import ReservationsListPage from "@/pages/ReservationsListPage";
 import CalendrierPage from "@/pages/CalendrierPage";
 import AgentsListPage from "@/pages/AgentsListPage";
@@ -74,6 +75,7 @@ export function AppRoutes() {
           element={<DemandeEnvoiDetailPage />}
         />
         <Route path="/validations" element={<InboxValidationsPage />} />
+        <Route path="/magasin" element={<MagasinierInboxPage />} />
         <Route path="/reservations" element={<ReservationsListPage />} />
         <Route path="/calendrier" element={<CalendrierPage />} />
         <Route path="/localisation" element={<LocalisationPage />} />

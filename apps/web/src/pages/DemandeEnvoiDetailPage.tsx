@@ -4,6 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { DemandeEnvoi } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import MagasinierActionModal, {
+  type ExpedierPayload,
+  type ReceptionPayload,
+  type ModalLigne,
+} from "@/components/MagasinierActionModal";
+import PhotoUploader from "@/components/PhotoUploader";
 
 const statutPill: Record<string, { cls: string; label: string }> = {
   BROUILLON:               { cls: "pill c-neutral", label: "Brouillon" },
@@ -56,6 +62,9 @@ interface Ligne {
   motifRefus?: string | null;
   valideeLe?: string | Date | null;
   dateReception?: string | Date | null;
+  etatDepart?: string | null;
+  etatReception?: string | null;
+  etatRetour?: string | null;
   validateur?: AgentLite | null;
   materiel?: {
     id: number;
@@ -79,8 +88,27 @@ interface Ligne {
 
 interface DemandeEnvoiDetail extends DemandeEnvoi {
   demandeur?: AgentLite | null;
+  magasinierEnvoi?: AgentLite | null;
+  magasinierReception?: AgentLite | null;
+  magasinierRetour?: AgentLite | null;
   lignes?: Ligne[];
 }
+
+function ligneToModalLigne(ligne: Ligne): ModalLigne {
+  const item = ligne.materiel ?? ligne.maquette;
+  return {
+    id: ligne.id,
+    reference: item?.reference ?? "—",
+    libelle: item?.libelle ?? "",
+    kind: ligne.materiel ? "materiel" : "maquette",
+  };
+}
+
+const etatLabel: Record<string, string> = {
+  CORRECT: "Correct",
+  LEGER_DEFAUT: "Léger défaut",
+  HS: "HS",
+};
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -108,6 +136,7 @@ export default function DemandeEnvoiDetailPage() {
   const queryClient = useQueryClient();
   const [refuseFor, setRefuseFor] = useState<number | null>(null);
   const [refuseMotif, setRefuseMotif] = useState("");
+  const [modalMode, setModalMode] = useState<null | "expedier" | "receptionner" | "receptionner-retour">(null);
 
   const {
     data: demande,
@@ -144,6 +173,39 @@ export default function DemandeEnvoiDetailPage() {
     },
   });
 
+  function invalidateMagasinier() {
+    queryClient.invalidateQueries({ queryKey: ["demandes-envoi", id] });
+    queryClient.invalidateQueries({ queryKey: ["demandes-envoi", "magasinier-inbox"] });
+  }
+
+  const prepareMut = useMutation({
+    mutationFn: () => api.post(`/demandes-envoi/${id}/preparer-expedition`, {}),
+    onSuccess: invalidateMagasinier,
+  });
+  const expedierMut = useMutation({
+    mutationFn: (payload: ExpedierPayload) =>
+      api.post(`/demandes-envoi/${id}/expedier`, payload),
+    onSuccess: () => { invalidateMagasinier(); setModalMode(null); },
+  });
+  const receptionnerMut = useMutation({
+    mutationFn: (payload: ReceptionPayload) =>
+      api.post(`/demandes-envoi/${id}/receptionner`, payload),
+    onSuccess: () => { invalidateMagasinier(); setModalMode(null); },
+  });
+  const prepareRetourMut = useMutation({
+    mutationFn: () => api.post(`/demandes-envoi/${id}/preparer-retour`, {}),
+    onSuccess: invalidateMagasinier,
+  });
+  const receptionnerRetourMut = useMutation({
+    mutationFn: (payload: ReceptionPayload) =>
+      api.post(`/demandes-envoi/${id}/receptionner-retour`, payload),
+    onSuccess: () => { invalidateMagasinier(); setModalMode(null); },
+  });
+  const cloturerMut = useMutation({
+    mutationFn: () => api.post(`/demandes-envoi/${id}/cloturer`, {}),
+    onSuccess: invalidateMagasinier,
+  });
+
   if (isLoading) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "32px 0", color: "var(--ink-3)", fontSize: 13 }}>
@@ -162,6 +224,11 @@ export default function DemandeEnvoiDetailPage() {
   const isReferent =
     isAdmin ||
     (user?.roles ?? []).some((r) => r === "REFERENT_MATERIEL" || r === "REFERENT_MAQUETTE");
+  const isMagasinier =
+    isAdmin ||
+    (user?.roles ?? []).some(
+      (r) => r === "GESTIONNAIRE_MAGASIN" || r === "REFERENT_LOGISTIQUE",
+    );
   const canSubmit =
     demande.statut === "BROUILLON" &&
     !!user &&
@@ -170,6 +237,36 @@ export default function DemandeEnvoiDetailPage() {
     (demande.lignes?.length ?? 0) > 0;
   const validationOpen =
     demande.statut === "SOUMISE" || demande.statut === "VALIDEE_PARTIELLEMENT";
+
+  const lignesEligibles =
+    modalMode === "expedier"
+      ? (demande.lignes ?? []).filter((l) => l.statut === "VALIDEE").map(ligneToModalLigne)
+      : modalMode === "receptionner"
+        ? (demande.lignes ?? []).filter((l) => l.statut === "EXPEDIEE").map(ligneToModalLigne)
+        : modalMode === "receptionner-retour"
+          ? (demande.lignes ?? []).filter((l) => l.statut === "EN_RETOUR").map(ligneToModalLigne)
+          : [];
+
+  const canPrepare = isMagasinier && demande.statut === "VALIDEE";
+  const canExpedier = isMagasinier && (demande.statut === "PRETE_A_EXPEDIER" || demande.statut === "VALIDEE");
+  const canReceptionner = isMagasinier && demande.statut === "EN_TRANSIT";
+  const isLoanOrCalibration =
+    demande.typeEnvoi === "ETALONNAGE" ||
+    demande.typeEnvoi === "PRET_INTERNE" ||
+    demande.typeEnvoi === "PRET_EXTERNE";
+  const canPrepareReturn =
+    isMagasinier && isLoanOrCalibration &&
+    (demande.statut === "EN_COURS" || demande.statut === "LIVREE_TITULAIRE");
+  const canReceptionnerRetour = isMagasinier && demande.statut === "EN_RETOUR";
+  const canCloturer = isMagasinier &&
+    (demande.statut === "RECUE" || demande.statut === "RECUE_RETOUR" || demande.statut === "LIVREE_TITULAIRE");
+
+  const showTransport = !!(
+    demande.numeroBonTransport ||
+    demande.transporteur ||
+    demande.dateExpedition
+  );
+  const photosVisible = demande.statut !== "BROUILLON" && demande.statut !== "SOUMISE";
 
   function canActOn(ligne: Ligne): boolean {
     if (!validationOpen || ligne.statut !== "EN_ATTENTE") return false;
@@ -209,15 +306,83 @@ export default function DemandeEnvoiDetailPage() {
               {submitMut.isPending ? "Soumission…" : "Soumettre pour validation"}
             </button>
           )}
+          {canPrepare && (
+            <button
+              className="obtn"
+              type="button"
+              disabled={prepareMut.isPending}
+              onClick={() => prepareMut.mutate()}
+            >
+              {prepareMut.isPending ? "…" : "Prendre en charge"}
+            </button>
+          )}
+          {canExpedier && (
+            <button
+              className="obtn accent"
+              type="button"
+              onClick={() => setModalMode("expedier")}
+            >
+              Expédier
+            </button>
+          )}
+          {canReceptionner && (
+            <button
+              className="obtn accent"
+              type="button"
+              onClick={() => setModalMode("receptionner")}
+            >
+              Réceptionner
+            </button>
+          )}
+          {canPrepareReturn && (
+            <button
+              className="obtn"
+              type="button"
+              disabled={prepareRetourMut.isPending}
+              onClick={() => {
+                if (confirm("Marquer cette demande comme prête au retour ?")) {
+                  prepareRetourMut.mutate();
+                }
+              }}
+            >
+              {prepareRetourMut.isPending ? "…" : "Préparer le retour"}
+            </button>
+          )}
+          {canReceptionnerRetour && (
+            <button
+              className="obtn accent"
+              type="button"
+              onClick={() => setModalMode("receptionner-retour")}
+            >
+              Réceptionner le retour
+            </button>
+          )}
+          {canCloturer && (
+            <button
+              className="obtn"
+              type="button"
+              disabled={cloturerMut.isPending}
+              onClick={() => {
+                if (confirm("Clôturer définitivement cette demande ?")) {
+                  cloturerMut.mutate();
+                }
+              }}
+            >
+              {cloturerMut.isPending ? "…" : "Clôturer"}
+            </button>
+          )}
           <Link to="/demandes-envoi" className="obtn" style={{ textDecoration: "none" }}>
             Retour à la liste
           </Link>
         </div>
       </div>
 
-      {submitMut.isError && (
+      {(submitMut.isError ||
+        prepareMut.isError ||
+        prepareRetourMut.isError ||
+        cloturerMut.isError) && (
         <div className="alert" style={{ marginBottom: 12, color: "var(--rose)", fontSize: 12.5 }}>
-          {(submitMut.error as Error).message}
+          {((submitMut.error ?? prepareMut.error ?? prepareRetourMut.error ?? cloturerMut.error) as Error)?.message}
         </div>
       )}
 
@@ -233,6 +398,7 @@ export default function DemandeEnvoiDetailPage() {
             <span className={pill.cls}><span className="dot" />{pill.label}</span>
           </Field>
           <Field label="Destinataire">{demande.destinataire}</Field>
+          <Field label="Site origine">{demande.siteOrigine ?? "—"}</Field>
           <Field label="Site destinataire">{demande.siteDestinataire ?? "—"}</Field>
           <Field label="Motif">{demande.motif ?? "—"}</Field>
           <Field label="Date souhaitée">{formatDate(demande.dateSouhaitee)}</Field>
@@ -248,6 +414,57 @@ export default function DemandeEnvoiDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Transport (visible dès qu'expédiée) */}
+      {showTransport && (
+        <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
+          <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
+            Transport
+          </h2>
+          <div className="detail-grid-2" style={{ gap: "16px 32px" }}>
+            <Field label="Bon de transport">{demande.numeroBonTransport ?? "—"}</Field>
+            <Field label="Transporteur">{demande.transporteur ?? "—"}</Field>
+            <Field label="Date d'expédition">{formatDate(demande.dateExpedition)}</Field>
+            <Field label="Date de retour">{formatDate(demande.dateRetour)}</Field>
+            <Field label="Magasinier expédition">
+              {demande.magasinierEnvoi ? `${demande.magasinierEnvoi.prenom} ${demande.magasinierEnvoi.nom}` : "—"}
+            </Field>
+            <Field label="Magasinier réception">
+              {demande.magasinierReception ? `${demande.magasinierReception.prenom} ${demande.magasinierReception.nom}` : "—"}
+            </Field>
+            {demande.commentaireExpedition && (
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Field label="Commentaire expédition">
+                  <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{demande.commentaireExpedition}</p>
+                </Field>
+              </div>
+            )}
+            {demande.commentaireReception && (
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Field label="Commentaire réception">
+                  <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{demande.commentaireReception}</p>
+                </Field>
+              </div>
+            )}
+            {demande.commentaireRetour && (
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Field label="Commentaire retour">
+                  <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{demande.commentaireRetour}</p>
+                </Field>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Photos */}
+      {photosVisible && id && (
+        <PhotoUploader
+          demandeId={Number(id)}
+          title="Photos"
+          readOnly={!isMagasinier}
+        />
+      )}
 
       {/* Lignes */}
       {demande.lignes && demande.lignes.length > 0 && (
@@ -280,6 +497,15 @@ export default function DemandeEnvoiDetailPage() {
                   <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12, color: "var(--ink-3)", flexWrap: "wrap" }}>
                     <span>Qté : {ligne.quantite}</span>
                     <span>Référent : {ligneReferentName(ligne)}</span>
+                    {ligne.etatDepart && (
+                      <span>État départ : {etatLabel[ligne.etatDepart] ?? ligne.etatDepart}</span>
+                    )}
+                    {ligne.etatReception && (
+                      <span>État réception : {etatLabel[ligne.etatReception] ?? ligne.etatReception}</span>
+                    )}
+                    {ligne.etatRetour && (
+                      <span>État retour : {etatLabel[ligne.etatRetour] ?? ligne.etatRetour}</span>
+                    )}
                     {ligne.validateur && (
                       <span>
                         {ligne.statut === "REFUSEE" ? "Refusée" : "Validée"} par{" "}
@@ -364,6 +590,40 @@ export default function DemandeEnvoiDetailPage() {
             </div>
           )}
         </div>
+      )}
+
+      {modalMode === "expedier" && (
+        <MagasinierActionModal
+          mode="expedier"
+          title="Expédier la demande"
+          lignes={lignesEligibles}
+          onClose={() => setModalMode(null)}
+          submitting={expedierMut.isPending}
+          error={(expedierMut.error as Error | null)?.message ?? null}
+          onSubmit={(payload) => expedierMut.mutate(payload)}
+        />
+      )}
+      {modalMode === "receptionner" && (
+        <MagasinierActionModal
+          mode="receptionner"
+          title="Réceptionner la demande"
+          lignes={lignesEligibles}
+          onClose={() => setModalMode(null)}
+          submitting={receptionnerMut.isPending}
+          error={(receptionnerMut.error as Error | null)?.message ?? null}
+          onSubmit={(payload) => receptionnerMut.mutate(payload)}
+        />
+      )}
+      {modalMode === "receptionner-retour" && (
+        <MagasinierActionModal
+          mode="receptionner-retour"
+          title="Réceptionner le retour"
+          lignes={lignesEligibles}
+          onClose={() => setModalMode(null)}
+          submitting={receptionnerRetourMut.isPending}
+          error={(receptionnerRetourMut.error as Error | null)?.message ?? null}
+          onSubmit={(payload) => receptionnerRetourMut.mutate(payload)}
+        />
       )}
     </div>
   );

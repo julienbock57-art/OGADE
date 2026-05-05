@@ -92,7 +92,38 @@ export const validateLignesBatchSchema = z.object({
   ligneIds: z.array(z.number().int().positive()).min(1),
 });
 
+const ETATS_PHYSIQUES = ["CORRECT", "LEGER_DEFAUT", "HS"] as const;
+
+const ligneEtatSchema = z.object({
+  ligneId: z.number().int().positive(),
+  etat: z.enum(ETATS_PHYSIQUES),
+});
+
+export const expedierSchema = z.object({
+  numeroBonTransport: z.string().min(1, "Numéro de bon de transport requis"),
+  transporteur: z.string().min(1, "Transporteur requis"),
+  dateExpedition: z.coerce.date().optional(),
+  commentaire: z.string().optional(),
+  lignesEtat: z.array(ligneEtatSchema).default([]),
+});
+
+export const receptionnerSchema = z.object({
+  dateReception: z.coerce.date().optional(),
+  commentaire: z.string().optional(),
+  lignesEtat: z.array(ligneEtatSchema).default([]),
+});
+
+export const receptionnerRetourSchema = z.object({
+  dateRetour: z.coerce.date().optional(),
+  commentaire: z.string().optional(),
+  lignesEtat: z.array(ligneEtatSchema).default([]),
+});
+
 export type CreateDemandeEnvoiInput = z.infer<typeof createDemandeEnvoiSchema>;
 export type UpdateDemandeEnvoiInput = z.infer<typeof updateDemandeEnvoiSchema>;
 export type RefuseLigneInput = z.infer<typeof refuseLigneSchema>;
 export type ValidateLignesBatchInput = z.infer<typeof validateLignesBatchSchema>;
+export type ExpedierInput = z.infer<typeof expedierSchema>;
+export type ReceptionnerInput = z.infer<typeof receptionnerSchema>;
+export type ReceptionnerRetourInput = z.infer<typeof receptionnerRetourSchema>;
+export type EtatPhysique = (typeof ETATS_PHYSIQUES)[number];

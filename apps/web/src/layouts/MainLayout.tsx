@@ -64,6 +64,7 @@ const navSections = [
     items: [
       { to: "/demandes-envoi", label: "Envois & retours", icon: "swap" },
       { to: "/validations", label: "Validations référent", icon: "check" },
+      { to: "/magasin", label: "Magasin", icon: "truck" },
       { to: "/calendrier", label: "Calendrier matériel", icon: "cal" },
       { to: "/reservations", label: "Réservations", icon: "star" },
     ],
