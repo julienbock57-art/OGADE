@@ -344,6 +344,16 @@ model DemandeEnvoi {
   dateCloture           DateTime? @map("date_cloture")
   /// Motif d'annulation / refus
   motifAnnulation       String?   @map("motif_annulation")
+  /// Numéro du bon de transport (renseigné à l'expédition)
+  numeroBonTransport    String?   @map("numero_bon_transport")
+  /// Transporteur (renseigné à l'expédition)
+  transporteur          String?   @map("transporteur")
+  /// Commentaire magasinier à l'expédition
+  commentaireExpedition String?   @map("commentaire_expedition")
+  /// Commentaire magasinier à la réception
+  commentaireReception  String?   @map("commentaire_reception")
+  /// Commentaire magasinier à la réception du retour
+  commentaireRetour     String?   @map("commentaire_retour")
 
   demandeur           Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   magasinierEnvoi     Agent?              @relation("demande_magasinier_envoi", fields: [magasinierEnvoiId], references: [id])

@@ -107,6 +107,12 @@ export type DemandeEnvoi = {
   dateRetour?: string | Date | null;
   dateCloture?: string | Date | null;
   motifAnnulation?: string | null;
+  // Workflow Phase 4 (transport / magasinier)
+  numeroBonTransport?: string | null;
+  transporteur?: string | null;
+  commentaireExpedition?: string | null;
+  commentaireReception?: string | null;
+  commentaireRetour?: string | null;
   createdAt: string | Date;
   updatedAt: string | Date;
 };
