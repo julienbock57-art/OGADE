@@ -28,6 +28,7 @@ function Icon({ name, size = 14 }: { name: string; size?: number }) {
     chevr:    "M7.5 4.17L13.33 10l-5.83 5.83",
     menu:     "M4 5h12M4 10h12M4 15h12",
     x:        "M5 5l10 10M15 5L5 15",
+    check:    "M4 10l4 4 8-8",
   };
   const d = paths[name] || "";
   return (
@@ -62,6 +63,7 @@ const navSections = [
     label: "Mouvements",
     items: [
       { to: "/demandes-envoi", label: "Envois & retours", icon: "swap" },
+      { to: "/validations", label: "Validations référent", icon: "check" },
       { to: "/calendrier", label: "Calendrier matériel", icon: "cal" },
       { to: "/reservations", label: "Réservations", icon: "star" },
     ],
