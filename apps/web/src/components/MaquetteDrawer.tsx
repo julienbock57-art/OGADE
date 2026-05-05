@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Defaut, Evenement, Fichier, Maquette } from "@ogade/shared";
 import { api } from "@/lib/api";
+import { usePanier } from "@/lib/panier";
 import {
   MQ_ETAT_PILL,
   defautColor,
@@ -412,6 +413,7 @@ export default function MaquetteDrawer({
   mode = "drawer",
 }: MaquetteDrawerProps) {
   const [tab, setTab] = useState<TabId>(initialTab);
+  const panier = usePanier();
   const isPage = mode === "page";
   const defauts: Defaut[] = m.defauts ?? [];
 
@@ -522,6 +524,21 @@ export default function MaquetteDrawer({
         )}
       </div>
       <div className="right">
+        <button
+          type="button"
+          className="obtn"
+          disabled={panier.has("maquette", m.id)}
+          onClick={() => panier.add({
+            kind: "maquette",
+            id: m.id,
+            reference: m.reference,
+            libelle: m.libelle,
+            site: m.site ?? null,
+            typeMaquette: m.typeMaquette ?? null,
+          })}
+        >
+          {panier.has("maquette", m.id) ? "✓ Dans le panier" : "+ Ajouter au panier"}
+        </button>
         <Link to={`/maquettes/${m.id}/edit`} className="obtn accent">
           <Icon name="edit" size={13} />
           Modifier

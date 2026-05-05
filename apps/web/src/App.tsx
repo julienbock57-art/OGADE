@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { SettingsProvider } from "@/lib/settings";
+import { PanierProvider } from "@/lib/panier";
 import { setTokenGetter } from "@/lib/api";
 import { AppRoutes } from "@/routes";
 
@@ -28,11 +29,13 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SettingsProvider>
-          <TokenBridge>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TokenBridge>
+          <PanierProvider>
+            <TokenBridge>
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TokenBridge>
+          </PanierProvider>
         </SettingsProvider>
       </AuthProvider>
     </QueryClientProvider>

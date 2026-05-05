@@ -3,7 +3,9 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import QrScannerModal from "@/components/QrScannerModal";
 import SettingsModal from "@/components/SettingsModal";
+import PanierDrawer from "@/components/PanierDrawer";
 import ChatWidget from "@/components/ChatWidget";
+import { usePanier } from "@/lib/panier";
 
 function Icon({ name, size = 14 }: { name: string; size?: number }) {
   const paths: Record<string, string> = {
@@ -12,6 +14,7 @@ function Icon({ name, size = 14 }: { name: string; size?: number }) {
     box:      "M3 6l7-3 7 3v8l-7 3-7-3V6z M3 6l7 3 7-3 M10 9v8",
     truck:    "M2 5h10v9H2z M12 8h4l2 3v3h-6 M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3 M14 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3",
     user:     "M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M4 17a6 6 0 0 1 12 0",
+    cart:     "M3 4h2l2 9h10l2-7H7 M8 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2 M16 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2",
     star:     "M10 3l2.3 4.6 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2L2.5 8.4l5.2-.8L10 3z",
     alert:    "M10 7v4m0 2v.01 M2 16L10 3l8 13H2z",
     swap:     "M5 7h11l-3-3 M15 13H4l3 3",
@@ -83,6 +86,8 @@ export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showPanier, setShowPanier] = useState(false);
+  const { count: panierCount } = usePanier();
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem("ogade_sidebar") === "collapsed"; } catch { return false; }
   });
@@ -205,6 +210,35 @@ export default function MainLayout() {
             <button
               type="button"
               className="icon-btn"
+              title="Panier d'envoi"
+              aria-label="Panier d'envoi"
+              onClick={() => setShowPanier(true)}
+              style={{ position: "relative" }}
+            >
+              <Icon name="cart" size={14} />
+              {panierCount > 0 && (
+                <span
+                  aria-label={`${panierCount} item${panierCount > 1 ? "s" : ""} dans le panier`}
+                  style={{
+                    position: "absolute",
+                    top: -2, right: -2,
+                    background: "var(--accent)",
+                    color: "white",
+                    fontSize: 10, fontWeight: 700,
+                    minWidth: 16, height: 16, padding: "0 4px",
+                    borderRadius: 999,
+                    display: "grid", placeItems: "center",
+                    lineHeight: 1,
+                    boxShadow: "0 0 0 2px var(--bg-panel)",
+                  }}
+                >
+                  {panierCount > 99 ? "99+" : panierCount}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
               title="Paramètres"
               aria-label="Paramètres"
               onClick={() => setShowSettings(true)}
@@ -222,6 +256,7 @@ export default function MainLayout() {
 
       {showScanner && <QrScannerModal onClose={() => setShowScanner(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showPanier && <PanierDrawer onClose={() => setShowPanier(false)} />}
       <ChatWidget />
     </div>
   );

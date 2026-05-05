@@ -7,6 +7,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 import Pagination from "@/components/Pagination";
 import MaterielDrawer from "@/components/MaterielDrawer";
+import { usePanier } from "@/lib/panier";
 
 type Stats = { total: number; echus: number; prochains: number; enPret: number; hs: number; incomplets: number };
 
@@ -192,6 +193,7 @@ export default function MaterielsListPage() {
   const [selection, setSelection] = useState<Set<number>>(new Set());
   const [cart, setCart] = useState<Map<number, Materiel>>(new Map());
   const [cartOpen, setCartOpen] = useState(false);
+  const panier = usePanier();
   const { page, setPage, queryParams } = usePagination();
 
   const { data: etats } = useReferentiel("ETAT_MATERIEL");
@@ -234,7 +236,17 @@ export default function MaterielsListPage() {
     const allIds = new Set(rows.map(r => r.id));
     return rows.every(r => s.has(r.id)) ? new Set<number>() : allIds;
   }), [rows]);
-  const addCart = useCallback((m: Materiel) => setCart(c => { const n = new Map(c); n.set(m.id, m); return n; }), []);
+  const addCart = useCallback((m: Materiel) => {
+    setCart(c => { const n = new Map(c); n.set(m.id, m); return n; });
+    panier.add({
+      kind: "materiel",
+      id: m.id,
+      reference: m.reference,
+      libelle: m.libelle,
+      site: m.site ?? null,
+      typeMateriel: m.typeMateriel ?? null,
+    });
+  }, [panier]);
   const removeCart = useCallback((id: number) => setCart(c => { const n = new Map(c); n.delete(id); return n; }), []);
   const clearCart = useCallback(() => setCart(new Map()), []);
   const addSelectionToCart = useCallback(() => {
