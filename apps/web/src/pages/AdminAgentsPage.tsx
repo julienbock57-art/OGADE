@@ -64,11 +64,35 @@ export default function AdminAgentsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [managingRolesId, setManagingRolesId] = useState<number | null>(null);
   const [passwordAgentId, setPasswordAgentId] = useState<number | null>(null);
+  const [sitesAgentId, setSitesAgentId] = useState<number | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
   const { data, isLoading } = useQuery<{ data: AgentWithRoles[]; total: number }>({
     queryKey: ["agents"],
     queryFn: () => api.get("/agents", { pageSize: 100 }),
+  });
+
+  const { data: allSites } = useQuery<{ code: string; label: string }[]>({
+    queryKey: ["sites"],
+    queryFn: () => api.get("/sites"),
+  });
+
+  const { data: agentSites = [] } = useQuery<{ siteCode: string; agentId: number; grantedAt: string }[]>({
+    queryKey: ["agent-magasinier-sites", sitesAgentId],
+    queryFn: () => api.get(`/agents/${sitesAgentId}/magasinier-sites`),
+    enabled: sitesAgentId != null,
+  });
+
+  const addSiteMut = useMutation({
+    mutationFn: ({ id, siteCode }: { id: number; siteCode: string }) =>
+      api.post(`/agents/${id}/magasinier-sites`, { siteCode }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agent-magasinier-sites", sitesAgentId] }),
+  });
+
+  const removeSiteMut = useMutation({
+    mutationFn: ({ id, siteCode }: { id: number; siteCode: string }) =>
+      api.delete(`/agents/${id}/magasinier-sites/${siteCode}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agent-magasinier-sites", sitesAgentId] }),
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["agents"] });
@@ -462,6 +486,66 @@ export default function AdminAgentsPage() {
                           )}
                         </div>
                       )}
+
+                      {/* Magasinier sites panel */}
+                      {sitesAgentId === agent.id && (
+                        <div style={{
+                          marginTop: 10, padding: "10px 12px",
+                          background: "var(--bg-sunken)", borderRadius: 9,
+                          border: "1px solid var(--line)",
+                        }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-3)", marginBottom: 8, marginTop: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Sites magasinier
+                          </p>
+                          <p style={{ fontSize: 12, color: "var(--ink-3)", margin: "0 0 10px" }}>
+                            Cocher les sites pour lesquels cet agent est magasinier (rôle GESTIONNAIRE_MAGASIN ou REFERENT_LOGISTIQUE recommandé).
+                          </p>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                            {(allSites ?? []).map((site) => {
+                              const has = agentSites.some((s) => s.siteCode === site.code);
+                              const pending = addSiteMut.isPending || removeSiteMut.isPending;
+                              return (
+                                <button
+                                  key={site.code}
+                                  type="button"
+                                  disabled={pending}
+                                  onClick={() => {
+                                    if (has) removeSiteMut.mutate({ id: agent.id, siteCode: site.code });
+                                    else addSiteMut.mutate({ id: agent.id, siteCode: site.code });
+                                  }}
+                                  style={{
+                                    appearance: "none",
+                                    display: "inline-flex", alignItems: "center", gap: 4,
+                                    padding: "4px 10px", borderRadius: 999,
+                                    fontSize: 11.5, fontWeight: 500,
+                                    cursor: pending ? "wait" : "pointer", transition: "all 0.12s",
+                                    background: has ? "var(--accent)" : "var(--bg-panel)",
+                                    color: has ? "white" : "var(--ink-2)",
+                                    border: has ? "1px solid var(--accent)" : "1px solid var(--line)",
+                                  }}
+                                >
+                                  {has && (
+                                    <svg width="12" height="12" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M4.17 10.83l3.33 3.34 8.33-6.67" />
+                                    </svg>
+                                  )}
+                                  {site.label}
+                                </button>
+                              );
+                            })}
+                            {(allSites ?? []).length === 0 && (
+                              <span style={{ fontSize: 12, color: "var(--ink-3)" }}>
+                                Aucun site disponible — créez-en dans <Link to="/admin/sites" style={{ color: "var(--accent)" }}>Référentiels &gt; Sites</Link>
+                              </span>
+                            )}
+                          </div>
+                          {(addSiteMut.isError || removeSiteMut.isError) && (
+                            <p style={{ marginTop: 8, color: "var(--rose)", fontSize: 12 }}>
+                              {((addSiteMut.error ?? removeSiteMut.error) as Error)?.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td style={tdStyle}>
                       <button
@@ -533,6 +617,35 @@ export default function AdminAgentsPage() {
                         >
                           <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12.5 5.83a1.67 1.67 0 011.67 1.67m3.33 0a5 5 0 01-6.45 4.79L9.17 14.17H7.5V15.83H5.83V17.5H3.33a.83.83 0 01-.83-.83v-2.15a.83.83 0 01.24-.59l4.97-4.97A5 5 0 1117.5 7.5z" />
+                          </svg>
+                        </button>
+
+                        {/* Magasinier sites */}
+                        <button
+                          onClick={() => setSitesAgentId(sitesAgentId === agent.id ? null : agent.id)}
+                          style={{
+                            appearance: "none", border: "none",
+                            background: sitesAgentId === agent.id ? "var(--accent-soft)" : "none",
+                            padding: 6, borderRadius: 7,
+                            color: sitesAgentId === agent.id ? "var(--accent-ink)" : "var(--ink-3)",
+                            cursor: "default", display: "flex", transition: "color 0.12s, background 0.12s",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (sitesAgentId !== agent.id) {
+                              e.currentTarget.style.color = "var(--accent-ink)";
+                              e.currentTarget.style.background = "var(--accent-soft)";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (sitesAgentId !== agent.id) {
+                              e.currentTarget.style.color = "var(--ink-3)";
+                              e.currentTarget.style.background = "none";
+                            }
+                          }}
+                          title="Sites magasinier"
+                        >
+                          <svg width="16" height="16" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 5h10v9H2z M12 8h4l2 3v3h-6 M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3 M14 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
                           </svg>
                         </button>
 

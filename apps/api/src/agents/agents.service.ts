@@ -103,6 +103,36 @@ export class AgentsService {
     return this.findOne(agentId);
   }
 
+  async listMagasinierSites(agentId: number) {
+    await this.findOne(agentId);
+    return this.prisma.magasinierSite.findMany({
+      where: { agentId },
+      orderBy: { siteCode: 'asc' },
+    });
+  }
+
+  async addMagasinierSite(agentId: number, siteCode: string) {
+    await this.findOne(agentId);
+    const site = await this.prisma.site.findUnique({ where: { code: siteCode } });
+    if (!site) {
+      throw new NotFoundException(`Site "${siteCode}" not found`);
+    }
+    await this.prisma.magasinierSite.upsert({
+      where: { agentId_siteCode: { agentId, siteCode } },
+      create: { agentId, siteCode },
+      update: {},
+    });
+    return this.listMagasinierSites(agentId);
+  }
+
+  async removeMagasinierSite(agentId: number, siteCode: string) {
+    await this.findOne(agentId);
+    await this.prisma.magasinierSite.deleteMany({
+      where: { agentId, siteCode },
+    });
+    return this.listMagasinierSites(agentId);
+  }
+
   async remove(id: number) {
     await this.findOne(id);
 
@@ -127,6 +157,7 @@ export class AgentsService {
       this.prisma.evenement.updateMany({ where: { acteurId: id }, data: { acteurId: null } }),
       this.prisma.fichier.updateMany({ where: { uploadedById: id }, data: { uploadedById: null } }),
       this.prisma.agentRole.updateMany({ where: { grantedBy: id }, data: { grantedBy: null } }),
+      this.prisma.magasinierSite.deleteMany({ where: { agentId: id } }),
       this.prisma.agent.delete({ where: { id } }),
     ]);
   }
