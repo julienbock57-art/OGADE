@@ -84,5 +84,15 @@ export const updateDemandeEnvoiSchema = z.object({
   statut: z.enum(ALL_STATUTS).optional(),
 });
 
+export const refuseLigneSchema = z.object({
+  motif: z.string().min(3, "Le motif de refus est obligatoire"),
+});
+
+export const validateLignesBatchSchema = z.object({
+  ligneIds: z.array(z.number().int().positive()).min(1),
+});
+
 export type CreateDemandeEnvoiInput = z.infer<typeof createDemandeEnvoiSchema>;
 export type UpdateDemandeEnvoiInput = z.infer<typeof updateDemandeEnvoiSchema>;
+export type RefuseLigneInput = z.infer<typeof refuseLigneSchema>;
+export type ValidateLignesBatchInput = z.infer<typeof validateLignesBatchSchema>;

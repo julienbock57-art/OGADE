@@ -12,6 +12,7 @@ import MaquetteFormPage from "@/pages/MaquetteFormPage";
 import DemandesEnvoiListPage from "@/pages/DemandesEnvoiListPage";
 import DemandeEnvoiDetailPage from "@/pages/DemandeEnvoiDetailPage";
 import DemandeEnvoiFormPage from "@/pages/DemandeEnvoiFormPage";
+import InboxValidationsPage from "@/pages/InboxValidationsPage";
 import ReservationsListPage from "@/pages/ReservationsListPage";
 import CalendrierPage from "@/pages/CalendrierPage";
 import AgentsListPage from "@/pages/AgentsListPage";
@@ -72,6 +73,7 @@ export function AppRoutes() {
           path="/demandes-envoi/:id"
           element={<DemandeEnvoiDetailPage />}
         />
+        <Route path="/validations" element={<InboxValidationsPage />} />
         <Route path="/reservations" element={<ReservationsListPage />} />
         <Route path="/calendrier" element={<CalendrierPage />} />
         <Route path="/localisation" element={<LocalisationPage />} />

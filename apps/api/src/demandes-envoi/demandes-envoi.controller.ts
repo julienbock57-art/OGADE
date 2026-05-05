@@ -17,10 +17,12 @@ import {
   createDemandeEnvoiSchema,
   updateDemandeEnvoiSchema,
   paginationSchema,
+  refuseLigneSchema,
 } from '@ogade/shared';
 import { z } from 'zod';
 import { DemandesEnvoiService } from './demandes-envoi.service';
 import { CurrentUser, RequestUser } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.decorator';
 
 const addLigneSchema = z.object({
   materielId: z.number().optional(),
@@ -50,6 +52,19 @@ export class DemandesEnvoiController {
       statut,
       type,
     });
+  }
+
+  @Get('inbox')
+  async inbox(
+    @CurrentUser() user: RequestUser | null,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    if (!user) {
+      throw new BadRequestException('Authenticated user required');
+    }
+    const pagination = paginationSchema.parse({ page, pageSize });
+    return this.demandesEnvoiService.findInbox(user.agentId, pagination);
   }
 
   @Get(':id')
@@ -106,5 +121,50 @@ export class DemandesEnvoiController {
     @Param('ligneId', ParseIntPipe) ligneId: number,
   ) {
     await this.demandesEnvoiService.removeLigne(id, ligneId);
+  }
+
+  @Post(':id/submit')
+  @HttpCode(HttpStatus.OK)
+  async submit(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) {
+      throw new BadRequestException('Authenticated user required');
+    }
+    return this.demandesEnvoiService.submit(id, user.agentId);
+  }
+
+  @Post(':id/lignes/:ligneId/validate')
+  @Roles('ADMIN', 'REFERENT_MATERIEL', 'REFERENT_MAQUETTE')
+  @HttpCode(HttpStatus.OK)
+  async validateLigne(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('ligneId', ParseIntPipe) ligneId: number,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) {
+      throw new BadRequestException('Authenticated user required');
+    }
+    return this.demandesEnvoiService.validateLigne(id, ligneId, user);
+  }
+
+  @Post(':id/lignes/:ligneId/refuse')
+  @Roles('ADMIN', 'REFERENT_MATERIEL', 'REFERENT_MAQUETTE')
+  @HttpCode(HttpStatus.OK)
+  async refuseLigne(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('ligneId', ParseIntPipe) ligneId: number,
+    @Body() body: any,
+    @CurrentUser() user: RequestUser | null,
+  ) {
+    if (!user) {
+      throw new BadRequestException('Authenticated user required');
+    }
+    const result = refuseLigneSchema.safeParse(body);
+    if (!result.success) {
+      throw new BadRequestException(result.error.flatten());
+    }
+    return this.demandesEnvoiService.refuseLigne(id, ligneId, result.data.motif, user);
   }
 }
