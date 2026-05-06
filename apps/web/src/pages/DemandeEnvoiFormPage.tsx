@@ -119,6 +119,22 @@ export default function DemandeEnvoiFormPage() {
     if (siteOrigine) setValue("siteOrigine", siteOrigine);
   }, [siteOrigine, setValue]);
 
+  // Synchronise `type` et `lignes` depuis le panier — sinon le resolver
+  // Zod voit toujours `lignes: []` et bloque la soumission avec
+  // "doit contenir au moins un item".
+  useEffect(() => {
+    setValue("type", typeDemande as any);
+    setValue(
+      "lignes",
+      panier.items.map((it) =>
+        it.kind === "materiel"
+          ? { materielId: it.id, quantite: 1 }
+          : { maquetteId: it.id, quantite: 1 },
+      ),
+      { shouldValidate: false },
+    );
+  }, [panier.items, typeDemande, setValue]);
+
   // Pour les envois internes (CNPE → CNPE / prêt interne), le destinataire
   // est déduit du site sélectionné — on le synchronise dans le state.
   useEffect(() => {
@@ -580,6 +596,19 @@ export default function DemandeEnvoiFormPage() {
                     <label className={`field-label ${triedAdvance.has(3) && !conventionFile ? "has-error" : ""}`}>
                       Convention (PDF / image) <span style={{ color: "var(--rose)" }}>*</span>
                     </label>
+                    <p style={{ fontSize: 12, color: "var(--ink-3)", margin: "0 0 8px" }}>
+                      Téléchargez d'abord le formulaire vierge sur SharePoint, complétez-le, puis joignez la version signée ci-dessous.
+                    </p>
+                    <a
+                      href="https://edfonline.sharepoint.com/:w:/r/sites/DISC-DSC-DQI-MAQUETTES/_layouts/15/Doc.aspx?sourcedoc=%7B59161D4C-CCDF-4CE3-A432-0AEA66F65361%7D&file=Formulaire%20Convention%20de%20Mise%20%25u00e0%20Disposition.doc&action=default&mobileredirect=true"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="obtn ghost sm"
+                      style={{ marginBottom: 10, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
+                    >
+                      <Icon name="check" size={12} />
+                      Convention de prêt à remplir (SharePoint)
+                    </a>
                     <input
                       ref={conventionInputRef}
                       type="file"
