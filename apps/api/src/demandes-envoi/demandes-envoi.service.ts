@@ -57,16 +57,35 @@ export class DemandesEnvoiService {
     pageSize: number;
     statut?: string;
     type?: string;
+    typeEnvoi?: string;
+    site?: string;
+    urgence?: string;
+    search?: string;
   }) {
-    const { page, pageSize, statut, type } = params;
+    const { page, pageSize, statut, type, typeEnvoi, site, urgence, search } = params;
     const skip = (page - 1) * pageSize;
 
     const where: any = {};
-    if (statut) {
-      where.statut = statut;
+    if (statut) where.statut = statut;
+    if (type) where.type = type;
+    if (typeEnvoi) where.typeEnvoi = typeEnvoi;
+    if (urgence) where.urgence = urgence;
+    if (site) {
+      where.OR = [{ siteOrigine: site }, { siteDestinataire: site }];
     }
-    if (type) {
-      where.type = type;
+    if (search && search.trim()) {
+      const term = search.trim();
+      where.AND = [
+        {
+          OR: [
+            { numero: { contains: term, mode: 'insensitive' as const } },
+            { destinataire: { contains: term, mode: 'insensitive' as const } },
+            { motif: { contains: term, mode: 'insensitive' as const } },
+            { numeroBonTransport: { contains: term, mode: 'insensitive' as const } },
+            { transporteur: { contains: term, mode: 'insensitive' as const } },
+          ],
+        },
+      ];
     }
 
     const [data, total] = await Promise.all([
@@ -93,6 +112,33 @@ export class DemandesEnvoiService {
       pageSize,
       totalPages: Math.ceil(total / pageSize),
     };
+  }
+
+  async stats() {
+    const [byStatut, total] = await Promise.all([
+      this.prisma.demandeEnvoi.groupBy({
+        by: ['statut'],
+        _count: { _all: true },
+      }),
+      this.prisma.demandeEnvoi.count(),
+    ]);
+    const counts: Record<string, number> = {};
+    for (const row of byStatut) counts[row.statut] = row._count._all;
+
+    const aValider =
+      (counts.SOUMISE ?? 0) + (counts.VALIDEE_PARTIELLEMENT ?? 0);
+    const aTraiter =
+      (counts.VALIDEE ?? 0) + (counts.PRETE_A_EXPEDIER ?? 0);
+    const enTransit =
+      (counts.EN_TRANSIT ?? 0) +
+      (counts.EN_COURS ?? 0) +
+      (counts.LIVREE_TITULAIRE ?? 0) +
+      (counts.EN_RETOUR ?? 0);
+    const cloturees = counts.CLOTUREE ?? 0;
+    const refusees = (counts.REFUSEE ?? 0) + (counts.ANNULEE ?? 0);
+    const brouillons = counts.BROUILLON ?? 0;
+
+    return { total, brouillons, aValider, aTraiter, enTransit, cloturees, refusees, byStatut: counts };
   }
 
   async findOne(id: number) {

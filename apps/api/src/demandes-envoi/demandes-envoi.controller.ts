@@ -48,13 +48,26 @@ export class DemandesEnvoiController {
     @Query('pageSize') pageSize?: string,
     @Query('statut') statut?: string,
     @Query('type') type?: string,
+    @Query('typeEnvoi') typeEnvoi?: string,
+    @Query('site') site?: string,
+    @Query('urgence') urgence?: string,
+    @Query('search') search?: string,
   ) {
     const pagination = paginationSchema.parse({ page, pageSize });
     return this.demandesEnvoiService.findAll({
       ...pagination,
       statut,
       type,
+      typeEnvoi,
+      site,
+      urgence,
+      search,
     });
+  }
+
+  @Get('stats')
+  async stats() {
+    return this.demandesEnvoiService.stats();
   }
 
   @Get('inbox')
