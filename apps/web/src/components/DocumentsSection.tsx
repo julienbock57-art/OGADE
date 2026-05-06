@@ -8,6 +8,7 @@ import { useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Fichier } from "@ogade/shared";
 import { api } from "@/lib/api";
+import { clearFichierBlobCache, downloadFichier, openFichier } from "@/lib/fichiers";
 
 interface Props {
   demandeId: number;
@@ -62,7 +63,8 @@ export default function DocumentsSection({
 
   const deleteMut = useMutation({
     mutationFn: (id: number) => api.delete(`/fichiers/${id}`),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      clearFichierBlobCache(id);
       queryClient.invalidateQueries({
         queryKey: ["fichiers", "DEMANDE_ENVOI", demandeId, "DOCUMENT"],
       });
@@ -149,10 +151,9 @@ export default function DocumentsSection({
               }}
             >
               <span style={{ fontSize: 18 }}>📎</span>
-              <a
-                href={`/api/v1/fichiers/${d.id}/download`}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={() => openFichier(d.id)}
                 style={{
                   flex: 1,
                   minWidth: 0,
@@ -163,10 +164,25 @@ export default function DocumentsSection({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  padding: 0,
                 }}
               >
                 {d.nomOriginal ?? `Fichier #${d.id}`}
-              </a>
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadFichier(d.id, d.nomOriginal ?? `fichier-${d.id}`)}
+                className="icon-btn"
+                aria-label="Télécharger"
+                title="Télécharger"
+                style={{ color: "var(--ink-3)" }}
+              >
+                ↓
+              </button>
               {d.context && (
                 <span
                   className="tag"
