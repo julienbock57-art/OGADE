@@ -113,6 +113,11 @@ export type DemandeEnvoi = {
   commentaireExpedition?: string | null;
   commentaireReception?: string | null;
   commentaireRetour?: string | null;
+  // Colisage
+  poidsColisage?: number | null;
+  longueurColisage?: number | null;
+  largeurColisage?: number | null;
+  hauteurColisage?: number | null;
   createdAt: string | Date;
   updatedAt: string | Date;
 };

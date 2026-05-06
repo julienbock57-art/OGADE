@@ -354,6 +354,11 @@ model DemandeEnvoi {
   commentaireReception  String?   @map("commentaire_reception")
   /// Commentaire magasinier à la réception du retour
   commentaireRetour     String?   @map("commentaire_retour")
+  /// Colisage (saisi par le demandeur)
+  poidsColisage         Float?    @map("poids_colisage")
+  longueurColisage      Float?    @map("longueur_colisage")
+  largeurColisage       Float?    @map("largeur_colisage")
+  hauteurColisage       Float?    @map("hauteur_colisage")
 
   demandeur           Agent               @relation("demande_demandeur", fields: [demandeurId], references: [id])
   magasinierEnvoi     Agent?              @relation("demande_magasinier_envoi", fields: [magasinierEnvoiId], references: [id])

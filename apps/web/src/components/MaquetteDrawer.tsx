@@ -528,14 +528,17 @@ export default function MaquetteDrawer({
           type="button"
           className="obtn"
           disabled={panier.has("maquette", m.id)}
-          onClick={() => panier.add({
-            kind: "maquette",
-            id: m.id,
-            reference: m.reference,
-            libelle: m.libelle,
-            site: m.site ?? null,
-            typeMaquette: m.typeMaquette ?? null,
-          })}
+          onClick={() => {
+            const r = panier.add({
+              kind: "maquette",
+              id: m.id,
+              reference: m.reference,
+              libelle: m.libelle,
+              site: m.site ?? null,
+              typeMaquette: m.typeMaquette ?? null,
+            });
+            if (!r.ok) alert(r.reason);
+          }}
         >
           {panier.has("maquette", m.id) ? "✓ Dans le panier" : "+ Ajouter au panier"}
         </button>

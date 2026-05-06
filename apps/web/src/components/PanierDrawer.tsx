@@ -41,6 +41,13 @@ export default function PanierDrawer({ onClose }: { onClose: () => void }) {
   const [tab, setTab] = useState<Tab>(items.length > 0 ? "panier" : "ajouter");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "materiel" | "maquette">("all");
+  const [addError, setAddError] = useState<string | null>(null);
+
+  function handleAdd(it: PanierItem) {
+    const r = add(it);
+    if (!r.ok) setAddError(r.reason);
+    else setAddError(null);
+  }
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -101,6 +108,9 @@ export default function PanierDrawer({ onClose }: { onClose: () => void }) {
             </div>
             <div className="drawer-sub">
               Préparez votre demande d'envoi en sélectionnant matériels et maquettes
+              {items[0]?.site && (
+                <> · <strong>Site origine : {items[0].site}</strong></>
+              )}
             </div>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="Fermer">
@@ -127,6 +137,19 @@ export default function PanierDrawer({ onClose }: { onClose: () => void }) {
             Ajouter
           </button>
         </div>
+
+        {addError && (
+          <div style={{ padding: "10px 16px", background: "var(--rose-soft, #fee2e2)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)", color: "var(--rose)", fontSize: 12.5 }}>
+            {addError}
+            <button
+              type="button"
+              onClick={() => setAddError(null)}
+              className="icon-btn"
+              style={{ marginLeft: 6, color: "var(--rose)" }}
+              aria-label="Fermer"
+            >×</button>
+          </div>
+        )}
 
         <div className="drawer-body">
           {tab === "panier" && (
@@ -199,7 +222,7 @@ export default function PanierDrawer({ onClose }: { onClose: () => void }) {
                       ) : (
                         <button
                           className="obtn accent sm"
-                          onClick={() => add(it)}
+                          onClick={() => handleAdd(it)}
                           type="button"
                         >
                           <Icon name="plus" size={11} />

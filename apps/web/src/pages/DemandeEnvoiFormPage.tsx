@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,7 @@ import {
   TypeDemande,
   type CreateDemandeEnvoiInput,
   type DemandeEnvoi,
+  type Fichier,
 } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { usePanier } from "@/lib/panier";
@@ -50,6 +51,8 @@ export default function DemandeEnvoiFormPage() {
   const [showPanierDrawer, setShowPanierDrawer] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
+  const [conventionFile, setConventionFile] = useState<File | null>(null);
+  const conventionInputRef = useRef<HTMLInputElement>(null);
 
   const { data: sites } = useSites();
   const { data: entreprises } = useEntreprises();
@@ -65,6 +68,15 @@ export default function DemandeEnvoiFormPage() {
         : maqCount > 0
           ? TypeDemande.MAQUETTE
           : TypeDemande.MATERIEL;
+
+  // Site origine = site commun à tous les items du panier (règle métier
+  // garantie côté `panier.add` : un panier ne peut contenir des items que
+  // d'un seul site).
+  const siteOrigine = panier.site;
+  const siteOrigineLabel = useMemo(() => {
+    if (!siteOrigine) return null;
+    return sites?.find((s) => s.code === siteOrigine)?.label ?? siteOrigine;
+  }, [siteOrigine, sites]);
 
   const {
     register,
@@ -86,7 +98,7 @@ export default function DemandeEnvoiFormPage() {
       souscriptionAssurance: false,
       produitsChimiques: false,
       lignes: [],
-    },
+    } as any,
   });
 
   const wTypeEnvoi = watch("typeEnvoi");
@@ -94,7 +106,18 @@ export default function DemandeEnvoiFormPage() {
   const wSiteDestinataire = watch("siteDestinataire");
   const wMotif = watch("motif");
   const wDateSouhaitee = watch("dateSouhaitee");
+  const wDateRetour = watch("dateRetourEstimee");
   const wContact = watch("contact");
+  const wConvention = watch("convention");
+  const wPoids = watch("poidsColisage" as never);
+  const wLong = watch("longueurColisage" as never);
+  const wLarg = watch("largeurColisage" as never);
+  const wHaut = watch("hauteurColisage" as never);
+
+  // Site origine déduit du panier (verrouillé)
+  useEffect(() => {
+    if (siteOrigine) setValue("siteOrigine", siteOrigine);
+  }, [siteOrigine, setValue]);
 
   // Pour les envois internes (CNPE → CNPE / prêt interne), le destinataire
   // est déduit du site sélectionné — on le synchronise dans le state.
@@ -110,12 +133,27 @@ export default function DemandeEnvoiFormPage() {
     }
   }, [wTypeEnvoi, wSiteDestinataire, sites, wDestinataire, setValue]);
 
+  // Auto-remplir l'adresse destination à partir du site sélectionné
+  useEffect(() => {
+    if (wSiteDestinataire && sites) {
+      const site = sites.find((s) => s.code === wSiteDestinataire);
+      if (site) {
+        const parts = [site.adresse, site.codePostal, site.ville]
+          .filter(Boolean)
+          .join(" ");
+        if (parts) setValue("adresseDestination", parts);
+      }
+    }
+  }, [wSiteDestinataire, sites, setValue]);
+
   type StepError = { field: string; label: string; message: string };
 
   const stepErrors = (s: number): StepError[] => {
     const errs: StepError[] = [];
-    if (s === 0 && panier.count === 0) {
-      errs.push({ field: "panier", label: "Panier", message: "Ajoutez au moins un matériel ou une maquette" });
+    if (s === 0) {
+      if (panier.count === 0) {
+        errs.push({ field: "panier", label: "Panier", message: "Ajoutez au moins un matériel ou une maquette" });
+      }
     }
     if (s === 1 && !wTypeEnvoi) {
       errs.push({ field: "typeEnvoi", label: "Type d'envoi", message: "Choisissez un type d'envoi" });
@@ -136,8 +174,26 @@ export default function DemandeEnvoiFormPage() {
       if (!wDateSouhaitee) {
         errs.push({ field: "dateSouhaitee", label: "Date souhaitée", message: "Renseignez la date souhaitée" });
       }
+      if (!wDateRetour) {
+        errs.push({ field: "dateRetourEstimee", label: "Date de retour", message: "Renseignez la date de retour" });
+      }
       if (!wContact || wContact.trim().length === 0) {
         errs.push({ field: "contact", label: "Contact", message: "Renseignez un contact destinataire" });
+      }
+      if (!wPoids || Number(wPoids) <= 0) {
+        errs.push({ field: "poidsColisage", label: "Poids colisage", message: "Renseignez le poids du colis (kg)" });
+      }
+      if (!wLong || Number(wLong) <= 0) {
+        errs.push({ field: "longueurColisage", label: "Longueur colisage", message: "Renseignez la longueur (mm)" });
+      }
+      if (!wLarg || Number(wLarg) <= 0) {
+        errs.push({ field: "largeurColisage", label: "Largeur colisage", message: "Renseignez la largeur (mm)" });
+      }
+      if (!wHaut || Number(wHaut) <= 0) {
+        errs.push({ field: "hauteurColisage", label: "Hauteur colisage", message: "Renseignez la hauteur (mm)" });
+      }
+      if (wConvention && !conventionFile) {
+        errs.push({ field: "conventionFile", label: "Convention", message: "Joignez la convention (PDF / image)" });
       }
     }
     return errs;
@@ -152,8 +208,21 @@ export default function DemandeEnvoiFormPage() {
   };
 
   const createMutation = useMutation({
-    mutationFn: (payload: CreateDemandeEnvoiInput) =>
-      api.post<DemandeEnvoi>("/demandes-envoi", payload),
+    mutationFn: async (payload: CreateDemandeEnvoiInput) => {
+      const created = await api.post<DemandeEnvoi>("/demandes-envoi", payload);
+      // Upload de la convention en pièce jointe si fournie
+      if (conventionFile) {
+        const fd = new FormData();
+        fd.append("file", conventionFile);
+        fd.append("entityType", "DEMANDE_ENVOI");
+        fd.append("entityId", String(created.id));
+        fd.append("typeFichier", "DOCUMENT");
+        fd.append("context", "convention");
+        fd.append("demandeEnvoiId", String(created.id));
+        await api.upload<Fichier>("/fichiers/upload", fd);
+      }
+      return created;
+    },
     onSuccess: (created) => {
       qc.invalidateQueries({ queryKey: ["demandes-envoi"] });
       panier.clear();
@@ -163,6 +232,11 @@ export default function DemandeEnvoiFormPage() {
   });
 
   const onSubmit = (data: CreateDemandeEnvoiInput) => {
+    // Garde-fou : on n'autorise la soumission que depuis l'étape Revue.
+    if (step !== STEPS.length - 1) {
+      setSubmitError("Validez la revue (étape 5) avant de soumettre.");
+      return;
+    }
     // Re-vérifie chaque étape avant l'envoi
     for (let s = 0; s < STEPS.length - 1; s++) {
       const errs = stepErrors(s);
@@ -182,6 +256,7 @@ export default function DemandeEnvoiFormPage() {
     const payload: CreateDemandeEnvoiInput = {
       ...cleaned,
       type: typeDemande,
+      siteOrigine: siteOrigine ?? cleaned.siteOrigine,
       lignes: panier.items.map((it) =>
         it.kind === "materiel"
           ? { materielId: it.id, quantite: 1 }
@@ -327,12 +402,17 @@ export default function DemandeEnvoiFormPage() {
               <div className="detail-grid-2">
                 <div className="field">
                   <label className="field-label">Site origine</label>
-                  <select className="oselect" {...register("siteOrigine")}>
-                    <option value="">— Sélectionner —</option>
-                    {(sites ?? []).map((s) => (
-                      <option key={s.code} value={s.code}>{s.label}</option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    className="oinput"
+                    value={siteOrigineLabel ?? "—"}
+                    readOnly
+                    disabled
+                    style={{ background: "var(--bg-sunken, #f3f4f6)", cursor: "not-allowed" }}
+                  />
+                  <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 4 }}>
+                    Déduit du site des items du panier (verrouillé).
+                  </p>
                 </div>
 
                 {wTypeEnvoi === TypeEnvoi.INTERNE || wTypeEnvoi === TypeEnvoi.PRET_INTERNE ? (
@@ -367,13 +447,12 @@ export default function DemandeEnvoiFormPage() {
                   </div>
                 )}
 
-                <div className="field">
+                <div className="field" style={{ gridColumn: "1 / -1" }}>
                   <label className="field-label">Adresse destination</label>
-                  <input type="text" className="oinput" {...register("adresseDestination")} placeholder="Adresse postale (optionnel pour les sites internes)" />
-                </div>
-                <div className="field">
-                  <label className="field-label">Date retour estimée</label>
-                  <input type="date" className="oinput" {...register("dateRetourEstimee")} />
+                  <input type="text" className="oinput" {...register("adresseDestination")} placeholder="Adresse postale (auto-remplie depuis le site)" />
+                  <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 4 }}>
+                    Auto-renseignée depuis l'adresse du site sélectionné — modifiable.
+                  </p>
                 </div>
               </div>
             )}
@@ -401,12 +480,64 @@ export default function DemandeEnvoiFormPage() {
                     )}
                   </div>
                   <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wDateRetour ? "has-error" : ""}`}>
+                      Date de retour <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="date" className="oinput" {...register("dateRetourEstimee")} />
+                    {triedAdvance.has(3) && !wDateRetour && (
+                      <p className="field-error">Renseignez la date de retour</p>
+                    )}
+                  </div>
+                  <div className="field">
                     <label className={`field-label ${triedAdvance.has(3) && !wContact ? "has-error" : ""}`}>
                       Contact destinataire <span style={{ color: "var(--rose)" }}>*</span>
                     </label>
                     <input type="text" className="oinput" {...register("contact")} placeholder="Nom du contact" />
                     {triedAdvance.has(3) && (!wContact || wContact.trim().length === 0) && (
                       <p className="field-error">Indiquez le contact destinataire</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Colisage — obligatoire */}
+                <h3 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "8px 0 4px" }}>
+                  Colisage
+                </h3>
+                <div className="detail-grid-3" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 12 }}>
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wPoids ? "has-error" : ""}`}>
+                      Poids Colisage (kg) <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="number" min="0" step="0.01" className="oinput" {...register("poidsColisage" as any, { valueAsNumber: true })} />
+                    {triedAdvance.has(3) && (!wPoids || Number(wPoids) <= 0) && (
+                      <p className="field-error">Poids requis (&gt; 0)</p>
+                    )}
+                  </div>
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wLong ? "has-error" : ""}`}>
+                      Longueur Colisage (mm) <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="number" min="0" step="1" className="oinput" {...register("longueurColisage" as any, { valueAsNumber: true })} />
+                    {triedAdvance.has(3) && (!wLong || Number(wLong) <= 0) && (
+                      <p className="field-error">Longueur requise (&gt; 0)</p>
+                    )}
+                  </div>
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wLarg ? "has-error" : ""}`}>
+                      Largeur Colisage (mm) <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="number" min="0" step="1" className="oinput" {...register("largeurColisage" as any, { valueAsNumber: true })} />
+                    {triedAdvance.has(3) && (!wLarg || Number(wLarg) <= 0) && (
+                      <p className="field-error">Largeur requise (&gt; 0)</p>
+                    )}
+                  </div>
+                  <div className="field">
+                    <label className={`field-label ${triedAdvance.has(3) && !wHaut ? "has-error" : ""}`}>
+                      Hauteur Colisage (mm) <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input type="number" min="0" step="1" className="oinput" {...register("hauteurColisage" as any, { valueAsNumber: true })} />
+                    {triedAdvance.has(3) && (!wHaut || Number(wHaut) <= 0) && (
+                      <p className="field-error">Hauteur requise (&gt; 0)</p>
                     )}
                   </div>
                 </div>
@@ -442,6 +573,58 @@ export default function DemandeEnvoiFormPage() {
                     Produits chimiques
                   </label>
                 </div>
+
+                {/* Upload convention si demandée */}
+                {wConvention && (
+                  <div className="field" style={{ padding: 12, background: "var(--bg-sunken, #f9fafb)", borderRadius: 8, border: "1px solid var(--line)" }}>
+                    <label className={`field-label ${triedAdvance.has(3) && !conventionFile ? "has-error" : ""}`}>
+                      Convention (PDF / image) <span style={{ color: "var(--rose)" }}>*</span>
+                    </label>
+                    <input
+                      ref={conventionInputRef}
+                      type="file"
+                      accept="application/pdf,image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0] ?? null;
+                        setConventionFile(f);
+                      }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        className="obtn"
+                        onClick={() => conventionInputRef.current?.click()}
+                      >
+                        {conventionFile ? "Remplacer le fichier" : "Choisir un fichier"}
+                      </button>
+                      {conventionFile && (
+                        <>
+                          <span style={{ fontSize: 12.5, color: "var(--ink-2)" }}>
+                            {conventionFile.name} ({Math.round(conventionFile.size / 1024)} Ko)
+                          </span>
+                          <button
+                            type="button"
+                            className="obtn ghost sm"
+                            onClick={() => {
+                              setConventionFile(null);
+                              if (conventionInputRef.current) conventionInputRef.current.value = "";
+                            }}
+                          >
+                            Retirer
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 6 }}>
+                      La convention sera consultable à toutes les étapes de la validation et du transport.
+                    </p>
+                    {triedAdvance.has(3) && wConvention && !conventionFile && (
+                      <p className="field-error">Joignez la convention</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="field">
                   <label className="field-label">Commentaire</label>
                   <textarea className="otextarea" rows={3} {...register("commentaire")} />
@@ -535,10 +718,26 @@ function ReviewStep({
         ["Site origine", lookupSite(values.siteOrigine)],
         ["Site destinataire", lookupSite(values.siteDestinataire)],
         ["Destinataire", values.destinataire || "—"],
+        ["Adresse destination", values.adresseDestination || "—"],
+        ["Contact", values.contact || "—"],
+        ["Téléphone", values.contactTelephone || "—"],
         ["Date souhaitée", values.dateSouhaitee || "—"],
-        ["Date retour estimée", values.dateRetourEstimee || "—"],
+        ["Date de retour", values.dateRetourEstimee || "—"],
         ["Urgence", values.urgence ?? "—"],
         ["Motif", values.motif || "—"],
+      ]} />
+
+      <Section title="Colisage" rows={[
+        ["Poids (kg)", values.poidsColisage ?? "—"],
+        ["Longueur (mm)", values.longueurColisage ?? "—"],
+        ["Largeur (mm)", values.largeurColisage ?? "—"],
+        ["Hauteur (mm)", values.hauteurColisage ?? "—"],
+      ]} />
+
+      <Section title="Documents et options" rows={[
+        ["Convention signée", values.convention ? "Oui" : "Non"],
+        ["Souscription assurance", values.souscriptionAssurance ? "Oui" : "Non"],
+        ["Produits chimiques", values.produitsChimiques ? "Oui" : "Non"],
       ]} />
 
       <div className="prop-card">

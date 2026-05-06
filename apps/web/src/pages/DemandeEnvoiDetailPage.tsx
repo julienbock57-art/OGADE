@@ -10,6 +10,7 @@ import MagasinierActionModal, {
   type ModalLigne,
 } from "@/components/MagasinierActionModal";
 import PhotoUploader from "@/components/PhotoUploader";
+import DocumentsSection from "@/components/DocumentsSection";
 
 const statutPill: Record<string, { cls: string; label: string }> = {
   BROUILLON:               { cls: "pill c-neutral", label: "Brouillon" },
@@ -455,6 +456,30 @@ export default function DemandeEnvoiDetailPage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Colisage (toujours visible si renseigné) */}
+      {(demande.poidsColisage || demande.longueurColisage || demande.largeurColisage || demande.hauteurColisage) && (
+        <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
+          <h2 style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--ink-3)", margin: "0 0 16px", paddingBottom: 10, borderBottom: "1px solid var(--line-2)" }}>
+            Colisage
+          </h2>
+          <div className="detail-grid-2" style={{ gap: "16px 32px" }}>
+            <Field label="Poids (kg)">{demande.poidsColisage ?? "—"}</Field>
+            <Field label="Longueur (mm)">{demande.longueurColisage ?? "—"}</Field>
+            <Field label="Largeur (mm)">{demande.largeurColisage ?? "—"}</Field>
+            <Field label="Hauteur (mm)">{demande.hauteurColisage ?? "—"}</Field>
+          </div>
+        </div>
+      )}
+
+      {/* Documents (convention, etc.) — toujours consultable */}
+      {id && (
+        <DocumentsSection
+          demandeId={Number(id)}
+          title="Pièces jointes (convention, documents)"
+          readOnly={!isMagasinier && !canSubmit}
+        />
       )}
 
       {/* Photos */}

@@ -49,19 +49,24 @@ export const createDemandeEnvoiSchema = z
     siteDestinataire: z.string().optional(),
     siteOrigine: z.string().optional(),
     typeEnvoi: z.enum(TYPES_ENVOI).optional(),
-    motif: z.string().optional(),
-    dateSouhaitee: z.coerce.date().optional(),
-    dateRetourEstimee: z.coerce.date().optional(),
+    motif: z.string().min(1, "Motif obligatoire"),
+    dateSouhaitee: z.coerce.date({ required_error: "Date souhaitée obligatoire" }),
+    dateRetourEstimee: z.coerce.date({ required_error: "Date de retour obligatoire" }),
     commentaire: z.string().optional(),
     urgence: z.string().optional(),
     justificationUrgence: z.string().optional(),
-    contact: z.string().optional(),
+    contact: z.string().min(1, "Contact destinataire obligatoire"),
     contactTelephone: z.string().optional(),
     adresseDestination: z.string().optional(),
     convention: z.boolean().optional(),
     souscriptionAssurance: z.boolean().optional(),
     produitsChimiques: z.boolean().optional(),
-    lignes: z.array(ligneSchema),
+    // Colisage — obligatoire
+    poidsColisage:    z.coerce.number().positive("Poids requis (> 0)"),
+    longueurColisage: z.coerce.number().positive("Longueur requise (> 0)"),
+    largeurColisage:  z.coerce.number().positive("Largeur requise (> 0)"),
+    hauteurColisage:  z.coerce.number().positive("Hauteur requise (> 0)"),
+    lignes: z.array(ligneSchema).min(1, "La demande doit contenir au moins un item"),
   });
 
 export const updateDemandeEnvoiSchema = z.object({
@@ -81,6 +86,10 @@ export const updateDemandeEnvoiSchema = z.object({
   convention: z.boolean().optional(),
   souscriptionAssurance: z.boolean().optional(),
   produitsChimiques: z.boolean().optional(),
+  poidsColisage:    z.coerce.number().positive().optional(),
+  longueurColisage: z.coerce.number().positive().optional(),
+  largeurColisage:  z.coerce.number().positive().optional(),
+  hauteurColisage:  z.coerce.number().positive().optional(),
   statut: z.enum(ALL_STATUTS).optional(),
 });
 
