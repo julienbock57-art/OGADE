@@ -94,42 +94,6 @@ function KpiCard({ label, value, sub, accent, active, onClick }: { label: string
   );
 }
 
-function CartPanel({ items, onClose, onRemove, onClear }: {
-  items: Materiel[]; onClose: () => void; onRemove: (id: number) => void; onClear: () => void;
-}) {
-  return (
-    <>
-      <div className="drawer-backdrop" onClick={onClose} style={{ background: "transparent" }} />
-      <div className="cart-panel">
-        <div className="cart-head">
-          <Icon name="cart" size={16} />
-          <h3>Panier de mouvements</h3>
-          <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--ink-3)" }}>{items.length} matériel{items.length > 1 ? "s" : ""}</span>
-          <button className="icon-btn" onClick={onClose} style={{ padding: 5, border: 0 }}><Icon name="x" size={13} /></button>
-        </div>
-        <div className="cart-body">
-          {items.length === 0 && <div style={{ padding: 60, textAlign: "center", color: "var(--ink-3)" }}>Sélectionnez des matériels pour préparer un mouvement</div>}
-          {items.map(m => (
-            <div key={m.id} className="cart-item">
-              <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                <span className="cart-id">{m.reference}</span>
-                <span className="cart-name">{m.typeMateriel ?? "Matériel"} · {m.modele ?? "—"}</span>
-                <span className="cart-loc"><Icon name="pin" size={11} /> {m.site ?? "—"}</span>
-              </div>
-              <button className="icon-btn" onClick={() => onRemove(m.id)} style={{ padding: 5, alignSelf: "center" }}><Icon name="x" size={12} /></button>
-            </div>
-          ))}
-        </div>
-        <div className="cart-foot">
-          <button className="obtn danger sm" disabled={!items.length} onClick={onClear}><Icon name="trash" size={12} />Vider</button>
-          <button className="obtn success sm" disabled={!items.length}><Icon name="swap" size={12} />Transfert</button>
-          <button className="obtn sm" disabled={!items.length}><Icon name="flask" size={12} />Étalonnage</button>
-          <button className="obtn accent sm" disabled={!items.length}><Icon name="star" size={12} />Réservation</button>
-        </div>
-      </div>
-    </>
-  );
-}
 
 function ExpandedRow({ m, typesEnd, typesMat, sites, inCart, onAddCart, onOpenQr }: {
   m: Materiel; typesEnd: any[]; typesMat: any[]; sites: any[]; inCart: boolean; onAddCart: () => void; onOpenQr: () => void;
@@ -191,8 +155,6 @@ export default function MaterielsListPage() {
   const [drawerTab, setDrawerTab] = useState<"infos" | "qr">("infos");
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selection, setSelection] = useState<Set<number>>(new Set());
-  const [cart, setCart] = useState<Map<number, Materiel>>(new Map());
-  const [cartOpen, setCartOpen] = useState(false);
   const panier = usePanier();
   const { page, setPage, queryParams } = usePagination();
 
@@ -245,21 +207,28 @@ export default function MaterielsListPage() {
       site: m.site ?? null,
       typeMateriel: m.typeMateriel ?? null,
     });
-    if (!r.ok) {
-      alert(r.reason);
-      return;
-    }
-    setCart(c => { const n = new Map(c); n.set(m.id, m); return n; });
+    if (!r.ok) alert(r.reason);
   }, [panier]);
-  const removeCart = useCallback((id: number) => setCart(c => { const n = new Map(c); n.delete(id); return n; }), []);
-  const clearCart = useCallback(() => setCart(new Map()), []);
   const addSelectionToCart = useCallback(() => {
-    setCart(c => { const n = new Map(c); selection.forEach(id => { const m = rows.find(x => x.id === id); if (m) n.set(id, m); }); return n; });
-  }, [selection, rows]);
+    let blocked: string | null = null;
+    selection.forEach(id => {
+      const m = rows.find(x => x.id === id);
+      if (!m) return;
+      const r = panier.add({
+        kind: "materiel",
+        id: m.id,
+        reference: m.reference,
+        libelle: m.libelle,
+        site: m.site ?? null,
+        typeMateriel: m.typeMateriel ?? null,
+      });
+      if (!r.ok && !blocked) blocked = r.reason;
+    });
+    if (blocked) alert(blocked);
+  }, [selection, rows, panier]);
 
   const allSel = rows.length > 0 && rows.every(r => selection.has(r.id));
   const someSel = rows.some(r => selection.has(r.id));
-  const cartItems = Array.from(cart.values());
 
   // --- RENDER PART 1: header + KPIs + toolbar ---
   // (table will follow in next edit)
@@ -272,9 +241,11 @@ export default function MaterielsListPage() {
           <p style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 2, marginBottom: 0 }}>Inventaire, étalonnage, mouvements et traçabilité</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="obtn" onClick={() => setCartOpen(true)}>
-            <Icon name="cart" size={14} />Panier{cart.size > 0 && <span className="tag c-accent" style={{ padding: "0 6px", fontSize: 11 }}>{cart.size}</span>}
-          </button>
+          {panier.count > 0 && (
+            <span className="tag c-accent" style={{ alignSelf: "center", padding: "4px 10px", fontSize: 12 }}>
+              <Icon name="cart" size={12} /> {panier.count} dans le panier global
+            </span>
+          )}
           <Link to="/materiels/nouveau" className="obtn accent" style={{ textDecoration: "none" }}><Icon name="plus" size={14} />Ajouter matériel</Link>
         </div>
       </div>
@@ -385,7 +356,7 @@ export default function MaterielsListPage() {
               ) : rows.map(m => {
                 const expanded = expandedIds.has(m.id);
                 const sel = selection.has(m.id);
-                const inCart = cart.has(m.id);
+                const inCart = panier.has("materiel", m.id);
                 const etat = etatCfg[m.etat] ?? { cls: "c-neutral", label: m.etat };
                 const comp = m.completude ? compCfg[m.completude] : null;
                 const typeEndRef = (typesEnd ?? []).find((t: any) => t.code === m.typeEND);
@@ -484,8 +455,6 @@ export default function MaterielsListPage() {
       {/* Drawer */}
       {selectedMat && <MaterielDrawer materiel={selectedMat} onClose={() => setSelectedId(null)} initialTab={drawerTab} />}
 
-      {/* Cart */}
-      {cartOpen && <CartPanel items={cartItems} onClose={() => setCartOpen(false)} onRemove={removeCart} onClear={clearCart} />}
     </div>
   );
 }
