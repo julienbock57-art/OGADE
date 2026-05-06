@@ -40,11 +40,20 @@ type PanierState = {
   items: PanierItem[];
 };
 
+type AddResult = { ok: true } | { ok: false; reason: string };
+
 type PanierContextValue = {
   items: PanierItem[];
   count: number;
+  /** Site commun à tous les items du panier (null si vide). */
+  site: string | null;
   has: (kind: PanierItem["kind"], id: number) => boolean;
-  add: (item: PanierItem) => void;
+  /**
+   * Ajoute un item. Retourne `{ ok: false, reason }` si l'item n'a pas le
+   * même site que les autres (règle métier : une demande d'envoi part
+   * toujours d'un site unique).
+   */
+  add: (item: PanierItem) => AddResult;
   remove: (kind: PanierItem["kind"], id: number) => void;
   clear: () => void;
 };
@@ -54,8 +63,9 @@ const STORAGE_KEY = "ogade_panier_envoi";
 const PanierContext = createContext<PanierContextValue>({
   items: [],
   count: 0,
+  site: null,
   has: () => false,
-  add: () => {},
+  add: () => ({ ok: true }),
   remove: () => {},
   clear: () => {},
 });
@@ -95,15 +105,28 @@ export function PanierProvider({ children }: { children: React.ReactNode }) {
     [state.items],
   );
 
-  const add = useCallback((item: PanierItem) => {
+  const add = useCallback((item: PanierItem): AddResult => {
+    let result: AddResult = { ok: true };
     setState((s) => {
       if (s.items.some((it) => it.kind === item.kind && it.id === item.id)) {
         return s; // already in
+      }
+      // Règle métier : tous les items d'une même demande doivent être sur
+      // le même site (un envoi part d'un seul site origine).
+      const currentSite = s.items[0]?.site ?? null;
+      const itemSite = item.site ?? null;
+      if (currentSite && itemSite && currentSite !== itemSite) {
+        result = {
+          ok: false,
+          reason: `Cet item est rattaché au site "${itemSite}" alors que le panier contient déjà des items du site "${currentSite}". Une demande d'envoi part d'un seul site — finalisez la demande en cours ou videz le panier avant d'ajouter cet item.`,
+        };
+        return s;
       }
       const next = { items: [...s.items, item] };
       save(next);
       return next;
     });
+    return result;
   }, []);
 
   const remove = useCallback((kind: PanierItem["kind"], id: number) => {
@@ -125,6 +148,7 @@ export function PanierProvider({ children }: { children: React.ReactNode }) {
     () => ({
       items: state.items,
       count: state.items.length,
+      site: state.items[0]?.site ?? null,
       has,
       add,
       remove,

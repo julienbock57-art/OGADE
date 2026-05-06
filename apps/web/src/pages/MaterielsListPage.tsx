@@ -237,8 +237,7 @@ export default function MaterielsListPage() {
     return rows.every(r => s.has(r.id)) ? new Set<number>() : allIds;
   }), [rows]);
   const addCart = useCallback((m: Materiel) => {
-    setCart(c => { const n = new Map(c); n.set(m.id, m); return n; });
-    panier.add({
+    const r = panier.add({
       kind: "materiel",
       id: m.id,
       reference: m.reference,
@@ -246,6 +245,11 @@ export default function MaterielsListPage() {
       site: m.site ?? null,
       typeMateriel: m.typeMateriel ?? null,
     });
+    if (!r.ok) {
+      alert(r.reason);
+      return;
+    }
+    setCart(c => { const n = new Map(c); n.set(m.id, m); return n; });
   }, [panier]);
   const removeCart = useCallback((id: number) => setCart(c => { const n = new Map(c); n.delete(id); return n; }), []);
   const clearCart = useCallback(() => setCart(new Map()), []);
