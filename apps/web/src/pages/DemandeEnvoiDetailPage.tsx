@@ -9,6 +9,10 @@ import MagasinierActionModal, {
   type ReceptionPayload,
   type ModalLigne,
 } from "@/components/MagasinierActionModal";
+import ExpeditionModal, {
+  type ExpedierLigne,
+  type ExpedierSubmitPayload,
+} from "@/components/ExpeditionModal";
 import PhotoUploader from "@/components/PhotoUploader";
 import DocumentsSection from "@/components/DocumentsSection";
 
@@ -617,15 +621,14 @@ export default function DemandeEnvoiDetailPage() {
         </div>
       )}
 
-      {modalMode === "expedier" && (
-        <MagasinierActionModal
-          mode="expedier"
-          title="Expédier la demande"
-          lignes={lignesEligibles}
+      {modalMode === "expedier" && id && (
+        <ExpeditionModal
+          demandeId={Number(id)}
+          lignes={lignesEligibles as ExpedierLigne[]}
           onClose={() => setModalMode(null)}
           submitting={expedierMut.isPending}
-          error={(expedierMut.error as Error | null)?.message ?? null}
-          onSubmit={(payload) => expedierMut.mutate(payload)}
+          serverError={(expedierMut.error as Error | null)?.message ?? null}
+          onConfirm={(payload: ExpedierSubmitPayload) => expedierMut.mutate(payload)}
         />
       )}
       {modalMode === "receptionner" && (
