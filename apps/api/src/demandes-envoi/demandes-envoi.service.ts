@@ -235,18 +235,25 @@ export class DemandesEnvoiService {
     return this.findOne(demandeId);
   }
 
-  async findInbox(userId: number, params: { page: number; pageSize: number }) {
-    const { page, pageSize } = params;
+  async findInbox(
+    userId: number,
+    params: { page: number; pageSize: number; isAdmin?: boolean },
+  ) {
+    const { page, pageSize, isAdmin } = params;
     const skip = (page - 1) * pageSize;
 
-    const where = {
+    const where: any = {
       statut: 'EN_ATTENTE',
       demande: { statut: { in: ['SOUMISE', 'VALIDEE_PARTIELLEMENT'] } },
-      OR: [
+    };
+    // Un admin voit toutes les lignes en attente (utile pour superviser et
+    // débloquer les demandes orphelines de référent).
+    if (!isAdmin) {
+      where.OR = [
         { materiel: { responsableId: userId } },
         { maquette: { referentId: userId } },
-      ],
-    };
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.demandeEnvoiLigne.findMany({
@@ -579,9 +586,16 @@ export class DemandesEnvoiService {
 
   async findMagasinierInbox(
     user: { agentId: number; roles: string[] },
-    params: { page: number; pageSize: number },
+    params: {
+      page: number;
+      pageSize: number;
+      statut?: string;
+      typeEnvoi?: string;
+      site?: string;
+      search?: string;
+    },
   ) {
-    const { page, pageSize } = params;
+    const { page, pageSize, statut, typeEnvoi, site, search } = params;
     const skip = (page - 1) * pageSize;
 
     const sites = await this.prisma.magasinierSite.findMany({
@@ -591,27 +605,46 @@ export class DemandesEnvoiService {
     const siteCodes = sites.map((s) => s.siteCode);
     const isAdmin = user.roles.includes('ADMIN');
 
+    const allowedStatuts = [
+      'VALIDEE',
+      'PRETE_A_EXPEDIER',
+      'EN_TRANSIT',
+      'EN_RETOUR',
+      'RECUE',
+      'LIVREE_TITULAIRE',
+      'EN_COURS',
+      'RECUE_RETOUR',
+    ];
+
     const where: any = {
-      statut: {
-        in: [
-          'VALIDEE',
-          'PRETE_A_EXPEDIER',
-          'EN_TRANSIT',
-          'EN_RETOUR',
-          'RECUE',
-          'LIVREE_TITULAIRE',
-          'EN_COURS',
-          'RECUE_RETOUR',
-        ],
-      },
+      statut: statut && allowedStatuts.includes(statut)
+        ? statut
+        : { in: allowedStatuts },
     };
-    if (!isAdmin) {
+    if (typeEnvoi) where.typeEnvoi = typeEnvoi;
+    if (site) {
+      where.OR = [{ siteOrigine: site }, { siteDestinataire: site }];
+    } else if (!isAdmin) {
       if (siteCodes.length === 0) {
         return { data: [], total: 0, page, pageSize, totalPages: 0 };
       }
       where.OR = [
         { siteOrigine: { in: siteCodes } },
         { siteDestinataire: { in: siteCodes } },
+      ];
+    }
+    if (search && search.trim()) {
+      const term = search.trim();
+      where.AND = [
+        {
+          OR: [
+            { numero: { contains: term, mode: 'insensitive' as const } },
+            { destinataire: { contains: term, mode: 'insensitive' as const } },
+            { motif: { contains: term, mode: 'insensitive' as const } },
+            { numeroBonTransport: { contains: term, mode: 'insensitive' as const } },
+            { transporteur: { contains: term, mode: 'insensitive' as const } },
+          ],
+        },
       ];
     }
 

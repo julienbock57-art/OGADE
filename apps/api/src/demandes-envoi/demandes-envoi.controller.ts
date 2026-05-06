@@ -67,7 +67,10 @@ export class DemandesEnvoiController {
       throw new BadRequestException('Authenticated user required');
     }
     const pagination = paginationSchema.parse({ page, pageSize });
-    return this.demandesEnvoiService.findInbox(user.agentId, pagination);
+    return this.demandesEnvoiService.findInbox(user.agentId, {
+      ...pagination,
+      isAdmin: user.roles.includes('ADMIN'),
+    });
   }
 
   @Get(':id')
@@ -178,10 +181,20 @@ export class DemandesEnvoiController {
     @CurrentUser() user: RequestUser | null,
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
+    @Query('statut') statut?: string,
+    @Query('typeEnvoi') typeEnvoi?: string,
+    @Query('site') site?: string,
+    @Query('search') search?: string,
   ) {
     if (!user) throw new BadRequestException('Authenticated user required');
     const pagination = paginationSchema.parse({ page, pageSize });
-    return this.demandesEnvoiService.findMagasinierInbox(user, pagination);
+    return this.demandesEnvoiService.findMagasinierInbox(user, {
+      ...pagination,
+      statut,
+      typeEnvoi,
+      site,
+      search,
+    });
   }
 
   @Post(':id/preparer-expedition')
