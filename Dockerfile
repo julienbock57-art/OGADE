@@ -4,6 +4,11 @@ FROM node:20-slim AS builder
 RUN corepack enable
 WORKDIR /app
 
+# Numéro de PR injecté par la CI (sert à composer V1.0.<N>).
+# Vide / 0 en local → fallback handled in vite.config.ts.
+ARG APP_PR_NUMBER=0
+ENV APP_PR_NUMBER=$APP_PR_NUMBER
+
 # Copy dependency files first (better Docker cache)
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json apps/api/
