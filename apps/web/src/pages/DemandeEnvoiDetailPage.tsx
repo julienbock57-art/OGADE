@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { DemandeEnvoi } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import MagasinierActionModal, {
+import {
   type ExpedierPayload,
   type ReceptionPayload,
   type ModalLigne,
@@ -13,6 +13,7 @@ import ExpeditionModal, {
   type ExpedierLigne,
   type ExpedierSubmitPayload,
 } from "@/components/ExpeditionModal";
+import ReceptionModal from "@/components/ReceptionModal";
 import LignePhotosInline from "@/components/LignePhotosInline";
 import DocumentsSection from "@/components/DocumentsSection";
 
@@ -627,26 +628,28 @@ export default function DemandeEnvoiDetailPage() {
           onConfirm={(payload: ExpedierSubmitPayload) => expedierMut.mutate(payload)}
         />
       )}
-      {modalMode === "receptionner" && (
-        <MagasinierActionModal
-          mode="receptionner"
+      {modalMode === "receptionner" && id && (
+        <ReceptionModal
+          demandeId={Number(id)}
+          mode="reception"
           title="Réceptionner la demande"
           lignes={lignesEligibles}
           onClose={() => setModalMode(null)}
           submitting={receptionnerMut.isPending}
-          error={(receptionnerMut.error as Error | null)?.message ?? null}
-          onSubmit={(payload) => receptionnerMut.mutate(payload)}
+          serverError={(receptionnerMut.error as Error | null)?.message ?? null}
+          onConfirm={(payload) => receptionnerMut.mutate(payload)}
         />
       )}
-      {modalMode === "receptionner-retour" && (
-        <MagasinierActionModal
-          mode="receptionner-retour"
+      {modalMode === "receptionner-retour" && id && (
+        <ReceptionModal
+          demandeId={Number(id)}
+          mode="retour"
           title="Réceptionner le retour"
           lignes={lignesEligibles}
           onClose={() => setModalMode(null)}
           submitting={receptionnerRetourMut.isPending}
-          error={(receptionnerRetourMut.error as Error | null)?.message ?? null}
-          onSubmit={(payload) => receptionnerRetourMut.mutate(payload)}
+          serverError={(receptionnerRetourMut.error as Error | null)?.message ?? null}
+          onConfirm={(payload) => receptionnerRetourMut.mutate(payload)}
         />
       )}
     </div>
