@@ -16,6 +16,7 @@ import ExpeditionModal, {
 import ReceptionModal from "@/components/ReceptionModal";
 import LignePhotosInline from "@/components/LignePhotosInline";
 import DocumentsSection from "@/components/DocumentsSection";
+import WorkflowTimeline from "@/components/WorkflowTimeline";
 
 const statutPill: Record<string, { cls: string; label: string }> = {
   BROUILLON:               { cls: "pill c-neutral", label: "Brouillon" },
@@ -50,6 +51,43 @@ const typeLabel: Record<string, string> = {
   MAQUETTE: "Maquette",
   MUTUALISEE: "Mutualisée",
 };
+
+const typeEnvoiBadge: Record<string, { label: string; bg: string; fg: string; icon: string }> = {
+  INTERNE:           { label: "TRANSFERT SITE", bg: "color-mix(in oklch, var(--emerald, #10b981) 14%, transparent)", fg: "var(--emerald, #047857)", icon: "M5 7h11l-3-3 M15 13H4l3 3" },
+  EXTERNE_TITULAIRE: { label: "ENVOI TITULAIRE", bg: "color-mix(in oklch, var(--sky, #0ea5e9) 14%, transparent)",     fg: "var(--sky, #0369a1)",     icon: "M2 5h10v9H2z M12 8h4l2 3v3h-6 M5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3 M14 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" },
+  ETALONNAGE:        { label: "ÉTALONNAGE",     bg: "color-mix(in oklch, var(--violet, #8b5cf6) 16%, transparent)",  fg: "var(--violet, #6d28d9)",  icon: "M8 3h4 M9 3v5l-4 8a2 2 0 0 0 2 3h6a2 2 0 0 0 2-3l-4-8V3" },
+  PRET_INTERNE:      { label: "PRÊT INTERNE",   bg: "color-mix(in oklch, var(--emerald, #10b981) 14%, transparent)", fg: "var(--emerald, #047857)", icon: "M4 8a6 6 0 0 1 11-2 M16 12a6 6 0 0 1-11 2 M14 6h2V4 M6 14H4v2" },
+  PRET_EXTERNE:      { label: "PRÊT EXTERNE",   bg: "color-mix(in oklch, var(--violet, #8b5cf6) 14%, transparent)",  fg: "var(--violet, #6d28d9)",  icon: "M4 8a6 6 0 0 1 11-2 M16 12a6 6 0 0 1-11 2 M14 6h2V4 M6 14H4v2" },
+};
+
+const typeEnvoiTitle: Record<string, string> = {
+  INTERNE: "Transfert interne",
+  EXTERNE_TITULAIRE: "Envoi vers titulaire",
+  ETALONNAGE: "Envoi en étalonnage",
+  PRET_INTERNE: "Prêt interne",
+  PRET_EXTERNE: "Prêt externe",
+};
+
+function TypeEnvoiBadge({ typeEnvoi }: { typeEnvoi?: string | null }) {
+  if (!typeEnvoi || !(typeEnvoi in typeEnvoiBadge)) return null;
+  const b = typeEnvoiBadge[typeEnvoi];
+  return (
+    <span
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 4,
+        padding: "3px 8px", borderRadius: 6,
+        background: b.bg, color: b.fg,
+        fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em",
+        textTransform: "uppercase", whiteSpace: "nowrap",
+      }}
+    >
+      <svg width={11} height={11} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+        {b.icon.split(" M").map((p, i) => <path key={i} d={i === 0 ? p : "M" + p} />)}
+      </svg>
+      {b.label}
+    </span>
+  );
+}
 
 function formatDate(value?: string | Date | null): string {
   if (!value) return "—";
@@ -280,20 +318,62 @@ export default function DemandeEnvoiDetailPage() {
     return ligneReferentEmail(ligne) === user.email;
   }
 
+  const lignesCount = demande.lignes?.length ?? 0;
+  const itemNoun =
+    demande.type === "MAQUETTE"
+      ? `maquette${lignesCount > 1 ? "s" : ""}`
+      : demande.type === "MUTUALISEE"
+        ? `item${lignesCount > 1 ? "s" : ""}`
+        : `matériel${lignesCount > 1 ? "s" : ""}`;
+  const titreEnvoi = demande.typeEnvoi
+    ? typeEnvoiTitle[demande.typeEnvoi] ?? "Demande d'envoi"
+    : "Demande d'envoi";
+  const demandeurNom = demande.demandeur
+    ? `${(demande.demandeur.nom ?? "").toUpperCase()} ${demande.demandeur.prenom ?? ""}`.trim()
+    : null;
+  const dateDemandeStr = new Date(demande.createdAt).toLocaleDateString("fr-FR");
+
   return (
     <div className="detail-page">
+      {/* Breadcrumb */}
+      <div style={{ fontSize: 12, color: "var(--ink-3)", marginBottom: 8 }}>
+        <Link to="/" style={{ color: "var(--ink-3)", textDecoration: "none" }}>Espace END</Link>
+        {" / "}
+        <Link to="/demandes-envoi" style={{ color: "var(--ink-3)", textDecoration: "none" }}>Mouvements</Link>
+        {" / "}
+        <span style={{ color: "var(--ink)", fontWeight: 600 }}>{demande.numero}</span>
+      </div>
+
+      {/* Back link */}
+      <div style={{ marginBottom: 12 }}>
+        <Link
+          to="/demandes-envoi"
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-2)", textDecoration: "none" }}
+        >
+          <svg width={14} height={14} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 5l-5 5 5 5M3 10h14" />
+          </svg>
+          Retour à la liste
+        </Link>
+      </div>
+
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 12, flexWrap: "wrap" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
-              Demande : {demande.numero}
-            </h1>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--ink-3)" }}>{demande.numero}</span>
+            <TypeEnvoiBadge typeEnvoi={demande.typeEnvoi} />
             <span className={pill.cls}><span className="dot" />{pill.label}</span>
           </div>
-          <p style={{ fontSize: 13, color: "var(--ink-3)", margin: 0 }}>
-            {typeLabel[demande.type] ?? demande.type}
-            {demande.demandeur && ` · Demandeur : ${demande.demandeur.prenom} ${demande.demandeur.nom}`}
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
+            {titreEnvoi} — {lignesCount} {itemNoun}
+          </h1>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", margin: "4px 0 0" }}>
+            {demandeurNom && <>Demandé par <strong>{demandeurNom}</strong></>}
+            {demandeurNom && ` le ${dateDemandeStr}`}
+            {(demande.siteDestinataire || demande.destinataire) && (
+              <> · Destination <strong>{demande.siteDestinataire ?? demande.destinataire}</strong></>
+            )}
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -390,6 +470,9 @@ export default function DemandeEnvoiDetailPage() {
           {((submitMut.error ?? prepareMut.error ?? prepareRetourMut.error ?? cloturerMut.error) as Error)?.message}
         </div>
       )}
+
+      {/* Workflow timeline */}
+      <WorkflowTimeline demande={demande as any} />
 
       {/* Info card */}
       <div style={{ background: "var(--bg-panel)", border: "1px solid var(--line)", borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
