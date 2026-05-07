@@ -1,7 +1,11 @@
 # Stage 1: Build everything with pnpm
 FROM node:20-slim AS builder
 
-RUN corepack enable
+# Active corepack et active la version exacte de pnpm pinnée dans
+# package.json#packageManager. Sans ce step, corepack récent (Node 20+)
+# refuse de continuer en frozen-lockfile si la version n'est pas pinnée.
+RUN corepack enable && corepack install -g pnpm@10.33.0 || corepack prepare pnpm@10.33.0 --activate
+
 WORKDIR /app
 
 # Numéro de PR injecté par la CI (sert à composer V1.0.<N>).
