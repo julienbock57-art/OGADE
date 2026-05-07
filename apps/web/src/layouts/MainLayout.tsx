@@ -397,9 +397,9 @@ export default function MainLayout() {
           {showLabels && (
             <div
               className="app-version"
-              title={`Build ${__APP_BUILD_AT__}`}
+              title={`Build ${__APP_BUILD_AT__} · ${__APP_COMMIT__}`}
             >
-              v{__APP_VERSION__} · {__APP_COMMIT__}
+              V{__APP_VERSION__}
             </div>
           )}
         </div>
