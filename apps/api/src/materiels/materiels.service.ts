@@ -246,4 +246,41 @@ export class MaterielsService {
     await this.findOne(materielId);
     return this.evenements.findByEntity('MATERIEL', materielId);
   }
+
+  /**
+   * Retourne toutes les lignes de demande d'envoi qui ont concerné ce
+   * matériel (quel que soit le statut), accompagnées de leur demande.
+   * Utile pour afficher un historique d'envois sur la fiche détail.
+   */
+  async findHistoriqueEnvois(materielId: number) {
+    await this.findOne(materielId);
+    const lignes = await this.prisma.demandeEnvoiLigne.findMany({
+      where: { materielId },
+      orderBy: { id: 'desc' },
+      include: {
+        demande: {
+          select: {
+            id: true,
+            numero: true,
+            type: true,
+            typeEnvoi: true,
+            statut: true,
+            destinataire: true,
+            siteOrigine: true,
+            siteDestinataire: true,
+            dateSouhaitee: true,
+            dateEnvoi: true,
+            dateReception: true,
+            dateRetour: true,
+            dateCloture: true,
+            createdAt: true,
+            demandeur: {
+              select: { id: true, nom: true, prenom: true, email: true },
+            },
+          },
+        },
+      },
+    });
+    return lignes;
+  }
 }

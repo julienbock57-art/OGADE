@@ -108,6 +108,23 @@ const ligneEtatSchema = z.object({
   etat: z.enum(ETATS_PHYSIQUES),
 });
 
+/**
+ * Localisation à mettre à jour sur le matériel/maquette à la réception.
+ * Tous les champs sont optionnels — on n'écrase pas une valeur existante
+ * si la nouvelle est vide.
+ */
+const ligneLocalisationSchema = z.object({
+  entreprise: z.string().optional(),
+  site: z.string().optional(),
+  rayonnage: z.string().optional(),
+  salle: z.string().optional(),
+  complements: z.string().optional(),
+});
+
+const ligneEtatReceptionSchema = ligneEtatSchema.extend({
+  localisation: ligneLocalisationSchema.optional(),
+});
+
 export const expedierSchema = z.object({
   numeroBonTransport: z.string().min(1, "Numéro de bon de transport requis"),
   transporteur: z.string().min(1, "Transporteur requis"),
@@ -119,7 +136,7 @@ export const expedierSchema = z.object({
 export const receptionnerSchema = z.object({
   dateReception: z.coerce.date().optional(),
   commentaire: z.string().optional(),
-  lignesEtat: z.array(ligneEtatSchema).default([]),
+  lignesEtat: z.array(ligneEtatReceptionSchema).default([]),
 });
 
 export const receptionnerRetourSchema = z.object({

@@ -237,6 +237,42 @@ export class MaquettesService {
     });
   }
 
+  /**
+   * Retourne toutes les lignes de demande d'envoi qui ont concerné cette
+   * maquette (quel que soit le statut), accompagnées de leur demande.
+   */
+  async findHistoriqueEnvois(maquetteId: number) {
+    await this.findOne(maquetteId);
+    const lignes = await this.prisma.demandeEnvoiLigne.findMany({
+      where: { maquetteId },
+      orderBy: { id: 'desc' },
+      include: {
+        demande: {
+          select: {
+            id: true,
+            numero: true,
+            type: true,
+            typeEnvoi: true,
+            statut: true,
+            destinataire: true,
+            siteOrigine: true,
+            siteDestinataire: true,
+            dateSouhaitee: true,
+            dateEnvoi: true,
+            dateReception: true,
+            dateRetour: true,
+            dateCloture: true,
+            createdAt: true,
+            demandeur: {
+              select: { id: true, nom: true, prenom: true, email: true },
+            },
+          },
+        },
+      },
+    });
+    return lignes;
+  }
+
   // ── Defauts CRUD ─────────────────────────────────────────────
   async listDefauts(maquetteId: number) {
     await this.findOne(maquetteId);

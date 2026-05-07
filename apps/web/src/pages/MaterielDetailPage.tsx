@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Materiel } from "@ogade/shared";
 import { api } from "@/lib/api";
 import MaterielDrawer from "@/components/MaterielDrawer";
+import HistoriqueEnvoisSection from "@/components/HistoriqueEnvoisSection";
 
 export default function MaterielDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +47,7 @@ export default function MaterielDetailPage() {
   return (
     <div style={{ padding: "24px 16px 0" }}>
       <MaterielDrawer materiel={materiel} mode="page" />
+      <HistoriqueEnvoisSection kind="materiel" id={materiel.id} />
     </div>
   );
 }

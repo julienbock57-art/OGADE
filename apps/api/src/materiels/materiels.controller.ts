@@ -77,6 +77,11 @@ export class MaterielsController {
     return this.materielsService.findHistorique(id);
   }
 
+  @Get(':id/historique-envois')
+  async findHistoriqueEnvois(@Param('id', ParseIntPipe) id: number) {
+    return this.materielsService.findHistoriqueEnvois(id);
+  }
+
   @Get(':id/pdf')
   async pdf(
     @Param('id', ParseIntPipe) id: number,
