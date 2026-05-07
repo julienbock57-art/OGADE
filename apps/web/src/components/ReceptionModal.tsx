@@ -18,6 +18,7 @@ import {
   openFichier,
   useFichierBlobUrl,
 } from "@/lib/fichiers";
+import { useSites, useEntreprises } from "@/hooks/use-referentiels";
 
 type Etat = "CORRECT" | "LEGER_DEFAUT" | "HS";
 const ETATS: { value: Etat; label: string }[] = [
@@ -33,9 +34,21 @@ export type ReceptionLigne = {
   kind: "materiel" | "maquette";
 };
 
+type LocalisationInput = {
+  entreprise?: string;
+  site?: string;
+  rayonnage?: string;
+  salle?: string;
+  complements?: string;
+};
+
 export type ReceptionSubmitPayload = {
   commentaire?: string;
-  lignesEtat: { ligneId: number; etat: Etat }[];
+  lignesEtat: {
+    ligneId: number;
+    etat: Etat;
+    localisation?: LocalisationInput;
+  }[];
 };
 
 interface Props {
@@ -302,6 +315,109 @@ function LignePhotos({
   );
 }
 
+function LocalisationFields({
+  ligne,
+  value,
+  onChange,
+}: {
+  ligne: ReceptionLigne;
+  value: LocalisationInput;
+  onChange: (v: LocalisationInput) => void;
+}) {
+  const { data: sites = [] } = useSites();
+  const { data: entreprises = [] } = useEntreprises();
+
+  const set = <K extends keyof LocalisationInput>(k: K, v: LocalisationInput[K]) =>
+    onChange({ ...value, [k]: v });
+
+  return (
+    <div
+      style={{
+        marginTop: 10,
+        padding: "10px 12px",
+        background: "var(--bg-sunken, #f9fafb)",
+        borderRadius: 8,
+        border: "1px solid var(--line-2)",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          color: "var(--ink-3)",
+          marginBottom: 8,
+        }}
+      >
+        Informations réception {ligne.kind === "materiel" ? "du matériel" : "de la maquette"} «{ligne.reference}»
+      </div>
+      <div className="detail-grid-2" style={{ gap: 10 }}>
+        <div className="field">
+          <label className="field-label" style={{ fontSize: 11 }}>Localisation : Entreprise</label>
+          <select
+            className="oselect"
+            value={value.entreprise ?? ""}
+            onChange={(e) => set("entreprise", e.target.value || undefined)}
+          >
+            <option value="">— Sélectionner —</option>
+            {entreprises.map((e) => (
+              <option key={e.code} value={e.label}>{e.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label className="field-label" style={{ fontSize: 11 }}>Localisation (site)</label>
+          <select
+            className="oselect"
+            value={value.site ?? ""}
+            onChange={(e) => set("site", e.target.value || undefined)}
+          >
+            <option value="">— Sélectionner —</option>
+            {sites.map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.label}
+                {s.adresse ? ` · ${s.adresse}` : ""}
+                {s.codePostal ? ` ${s.codePostal}` : ""}
+                {s.ville ? ` ${s.ville}` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label className="field-label" style={{ fontSize: 11 }}>Localisation_Rayonnage</label>
+          <input
+            type="text"
+            className="oinput"
+            value={value.rayonnage ?? ""}
+            placeholder="A4"
+            onChange={(e) => set("rayonnage", e.target.value || undefined)}
+          />
+        </div>
+        <div className="field">
+          <label className="field-label" style={{ fontSize: 11 }}>Localisation_Salle</label>
+          <input
+            type="text"
+            className="oinput"
+            value={value.salle ?? ""}
+            placeholder="L0-513"
+            onChange={(e) => set("salle", e.target.value || undefined)}
+          />
+        </div>
+        <div className="field" style={{ gridColumn: "1 / -1" }}>
+          <label className="field-label" style={{ fontSize: 11 }}>Compléments localisation</label>
+          <textarea
+            className="otextarea"
+            rows={2}
+            value={value.complements ?? ""}
+            onChange={(e) => set("complements", e.target.value || undefined)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ReceptionModal({
   demandeId,
   lignes,
@@ -316,6 +432,9 @@ export default function ReceptionModal({
   const [commentaire, setCommentaire] = useState("");
   const [etats, setEtats] = useState<Record<number, Etat>>(() =>
     Object.fromEntries(lignes.map((l) => [l.id, "CORRECT" as Etat])),
+  );
+  const [localisations, setLocalisations] = useState<Record<number, LocalisationInput>>(
+    () => Object.fromEntries(lignes.map((l) => [l.id, {}])),
   );
 
   // Polling pour suivre les uploads des sous-composants et activer
@@ -346,7 +465,16 @@ export default function ReceptionModal({
   function handleSubmit() {
     onConfirm({
       commentaire: commentaire.trim() || undefined,
-      lignesEtat: lignes.map((l) => ({ ligneId: l.id, etat: etats[l.id] ?? "CORRECT" })),
+      lignesEtat: lignes.map((l) => {
+        const loc = localisations[l.id] ?? {};
+        // On n'envoie le bloc que si au moins un champ est rempli
+        const hasLoc = Object.values(loc).some((v) => v && String(v).trim() !== "");
+        return {
+          ligneId: l.id,
+          etat: etats[l.id] ?? "CORRECT",
+          ...(hasLoc ? { localisation: loc } : {}),
+        };
+      }),
     });
   }
 
@@ -379,14 +507,22 @@ export default function ReceptionModal({
           </h3>
           <div className="vstack" style={{ gap: 10 }}>
             {lignes.map((ligne) => (
-              <LignePhotos
-                key={ligne.id}
-                demandeId={demandeId}
-                ligne={ligne}
-                contextPrefix={contextPrefix}
-                etat={etats[ligne.id] ?? "CORRECT"}
-                onEtatChange={(e) => setEtats((s) => ({ ...s, [ligne.id]: e }))}
-              />
+              <div key={ligne.id}>
+                <LignePhotos
+                  demandeId={demandeId}
+                  ligne={ligne}
+                  contextPrefix={contextPrefix}
+                  etat={etats[ligne.id] ?? "CORRECT"}
+                  onEtatChange={(e) => setEtats((s) => ({ ...s, [ligne.id]: e }))}
+                />
+                <LocalisationFields
+                  ligne={ligne}
+                  value={localisations[ligne.id] ?? {}}
+                  onChange={(v) =>
+                    setLocalisations((s) => ({ ...s, [ligne.id]: v }))
+                  }
+                />
+              </div>
             ))}
           </div>
 

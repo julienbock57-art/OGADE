@@ -474,7 +474,17 @@ export class DemandesEnvoiService {
     payload: {
       dateReception?: Date;
       commentaire?: string;
-      lignesEtat: { ligneId: number; etat: string }[];
+      lignesEtat: {
+        ligneId: number;
+        etat: string;
+        localisation?: {
+          entreprise?: string;
+          site?: string;
+          rayonnage?: string;
+          salle?: string;
+          complements?: string;
+        };
+      }[];
     },
     user: { agentId: number; roles: string[] },
   ) {
@@ -492,7 +502,9 @@ export class DemandesEnvoiService {
     }
 
     const eligibleLignes = demande.lignes.filter((l) => l.statut === 'EXPEDIEE');
-    const etatById = new Map(payload.lignesEtat.map((l) => [l.ligneId, l.etat]));
+    const inputById = new Map(
+      payload.lignesEtat.map((l) => [l.ligneId, l] as const),
+    );
 
     const isLoanOrCalibration =
       demande.typeEnvoi === 'ETALONNAGE' ||
@@ -506,15 +518,51 @@ export class DemandesEnvoiService {
 
     await this.prisma.$transaction(async (tx) => {
       for (const ligne of eligibleLignes) {
+        const input = inputById.get(ligne.id);
         await tx.demandeEnvoiLigne.update({
           where: { id: ligne.id },
           data: {
             statut: 'LIVREE',
-            etatReception: etatById.get(ligne.id) ?? 'CORRECT',
+            etatReception: input?.etat ?? 'CORRECT',
             recue: true,
             dateReception: payload.dateReception ?? new Date(),
           },
         });
+
+        // Propagation de la localisation au matériel/maquette concerné.
+        // On ne réécrit que les champs renseignés (non vides).
+        const loc = input?.localisation;
+        if (loc) {
+          if (ligne.materielId) {
+            const data: Record<string, unknown> = {};
+            if (loc.entreprise) data.entreprise = loc.entreprise;
+            if (loc.site) data.site = loc.site;
+            if (loc.rayonnage || loc.salle) {
+              // Materiel n'a pas de champs séparés rayonnage/salle :
+              // on les agrège dans le champ "localisation".
+              const parts = [loc.salle, loc.rayonnage].filter(Boolean);
+              if (parts.length > 0) data.localisation = parts.join(" / ");
+            }
+            if (loc.complements !== undefined && loc.complements !== "") {
+              data.complementsLocalisation = loc.complements;
+            }
+            if (Object.keys(data).length > 0) {
+              await tx.materiel.update({ where: { id: ligne.materielId }, data });
+            }
+          } else if (ligne.maquetteId) {
+            const data: Record<string, unknown> = {};
+            if (loc.entreprise) data.entreprise = loc.entreprise;
+            if (loc.site) data.site = loc.site;
+            if (loc.rayonnage) data.localisationRayonnage = loc.rayonnage;
+            if (loc.salle) data.localisationSalle = loc.salle;
+            if (loc.complements !== undefined && loc.complements !== "") {
+              data.complementsLocalisation = loc.complements;
+            }
+            if (Object.keys(data).length > 0) {
+              await tx.maquette.update({ where: { id: ligne.maquetteId }, data });
+            }
+          }
+        }
       }
       await tx.demandeEnvoi.update({
         where: { id },

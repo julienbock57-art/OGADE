@@ -127,6 +127,11 @@ export class MaquettesController {
     return this.maquettesService.retourner(id);
   }
 
+  @Get(':id/historique-envois')
+  async findHistoriqueEnvois(@Param('id', ParseIntPipe) id: number) {
+    return this.maquettesService.findHistoriqueEnvois(id);
+  }
+
   // ── Defauts CRUD ────────────────────────────────────────────────
   @Get(':id/defauts')
   async listDefauts(@Param('id', ParseIntPipe) id: number) {
