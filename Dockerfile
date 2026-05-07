@@ -1,10 +1,10 @@
 # Stage 1: Build everything with pnpm
 FROM node:20-slim AS builder
 
-# Active corepack et active la version exacte de pnpm pinnée dans
-# package.json#packageManager. Sans ce step, corepack récent (Node 20+)
-# refuse de continuer en frozen-lockfile si la version n'est pas pinnée.
-RUN corepack enable && corepack install -g pnpm@10.33.0 || corepack prepare pnpm@10.33.0 --activate
+# Installation directe de pnpm via npm pour éviter les écueils de
+# corepack (versions différentes selon le tag node:20-slim, comportement
+# strict en frozen-lockfile, etc.). npm est toujours disponible.
+RUN npm install -g pnpm@10.33.0
 
 WORKDIR /app
 
