@@ -13,7 +13,7 @@ import ExpeditionModal, {
   type ExpedierLigne,
   type ExpedierSubmitPayload,
 } from "@/components/ExpeditionModal";
-import PhotoUploader from "@/components/PhotoUploader";
+import LignePhotosInline from "@/components/LignePhotosInline";
 import DocumentsSection from "@/components/DocumentsSection";
 
 const statutPill: Record<string, { cls: string; label: string }> = {
@@ -271,7 +271,6 @@ export default function DemandeEnvoiDetailPage() {
     demande.transporteur ||
     demande.dateExpedition
   );
-  const photosVisible = demande.statut !== "BROUILLON" && demande.statut !== "SOUMISE";
 
   function canActOn(ligne: Ligne): boolean {
     if (!validationOpen || ligne.statut !== "EN_ATTENTE") return false;
@@ -486,14 +485,6 @@ export default function DemandeEnvoiDetailPage() {
         />
       )}
 
-      {/* Photos */}
-      {photosVisible && id && (
-        <PhotoUploader
-          demandeId={Number(id)}
-          title="Photos"
-          readOnly={!isMagasinier}
-        />
-      )}
 
       {/* Lignes */}
       {demande.lignes && demande.lignes.length > 0 && (
@@ -549,6 +540,11 @@ export default function DemandeEnvoiDetailPage() {
                       <strong>Motif du refus : </strong>
                       {ligne.motifRefus}
                     </div>
+                  )}
+
+                  {/* Photos départ / réception / retour rattachées à cette ligne */}
+                  {id && (
+                    <LignePhotosInline demandeId={Number(id)} ligneId={ligne.id} />
                   )}
 
                   {acting && refuseFor !== ligne.id && (
