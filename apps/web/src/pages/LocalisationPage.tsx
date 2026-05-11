@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import type { Materiel, Maquette, PaginatedResult } from "@ogade/shared";
 import { api } from "@/lib/api";
 
 // Fix Leaflet default marker icons in Vite bundler
@@ -25,11 +27,29 @@ type SiteMapData = {
 
 export default function LocalisationPage() {
   const navigate = useNavigate();
+  const [selectedSite, setSelectedSite] = useState<SiteMapData | null>(null);
 
   const { data: sites, isLoading } = useQuery<SiteMapData[]>({
     queryKey: ["sites", "map-data"],
     queryFn: () => api.get("/sites/map-data"),
   });
+
+  // Listes matériels / maquettes du site sélectionné
+  const { data: materielsPage, isLoading: matLoading } = useQuery<PaginatedResult<Materiel>>({
+    queryKey: ["materiels", "by-site", selectedSite?.code],
+    queryFn: () =>
+      api.get("/materiels", { site: selectedSite!.code, pageSize: 200, page: 1 }),
+    enabled: !!selectedSite,
+  });
+  const { data: maquettesPage, isLoading: maqLoading } = useQuery<PaginatedResult<Maquette>>({
+    queryKey: ["maquettes", "by-site", selectedSite?.code],
+    queryFn: () =>
+      api.get("/maquettes", { site: selectedSite!.code, pageSize: 200, page: 1 }),
+    enabled: !!selectedSite,
+  });
+
+  const materiels = materielsPage?.data ?? [];
+  const maquettes = maquettesPage?.data ?? [];
 
   const totalMateriels = (sites ?? []).reduce((s, x) => s + x.materielCount, 0);
   const totalMaquettes = (sites ?? []).reduce((s, x) => s + x.maquetteCount, 0);
@@ -53,43 +73,38 @@ export default function LocalisationPage() {
       {/* Stats cards */}
       {!isLoading && sites && sites.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
-          {sites.map((site) => (
-            <div
-              key={site.id}
-              style={{
-                background: "var(--bg-panel)",
-                border: "1px solid var(--line)",
-                borderRadius: 10,
-                padding: "12px 16px",
-                cursor: "pointer",
-                transition: "border-color 0.15s, background 0.15s",
-              }}
-              onClick={() => navigate(`/materiels?site=${site.code}`)}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)";
-                (e.currentTarget as HTMLElement).style.background = "var(--accent-soft)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
-                (e.currentTarget as HTMLElement).style.background = "var(--bg-panel)";
-              }}
-            >
-              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{site.label}</div>
-              <div style={{ fontSize: 11.5, color: "var(--ink-3)", marginTop: 2 }}>
-                {site.ville ?? "—"}
-              </div>
-              <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-                <div style={{ fontSize: 11.5 }}>
-                  <span style={{ fontWeight: 600, color: "var(--accent-ink)" }}>{site.materielCount}</span>
-                  <span style={{ color: "var(--ink-3)", marginLeft: 4 }}>matériel{site.materielCount > 1 ? "s" : ""}</span>
+          {sites.map((site) => {
+            const active = selectedSite?.id === site.id;
+            return (
+              <div
+                key={site.id}
+                style={{
+                  background: active ? "var(--accent-soft)" : "var(--bg-panel)",
+                  border: `1px solid ${active ? "var(--accent-line)" : "var(--line)"}`,
+                  borderRadius: 10,
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  transition: "border-color 0.15s, background 0.15s",
+                }}
+                onClick={() => setSelectedSite(active ? null : site)}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{site.label}</div>
+                <div style={{ fontSize: 11.5, color: "var(--ink-3)", marginTop: 2 }}>
+                  {site.ville ?? "—"}
                 </div>
-                <div style={{ fontSize: 11.5 }}>
-                  <span style={{ fontWeight: 600, color: "var(--violet)" }}>{site.maquetteCount}</span>
-                  <span style={{ color: "var(--ink-3)", marginLeft: 4 }}>maquette{site.maquetteCount > 1 ? "s" : ""}</span>
+                <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+                  <div style={{ fontSize: 11.5 }}>
+                    <span style={{ fontWeight: 600, color: "var(--accent-ink)" }}>{site.materielCount}</span>
+                    <span style={{ color: "var(--ink-3)", marginLeft: 4 }}>matériel{site.materielCount > 1 ? "s" : ""}</span>
+                  </div>
+                  <div style={{ fontSize: 11.5 }}>
+                    <span style={{ fontWeight: 600, color: "var(--violet)" }}>{site.maquetteCount}</span>
+                    <span style={{ color: "var(--ink-3)", marginLeft: 4 }}>maquette{site.maquetteCount > 1 ? "s" : ""}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -146,9 +161,12 @@ export default function LocalisationPage() {
               <Marker
                 key={site.id}
                 position={[site.latitude, site.longitude]}
+                eventHandlers={{
+                  click: () => setSelectedSite(site),
+                }}
               >
                 <Popup>
-                  <div style={{ minWidth: 180, fontFamily: "inherit" }}>
+                  <div style={{ minWidth: 200, fontFamily: "inherit" }}>
                     <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{site.label}</div>
                     {site.ville && (
                       <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>{site.ville}</div>
@@ -166,25 +184,25 @@ export default function LocalisationPage() {
                     <div style={{ display: "flex", gap: 6 }}>
                       <button
                         type="button"
-                        onClick={() => navigate(`/materiels?site=${site.code}`)}
+                        onClick={() => setSelectedSite(site)}
                         style={{
                           flex: 1, padding: "5px 8px", fontSize: 11.5, fontWeight: 500,
                           background: "#4f46e5", color: "white", border: "none",
                           borderRadius: 6, cursor: "pointer",
                         }}
                       >
-                        Matériels
+                        Voir les actifs
                       </button>
                       <button
                         type="button"
-                        onClick={() => navigate(`/maquettes?site=${site.code}`)}
+                        onClick={() => navigate(`/materiels?site=${site.code}`)}
                         style={{
                           flex: 1, padding: "5px 8px", fontSize: 11.5, fontWeight: 500,
-                          background: "#7c3aed", color: "white", border: "none",
+                          background: "#f3f4f6", color: "#374151", border: "1px solid #d1d5db",
                           borderRadius: 6, cursor: "pointer",
                         }}
                       >
-                        Maquettes
+                        Liste complète
                       </button>
                     </div>
                   </div>
@@ -192,6 +210,185 @@ export default function LocalisationPage() {
               </Marker>
             ))}
           </MapContainer>
+        )}
+      </div>
+
+      {/* Listes matériels + maquettes du site sélectionné */}
+      {selectedSite && (
+        <div style={{ marginTop: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <div>
+              <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", margin: 0 }}>
+                {selectedSite.label}
+                {selectedSite.ville && (
+                  <span style={{ fontSize: 13, color: "var(--ink-3)", fontWeight: 400 }}> · {selectedSite.ville}</span>
+                )}
+              </h2>
+              <p style={{ fontSize: 12.5, color: "var(--ink-3)", margin: "2px 0 0" }}>
+                {selectedSite.materielCount} matériel{selectedSite.materielCount > 1 ? "s" : ""} · {selectedSite.maquetteCount} maquette{selectedSite.maquetteCount > 1 ? "s" : ""} sur ce site
+              </p>
+            </div>
+            <button
+              type="button"
+              className="obtn ghost sm"
+              onClick={() => setSelectedSite(null)}
+            >
+              Fermer
+            </button>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {/* Matériels */}
+            <ListePanel
+              title="Matériels"
+              count={materiels.length}
+              loading={matLoading}
+              emptyLabel="Aucun matériel sur ce site"
+              items={materiels.map((m) => ({
+                id: m.id,
+                reference: m.reference,
+                libelle: m.libelle,
+                sub: m.typeMateriel ?? m.modele ?? "—",
+                href: `/materiels/${m.id}`,
+              }))}
+            />
+            {/* Maquettes */}
+            <ListePanel
+              title="Maquettes"
+              count={maquettes.length}
+              loading={maqLoading}
+              emptyLabel="Aucune maquette sur ce site"
+              items={maquettes.map((m) => ({
+                id: m.id,
+                reference: m.reference,
+                libelle: m.libelle,
+                sub: m.typeMaquette ?? m.categorie ?? "—",
+                href: `/maquettes/${m.id}`,
+              }))}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface ListePanelItem {
+  id: number;
+  reference: string;
+  libelle: string;
+  sub: string;
+  href: string;
+}
+
+function ListePanel({
+  title,
+  count,
+  loading,
+  emptyLabel,
+  items,
+}: {
+  title: string;
+  count: number;
+  loading: boolean;
+  emptyLabel: string;
+  items: ListePanelItem[];
+}) {
+  return (
+    <div
+      style={{
+        background: "var(--bg-panel)",
+        border: "1px solid var(--line)",
+        borderRadius: 10,
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: 480,
+      }}
+    >
+      <div
+        style={{
+          padding: "10px 14px",
+          borderBottom: "1px solid var(--line)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            color: "var(--ink-3)",
+          }}
+        >
+          {title} ({count})
+        </span>
+      </div>
+      <div style={{ overflow: "auto", flex: 1 }}>
+        {loading ? (
+          <p style={{ padding: 14, fontSize: 12.5, color: "var(--ink-3)", margin: 0 }}>Chargement…</p>
+        ) : items.length === 0 ? (
+          <p style={{ padding: 14, fontSize: 12.5, color: "var(--ink-3)", margin: 0 }}>{emptyLabel}</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+            <thead>
+              <tr>
+                {["Référence", "Libellé", "Type"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      textAlign: "left",
+                      padding: "8px 12px",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      color: "var(--ink-3)",
+                      borderBottom: "1px solid var(--line-2)",
+                      background: "var(--bg-panel)",
+                      position: "sticky",
+                      top: 0,
+                      zIndex: 1,
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr
+                  key={item.id}
+                  style={{
+                    borderBottom: "1px solid var(--line-2)",
+                    transition: "background 0.1s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-sunken, #f9fafb)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                >
+                  <td style={{ padding: "8px 12px" }}>
+                    <Link
+                      to={item.href}
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontWeight: 600,
+                        color: "var(--accent)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      {item.reference}
+                    </Link>
+                  </td>
+                  <td style={{ padding: "8px 12px", color: "var(--ink-2)" }}>{item.libelle}</td>
+                  <td style={{ padding: "8px 12px", color: "var(--ink-3)" }}>{item.sub}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

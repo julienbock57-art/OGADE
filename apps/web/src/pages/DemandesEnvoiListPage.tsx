@@ -493,6 +493,7 @@ export default function DemandesEnvoiListPage() {
 
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<TabKey>("tous");
+  const [kpiFilter, setKpiFilter] = useState<null | "transit" | "etalonnage" | "prets" | "retards">(null);
   const [filterTypeEnvoi, setFilterTypeEnvoi] = useState("");
   const [filterUrgence, setFilterUrgence] = useState("");
   const [filterSite, setFilterSite] = useState("");
@@ -535,12 +536,41 @@ export default function DemandesEnvoiListPage() {
   });
 
   const rowsRaw = data?.data ?? [];
-  // Filtrage côté client pour onglets multi-statuts + scope "mes"
+  // Filtrage côté client pour onglets multi-statuts + scope "mes" + KPI
   const rows = rowsRaw.filter((r) => {
     if (tabStatuts && tabStatuts.length > 1 && !tabStatuts.includes(r.statut)) return false;
     if (scope === "mes" && user && r.demandeur?.email !== user.email) return false;
+    if (kpiFilter === "transit" && !(r.statut === "EN_TRANSIT" || r.statut === "EN_RETOUR")) return false;
+    if (
+      kpiFilter === "etalonnage" &&
+      !(r.typeEnvoi === "ETALONNAGE" && r.statut !== "CLOTUREE" && r.statut !== "ANNULEE")
+    )
+      return false;
+    if (
+      kpiFilter === "prets" &&
+      !(
+        (r.typeEnvoi === "PRET_INTERNE" || r.typeEnvoi === "PRET_EXTERNE") &&
+        r.statut !== "CLOTUREE" &&
+        r.statut !== "ANNULEE"
+      )
+    )
+      return false;
+    if (
+      kpiFilter === "retards" &&
+      !(
+        isLate(r.dateRetourEstimee) &&
+        r.statut !== "CLOTUREE" &&
+        r.statut !== "ANNULEE" &&
+        r.statut !== "RECUE_RETOUR"
+      )
+    )
+      return false;
     return true;
   });
+
+  function toggleKpi(k: NonNullable<typeof kpiFilter>) {
+    setKpiFilter((prev) => (prev === k ? null : k));
+  }
 
   // Compteurs par onglet (sur les stats globales)
   const tabCounts: Record<TabKey, number> = {
@@ -628,11 +658,11 @@ export default function DemandesEnvoiListPage() {
           marginBottom: 16,
         }}
       >
-        <KpiCard label="Total actifs"        value={kpiTotalActifs}  sub="mouvements en cours"   color="var(--accent, #6366f1)"     active={tab === "actifs"}    onClick={() => setTab("actifs")} />
-        <KpiCard label="En transit"           value={kpiEnTransit}    sub="aller + retour"        color="var(--sky, #0ea5e9)" />
-        <KpiCard label="Étalonnages en cours" value={kpiEtalonnages}  sub="chez prestataire"      color="var(--violet, #8b5cf6)" />
-        <KpiCard label="Prêts en cours"       value={kpiPrets}        sub="internes + externes"   color="var(--amber, #f59e0b)" />
-        <KpiCard label="Retards"              value={kpiRetards}      sub="retour dépassé"        color="var(--rose, #ef4444)" />
+        <KpiCard label="Total actifs"        value={kpiTotalActifs}  sub="mouvements en cours"   color="var(--accent, #6366f1)"  active={tab === "actifs" && !kpiFilter} onClick={() => { setTab("actifs"); setKpiFilter(null); }} />
+        <KpiCard label="En transit"           value={kpiEnTransit}    sub="aller + retour"        color="var(--sky, #0ea5e9)"     active={kpiFilter === "transit"}    onClick={() => toggleKpi("transit")} />
+        <KpiCard label="Étalonnages en cours" value={kpiEtalonnages}  sub="chez prestataire"      color="var(--violet, #8b5cf6)"  active={kpiFilter === "etalonnage"} onClick={() => toggleKpi("etalonnage")} />
+        <KpiCard label="Prêts en cours"       value={kpiPrets}        sub="internes + externes"   color="var(--amber, #f59e0b)"   active={kpiFilter === "prets"}      onClick={() => toggleKpi("prets")} />
+        <KpiCard label="Retards"              value={kpiRetards}      sub="retour dépassé"        color="var(--rose, #ef4444)"    active={kpiFilter === "retards"}    onClick={() => toggleKpi("retards")} />
       </div>
 
       {/* Toolbar */}
