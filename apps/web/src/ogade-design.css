@@ -1360,21 +1360,13 @@ table.list tr.expand td {
 /* ─── Localisation page : empêche Leaflet de passer devant le sidebar ──
    Leaflet a des z-index internes (jusqu'à 1000 pour les .leaflet-control),
    ce qui passait devant le sidebar (z-index 40). On crée un nouveau
-   stacking context qui scope tout le z-index de Leaflet à la page. */
+   stacking context qui scope tout le z-index de Leaflet à la page.
+   `isolation: isolate` suffit — il ne faut PAS écraser les z-index
+   internes (sinon les popups passent sous les tiles). */
 .localisation-page {
   position: relative;
   z-index: 0;
   isolation: isolate;
-}
-
-/* Filet de sécurité supplémentaire : le wrapper Leaflet ne peut pas
-   dépasser le z-index 39 (juste sous le sidebar). */
-.localisation-page .leaflet-container,
-.localisation-page .leaflet-pane,
-.localisation-page .leaflet-control,
-.localisation-page .leaflet-top,
-.localisation-page .leaflet-bottom {
-  z-index: auto !important;
 }
 
 /* ─── Version badge dans le sidebar ─── */

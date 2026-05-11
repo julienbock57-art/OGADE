@@ -50,7 +50,6 @@ const navSections = [
     items: [
       { to: "/materiels", label: "Matériels END", icon: "list" },
       { to: "/localisation", label: "Localisation", icon: "map" },
-      { to: "/agents", label: "Agents", icon: "user" },
     ],
   },
   {
