@@ -13,6 +13,7 @@ import {
 import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 import MaquetteDefautsEditor from "@/components/MaquetteDefautsEditor";
+import Maquette3DSection from "@/components/Maquette3DSection";
 
 type Agent = { id: number; nom: string; prenom: string; email: string };
 
@@ -47,12 +48,15 @@ export default function MaquetteFormPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // In edit mode we insert a "Défauts" step between "Vie & patrimoine" and "Revue".
+  // In edit mode we insert "Défauts" + "Modèles 3D" steps before "Revue".
+  // Les modèles 3D nécessitent un id de maquette existant (lien fichier
+  // → entityId), donc seulement accessibles en édition.
   const STEPS = isEdit
-    ? ["Identité", "Géométrie", "Localisation", "Vie & patrimoine", "Défauts", "Revue"]
+    ? ["Identité", "Géométrie", "Localisation", "Vie & patrimoine", "Défauts", "Modèles 3D", "Revue"]
     : (BASE_STEPS as unknown as string[]);
   const REVIEW_STEP = STEPS.length - 1;
   const DEFAUTS_STEP = isEdit ? 4 : -1;
+  const MODELES_3D_STEP = isEdit ? 5 : -1;
 
   const [step, setStep] = useState(0);
   const [triedAdvance, setTriedAdvance] = useState<Set<number>>(new Set());
@@ -542,6 +546,11 @@ export default function MaquetteFormPage() {
             {/* STEP — Défauts (edit mode only) */}
             {isEdit && step === DEFAUTS_STEP && id && (
               <MaquetteDefautsEditor maquetteId={Number(id)} />
+            )}
+
+            {/* STEP — Modèles 3D (edit mode only) */}
+            {isEdit && step === MODELES_3D_STEP && id && (
+              <Maquette3DSection maquetteId={Number(id)} />
             )}
 
             {/* STEP — Revue (last step) */}
