@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { Maquette } from "@ogade/shared";
 import { api } from "@/lib/api";
 import MaquetteDrawer from "@/components/MaquetteDrawer";
-import HistoriqueEnvoisSection from "@/components/HistoriqueEnvoisSection";
 
 export default function MaquetteDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -53,7 +52,6 @@ export default function MaquetteDetailPage() {
   return (
     <div style={{ padding: "24px 16px 0" }}>
       <MaquetteDrawer maquette={data} mode="page" />
-      <HistoriqueEnvoisSection kind="maquette" id={data.id} />
     </div>
   );
 }
