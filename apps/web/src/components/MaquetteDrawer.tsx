@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Defaut, Evenement, Fichier, Maquette } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { usePanier } from "@/lib/panier";
+import Maquette3DSection from "@/components/Maquette3DSection";
 import {
   MQ_ETAT_PILL,
   defautColor,
@@ -387,13 +388,14 @@ function InfosTab({ m }: { m: Maquette }) {
 }
 
 // Placeholder export — other tabs will be added by the next step.
-type TabId = "infos" | "defauts" | "pj" | "photos" | "historique" | "colisage" | "qr";
+type TabId = "infos" | "defauts" | "pj" | "photos" | "modeles3d" | "historique" | "colisage" | "qr";
 
 const TABS: { id: TabId; label: string; icon: string; countKey?: "defauts" }[] = [
   { id: "infos",      label: "Infos générales", icon: "eye" },
   { id: "defauts",    label: "Défauts & plan",  icon: "alert", countKey: "defauts" },
   { id: "pj",         label: "Documents & ECM", icon: "clip" },
   { id: "photos",     label: "Photos",          icon: "photo" },
+  { id: "modeles3d",  label: "Modèles 3D",      icon: "box" },
   { id: "historique", label: "Historique",      icon: "history" },
   { id: "colisage",   label: "Colisage",        icon: "box" },
   { id: "qr",         label: "QR / fiche",      icon: "qr" },
@@ -503,6 +505,7 @@ export default function MaquetteDrawer({
       {tab === "defauts" && <DefautsTab m={m} defauts={defauts} />}
       {tab === "pj" && <PiecesJointesTab m={m} />}
       {tab === "photos" && <PhotosTab m={m} />}
+      {tab === "modeles3d" && <Maquette3DSection maquetteId={m.id} readOnly />}
       {tab === "historique" && <HistoriqueTab m={m} />}
       {tab === "colisage" && <ColisageTab m={m} />}
       {tab === "qr" && <QrTab m={m} />}
