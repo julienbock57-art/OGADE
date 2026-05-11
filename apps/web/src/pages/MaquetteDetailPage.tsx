@@ -4,7 +4,6 @@ import type { Maquette } from "@ogade/shared";
 import { api } from "@/lib/api";
 import MaquetteDrawer from "@/components/MaquetteDrawer";
 import HistoriqueEnvoisSection from "@/components/HistoriqueEnvoisSection";
-import Maquette3DSection from "@/components/Maquette3DSection";
 
 export default function MaquetteDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +53,6 @@ export default function MaquetteDetailPage() {
   return (
     <div style={{ padding: "24px 16px 0" }}>
       <MaquetteDrawer maquette={data} mode="page" />
-      <Maquette3DSection maquetteId={data.id} readOnly={false} />
       <HistoriqueEnvoisSection kind="maquette" id={data.id} />
     </div>
   );
