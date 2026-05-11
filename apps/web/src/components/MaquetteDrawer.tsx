@@ -5,6 +5,7 @@ import type { Defaut, Evenement, Fichier, Maquette } from "@ogade/shared";
 import { api } from "@/lib/api";
 import { usePanier } from "@/lib/panier";
 import Maquette3DSection from "@/components/Maquette3DSection";
+import HistoriqueEnvoisSection from "@/components/HistoriqueEnvoisSection";
 import {
   MQ_ETAT_PILL,
   defautColor,
@@ -906,51 +907,47 @@ function HistoriqueTab({ m }: { m: Maquette }) {
       }
     },
   });
-  if (isLoading) {
-    return (
-      <PropCard title="Historique" icon="history">
-        <p style={{ margin: 0, color: "var(--ink-3)", fontSize: 12.5 }}>
-          Chargement…
-        </p>
-      </PropCard>
-    );
-  }
   const events = data ?? [];
-  if (events.length === 0) {
-    return (
-      <PropCard title="Historique" icon="history">
-        <p style={{ margin: 0, color: "var(--ink-3)", fontSize: 12.5 }}>
-          Aucun évènement enregistré pour cette maquette.
-        </p>
-      </PropCard>
-    );
-  }
+
   return (
-    <PropCard title="Historique" icon="history" count={events.length}>
-      <div className="vtimeline">
-        {events.map((evt, i) => {
-          const acteur = evt.acteur;
-          return (
-            <div key={evt.id} className={`vstep ${i === 0 ? "current" : "done"}`}>
-              <div className="vdot">{i === 0 ? <Icon name="check" size={8} /> : null}</div>
-              <div className="vbody">
-                <div className="vtitle">{EVENT_TITLES[evt.eventType] ?? evt.eventType}</div>
-                <div className="vmeta">
-                  {new Date(evt.occurredAt).toLocaleString("fr-FR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  {acteur ? ` · ${acteur.prenom} ${acteur.nom}` : ""}
+    <div className="vstack" style={{ gap: 14 }}>
+      <PropCard title="Historique de modification" icon="history" count={events.length}>
+        {isLoading ? (
+          <p style={{ margin: 0, color: "var(--ink-3)", fontSize: 12.5 }}>Chargement…</p>
+        ) : events.length === 0 ? (
+          <p style={{ margin: 0, color: "var(--ink-3)", fontSize: 12.5 }}>
+            Aucun évènement enregistré pour cette maquette.
+          </p>
+        ) : (
+          <div className="vtimeline">
+            {events.map((evt, i) => {
+              const acteur = evt.acteur;
+              return (
+                <div key={evt.id} className={`vstep ${i === 0 ? "current" : "done"}`}>
+                  <div className="vdot">{i === 0 ? <Icon name="check" size={8} /> : null}</div>
+                  <div className="vbody">
+                    <div className="vtitle">{EVENT_TITLES[evt.eventType] ?? evt.eventType}</div>
+                    <div className="vmeta">
+                      {new Date(evt.occurredAt).toLocaleString("fr-FR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      {acteur ? ` · ${acteur.prenom} ${acteur.nom}` : ""}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </PropCard>
+              );
+            })}
+          </div>
+        )}
+      </PropCard>
+
+      {/* Historique des envois (mouvements de la maquette) */}
+      <HistoriqueEnvoisSection kind="maquette" id={m.id} />
+    </div>
   );
 }
 

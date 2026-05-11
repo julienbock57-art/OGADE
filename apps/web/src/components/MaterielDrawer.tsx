@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { useReferentiel, useSites, useEntreprises } from "@/hooks/use-referentiels";
 import ReservationModal from "@/components/ReservationModal";
 import GanttCalendar from "@/components/GanttCalendar";
+import HistoriqueEnvoisSection from "@/components/HistoriqueEnvoisSection";
 
 // ─── LOCAL ICON COMPONENT ──────────────────────────────────────────────────
 const iconPaths: Record<string, string> = {
@@ -1358,7 +1359,12 @@ export default function MaterielDrawer({
           )}
 
           {/* ── Tab: Historique ── */}
-          {tab === "historique" && <HistoriqueTab materielId={m.id} />}
+          {tab === "historique" && (
+            <div className="vstack" style={{ gap: 14 }}>
+              <HistoriqueTab materielId={m.id} />
+              <HistoriqueEnvoisSection kind="materiel" id={m.id} />
+            </div>
+          )}
 
           {/* ── Tab: QR code ── */}
           {tab === "qr" && (
