@@ -124,7 +124,7 @@ export class MaterielsService {
     const now = new Date();
     const in30Days = new Date(now.getTime() + 30 * 86400000);
 
-    const [total, echus, prochains, enPret, hs, incomplets] = await Promise.all([
+    const [total, echus, prochains, enPret, hs, byEtatRows, incomplets] = await Promise.all([
       this.prisma.materiel.count({ where }),
       this.prisma.materiel.count({
         where: {
@@ -144,12 +144,22 @@ export class MaterielsService {
       this.prisma.materiel.count({
         where: { ...where, etat: { in: ['HS', 'PERDU'] } },
       }),
+      this.prisma.materiel.groupBy({
+        by: ['etat'],
+        where,
+        _count: { _all: true },
+      }),
       this.prisma.materiel.count({
         where: { ...where, completude: 'INCOMPLET' },
       }),
     ]);
 
-    return { total, echus, prochains, enPret, hs, incomplets };
+    const byEtat: Record<string, number> = {};
+    for (const r of byEtatRows) {
+      if (r.etat) byEtat[r.etat] = r._count._all;
+    }
+
+    return { total, echus, prochains, enPret, hs, incomplets, byEtat };
   }
 
   async findOne(id: number) {
