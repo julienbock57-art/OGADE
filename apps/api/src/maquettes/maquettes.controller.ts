@@ -101,7 +101,12 @@ export class MaquettesController {
     if (!result.success) {
       throw new BadRequestException(result.error.flatten());
     }
-    return this.maquettesService.update(id, result.data, user?.agentId);
+    return this.maquettesService.update(
+      id,
+      result.data,
+      user?.agentId,
+      user?.agentId,
+    );
   }
 
   @Delete(':id')

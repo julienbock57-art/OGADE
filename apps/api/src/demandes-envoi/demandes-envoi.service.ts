@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService, type CreateNotificationInput } from '../notifications/notifications.service';
 import type { CreateDemandeEnvoiInput, UpdateDemandeEnvoiInput } from '@ogade/shared';
 
 const AGENT_SELECT = {
@@ -50,7 +51,58 @@ const DEMANDE_DETAIL_INCLUDE = {
 
 @Injectable()
 export class DemandesEnvoiService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
+
+  // ─── Notifications helpers ───────────────────────────────────
+
+  /** Construit le résumé "SITE_A → SITE_B · N ligne(s)" pour le message. */
+  private buildDemandeSummary(demande: {
+    siteOrigine?: string | null;
+    siteDestinataire?: string | null;
+    lignes?: { id: number }[];
+  }): string {
+    const origine = demande.siteOrigine ?? '?';
+    const dest = demande.siteDestinataire ?? '?';
+    const count = demande.lignes?.length ?? 0;
+    const label = count > 1 ? `${count} lignes` : `${count} ligne`;
+    return `${origine} → ${dest} · ${label}`;
+  }
+
+  /** Construit un payload de notif pour une demande, en ignorant l'acteur. */
+  private buildDemandeNotif(
+    demande: { id: number; numero: string; siteOrigine?: string | null; siteDestinataire?: string | null; lignes?: { id: number }[] },
+    recipientId: number,
+    type: string,
+    title: string,
+    link?: string,
+    actorId?: number,
+  ): CreateNotificationInput | null {
+    if (!recipientId) return null;
+    if (actorId && recipientId === actorId) return null;
+    return {
+      recipientId,
+      type,
+      title,
+      message: this.buildDemandeSummary(demande),
+      link: link ?? `/demandes-envoi/${demande.id}`,
+      entityType: 'DemandeEnvoi',
+      entityId: demande.id,
+    };
+  }
+
+  /** Récupère les agentIds magasiniers attachés à un site donné. */
+  private async getMagasinierIdsForSite(siteCode: string | null | undefined): Promise<number[]> {
+    if (!siteCode) return [];
+    const links = await this.prisma.magasinierSite.findMany({
+      where: { siteCode },
+      select: { agentId: true },
+    });
+    return Array.from(new Set(links.map((l) => l.agentId)));
+  }
+
 
   async findAll(params: {
     page: number;
@@ -233,7 +285,7 @@ export class DemandesEnvoiService {
     if (demande.lignes.length === 0) {
       throw new BadRequestException('La demande doit contenir au moins une ligne');
     }
-    return this.prisma.demandeEnvoi.update({
+    const updated = await this.prisma.demandeEnvoi.update({
       where: { id },
       data: {
         statut: 'SOUMISE',
@@ -241,6 +293,28 @@ export class DemandesEnvoiService {
       },
       include: DEMANDE_DETAIL_INCLUDE,
     });
+
+    // Notifie tous les référents (uniques) responsables des lignes.
+    const referentIds = new Set<number>();
+    for (const ligne of updated.lignes) {
+      const refId = ligne.materiel?.responsableId ?? ligne.maquette?.referentId ?? null;
+      if (refId) referentIds.add(refId);
+    }
+    const notifs: CreateNotificationInput[] = [];
+    for (const refId of referentIds) {
+      const n = this.buildDemandeNotif(
+        updated,
+        refId,
+        'DEMANDE_A_VALIDER',
+        `Demande ${updated.numero} à valider`,
+        '/validations',
+        userId,
+      );
+      if (n) notifs.push(n);
+    }
+    if (notifs.length > 0) await this.notifications.createMany(notifs);
+
+    return updated;
   }
 
   async validateLigne(
@@ -263,8 +337,10 @@ export class DemandesEnvoiService {
         motifRefus: null,
       },
     });
-    await this.recomputeDemandeStatut(demandeId);
-    return this.findOne(demandeId);
+    const { previousStatut, nextStatut } = await this.recomputeDemandeStatut(demandeId);
+    const demande = await this.findOne(demandeId);
+    await this.emitValidationNotifs(demande, previousStatut, nextStatut, user.agentId, 'validation');
+    return demande;
   }
 
   async refuseLigne(
@@ -288,8 +364,77 @@ export class DemandesEnvoiService {
         motifRefus: motif,
       },
     });
-    await this.recomputeDemandeStatut(demandeId);
-    return this.findOne(demandeId);
+    const { previousStatut, nextStatut } = await this.recomputeDemandeStatut(demandeId);
+    const demande = await this.findOne(demandeId);
+    await this.emitValidationNotifs(demande, previousStatut, nextStatut, user.agentId, 'refus');
+    return demande;
+  }
+
+  /**
+   * Émet les notifications consécutives à une validation/refus de ligne,
+   * en fonction de la transition de statut de la demande (évite les
+   * doublons de VALIDEE_PARTIELLEMENT à chaque ligne).
+   */
+  private async emitValidationNotifs(
+    demande: { id: number; numero: string; demandeurId: number; siteOrigine?: string | null; siteDestinataire?: string | null; lignes: { id: number }[] },
+    previousStatut: string | null,
+    nextStatut: string | null,
+    actorId: number,
+    action: 'validation' | 'refus',
+  ): Promise<void> {
+    if (!nextStatut || nextStatut === previousStatut) return;
+
+    const notifs: CreateNotificationInput[] = [];
+
+    if (nextStatut === 'VALIDEE_PARTIELLEMENT') {
+      const title = action === 'refus'
+        ? `Demande ${demande.numero} partiellement refusée`
+        : `Demande ${demande.numero} partiellement validée`;
+      const n = this.buildDemandeNotif(
+        demande,
+        demande.demandeurId,
+        'DEMANDE_VAL_PARTIELLE',
+        title,
+        undefined,
+        actorId,
+      );
+      if (n) notifs.push(n);
+    } else if (nextStatut === 'VALIDEE') {
+      const n = this.buildDemandeNotif(
+        demande,
+        demande.demandeurId,
+        'DEMANDE_VALIDEE',
+        `Demande ${demande.numero} validée`,
+        undefined,
+        actorId,
+      );
+      if (n) notifs.push(n);
+      // Notifier les magasiniers du site d'origine.
+      const magasinierIds = await this.getMagasinierIdsForSite(demande.siteOrigine);
+      for (const mId of magasinierIds) {
+        const m = this.buildDemandeNotif(
+          demande,
+          mId,
+          'DEMANDE_A_TRAITER',
+          `Demande ${demande.numero} à prendre en charge`,
+          '/magasin',
+          actorId,
+        );
+        if (m) notifs.push(m);
+      }
+    } else if (nextStatut === 'REFUSEE') {
+      const n = this.buildDemandeNotif(
+        demande,
+        demande.demandeurId,
+        'DEMANDE_REFUSEE',
+        `Demande ${demande.numero} refusée`,
+        undefined,
+        actorId,
+      );
+      if (n) notifs.push(n);
+    }
+
+    if (notifs.length > 0) await this.notifications.createMany(notifs);
   }
 
   async findInbox(
@@ -381,12 +526,26 @@ export class DemandesEnvoiService {
     return ligne;
   }
 
-  private async recomputeDemandeStatut(demandeId: number) {
+  /**
+   * Recalcule le statut global de la demande en fonction de ses lignes.
+   * Retourne un objet { previousStatut, nextStatut } pour permettre à
+   * l'appelant de décider quelles notifications déclencher (et d'éviter
+   * d'envoyer une notif VALIDEE_PARTIELLEMENT plusieurs fois).
+   */
+  private async recomputeDemandeStatut(
+    demandeId: number,
+  ): Promise<{ previousStatut: string | null; nextStatut: string | null }> {
     const lignes = await this.prisma.demandeEnvoiLigne.findMany({
       where: { demandeId },
       select: { statut: true },
     });
-    if (lignes.length === 0) return;
+    if (lignes.length === 0) return { previousStatut: null, nextStatut: null };
+
+    const current = await this.prisma.demandeEnvoi.findUnique({
+      where: { id: demandeId },
+      select: { statut: true },
+    });
+    const previousStatut = current?.statut ?? null;
 
     const enAttente = lignes.some((l) => l.statut === 'EN_ATTENTE');
     const validees = lignes.filter((l) => l.statut === 'VALIDEE').length;
@@ -407,6 +566,7 @@ export class DemandesEnvoiService {
       data.dateValidation = new Date();
     }
     await this.prisma.demandeEnvoi.update({ where: { id: demandeId }, data });
+    return { previousStatut, nextStatut };
   }
 
   // ─── Phase 4 : module magasinier ─────────────────────────────
@@ -477,7 +637,37 @@ export class DemandesEnvoiService {
         },
       });
     });
-    return this.findOne(id);
+
+    const refreshed = await this.findOne(id);
+    const notifs: CreateNotificationInput[] = [];
+    // Demandeur : sa demande est partie.
+    const nDemandeur = this.buildDemandeNotif(
+      refreshed,
+      refreshed.demandeurId,
+      'DEMANDE_EXPEDIEE',
+      `Demande ${refreshed.numero} expédiée`,
+      undefined,
+      user.agentId,
+    );
+    if (nDemandeur) notifs.push(nDemandeur);
+
+    // Si envoi interne : prévenir les magasiniers du site destinataire.
+    if (refreshed.typeEnvoi === 'INTERNE') {
+      const magasinierIds = await this.getMagasinierIdsForSite(refreshed.siteDestinataire);
+      for (const mId of magasinierIds) {
+        const m = this.buildDemandeNotif(
+          refreshed,
+          mId,
+          'DEMANDE_EXPEDIEE',
+          `Demande ${refreshed.numero} arrive sur votre site`,
+          '/magasin',
+          user.agentId,
+        );
+        if (m) notifs.push(m);
+      }
+    }
+    if (notifs.length > 0) await this.notifications.createMany(notifs);
+    return refreshed;
   }
 
   async receptionner(
@@ -585,7 +775,18 @@ export class DemandesEnvoiService {
         },
       });
     });
-    return this.findOne(id);
+
+    const refreshed = await this.findOne(id);
+    const nDemandeur = this.buildDemandeNotif(
+      refreshed,
+      refreshed.demandeurId,
+      'DEMANDE_RECUE',
+      `Demande ${refreshed.numero} réceptionnée`,
+      undefined,
+      user.agentId,
+    );
+    if (nDemandeur) await this.notifications.create(nDemandeur);
+    return refreshed;
   }
 
   async prepareReturn(id: number, user: { agentId: number; roles: string[] }) {
@@ -655,7 +856,18 @@ export class DemandesEnvoiService {
         },
       });
     });
-    return this.findOne(id);
+
+    const refreshed = await this.findOne(id);
+    const nDemandeur = this.buildDemandeNotif(
+      refreshed,
+      refreshed.demandeurId,
+      'DEMANDE_RECUE',
+      `Demande ${refreshed.numero} retour reçu`,
+      undefined,
+      user.agentId,
+    );
+    if (nDemandeur) await this.notifications.create(nDemandeur);
+    return refreshed;
   }
 
   async cloturer(id: number, user: { agentId: number; roles: string[] }) {
@@ -686,7 +898,18 @@ export class DemandesEnvoiService {
         data: { statut: 'CLOTUREE', dateCloture: new Date() },
       });
     });
-    return this.findOne(id);
+
+    const refreshed = await this.findOne(id);
+    const nDemandeur = this.buildDemandeNotif(
+      refreshed,
+      refreshed.demandeurId,
+      'DEMANDE_CLOTUREE',
+      `Demande ${refreshed.numero} clôturée`,
+      undefined,
+      user.agentId,
+    );
+    if (nDemandeur) await this.notifications.create(nDemandeur);
+    return refreshed;
   }
 
   async findMagasinierInbox(

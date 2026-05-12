@@ -23,6 +23,8 @@ import AdminSitesPage from "@/pages/AdminSitesPage";
 import AdminEntreprisesPage from "@/pages/AdminEntreprisesPage";
 import AdminAgentsPage from "@/pages/AdminAgentsPage";
 import LocalisationPage from "@/pages/LocalisationPage";
+import NotificationsPage from "@/pages/NotificationsPage";
+import NotificationPreferencesPage from "@/pages/NotificationPreferencesPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading, authConfig } = useAuth();
@@ -85,6 +87,11 @@ export function AppRoutes() {
         <Route path="/admin/sites" element={<AdminSitesPage />} />
         <Route path="/admin/entreprises" element={<AdminEntreprisesPage />} />
         <Route path="/admin/agents" element={<AdminAgentsPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route
+          path="/parametres/notifications"
+          element={<NotificationPreferencesPage />}
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

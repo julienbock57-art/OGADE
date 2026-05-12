@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EvenementsService } from '../evenements/evenements.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import type { CreateMaterielInput, UpdateMaterielInput } from '@ogade/shared';
 
 const materielInclude = {
@@ -30,6 +31,7 @@ export class MaterielsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly evenements: EvenementsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async findAll(params: {
@@ -198,7 +200,12 @@ export class MaterielsService {
     return materiel;
   }
 
-  async update(id: number, data: UpdateMaterielInput, userId?: number) {
+  async update(
+    id: number,
+    data: UpdateMaterielInput,
+    userId?: number,
+    actorId?: number,
+  ) {
     const before = await this.findOne(id);
 
     const materiel = await this.prisma.materiel.update({
@@ -229,6 +236,23 @@ export class MaterielsService {
         },
         acteurId: userId,
       });
+
+      // Notification au responsable, sauf si c'est lui qui modifie.
+      const effectiveActorId = actorId ?? userId;
+      if (
+        materiel.responsableId &&
+        materiel.responsableId !== effectiveActorId
+      ) {
+        await this.notifications.create({
+          recipientId: materiel.responsableId,
+          type: 'MATERIEL_MODIFIE',
+          title: `Matériel ${materiel.reference} modifié`,
+          message: `${materiel.libelle} a été modifié`,
+          link: `/materiels/${materiel.id}`,
+          entityType: 'Materiel',
+          entityId: materiel.id,
+        });
+      }
     }
 
     return materiel;

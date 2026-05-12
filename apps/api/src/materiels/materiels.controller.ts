@@ -124,7 +124,12 @@ export class MaterielsController {
     if (!result.success) {
       throw new BadRequestException(result.error.flatten());
     }
-    return this.materielsService.update(id, result.data, user?.agentId);
+    return this.materielsService.update(
+      id,
+      result.data,
+      user?.agentId,
+      user?.agentId,
+    );
   }
 
   @Delete(':id')

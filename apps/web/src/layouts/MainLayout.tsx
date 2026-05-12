@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import QrScannerModal from "@/components/QrScannerModal";
 import SettingsModal from "@/components/SettingsModal";
 import PanierDrawer from "@/components/PanierDrawer";
+import NotificationsBell from "@/components/NotificationsBell";
 import ChatWidget from "@/components/ChatWidget";
 import { usePanier } from "@/lib/panier";
 
@@ -238,6 +239,7 @@ export default function MainLayout() {
                 </span>
               )}
             </button>
+            <NotificationsBell />
             <button
               type="button"
               className="icon-btn"
