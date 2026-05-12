@@ -10,10 +10,12 @@
  * dateReception, dateRetour, dateCloture) et du typeEnvoi (cycle aller +
  * retour pour étalonnage / prêt, simple aller pour titulaire/interne).
  */
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Fichier } from "@ogade/shared";
 import { api } from "@/lib/api";
-import { downloadFichier, openFichier } from "@/lib/fichiers";
+import { downloadFichier } from "@/lib/fichiers";
+import PhotosGalleryModal from "./PhotosGalleryModal";
 
 type StepState = "done" | "current" | "future";
 
@@ -174,6 +176,9 @@ interface Props {
 }
 
 export default function WorkflowTimeline({ demande }: Props) {
+  // Quel groupe de photos ouvrir en plein écran (null = fermé).
+  const [galleryKind, setGalleryKind] = useState<null | "colis" | "reception" | "retour">(null);
+
   // On charge les fichiers pour construire les tags "Photo colis" et
   // "Bon transport" sur les étapes adéquates.
   const { data: fichiers = [] } = useQuery<Fichier[]>({
@@ -270,9 +275,7 @@ export default function WorkflowTimeline({ demande }: Props) {
   }
 
   if (isRefused) {
-    return (
-      <Section steps={steps} />
-    );
+    return <Section steps={steps} />;
   }
 
   // 4. Prête à expédier
@@ -286,7 +289,7 @@ export default function WorkflowTimeline({ demande }: Props) {
       stateFor(4) === "done"
         ? [
             ...(photosColis.length > 0
-              ? [{ label: `Photo colis (${photosColis.length})`, onClick: () => photosColis[0] && openFichier(photosColis[0].id) }]
+              ? [{ label: `Photo colis (${photosColis.length})`, onClick: () => setGalleryKind("colis") }]
               : []),
             ...(bonTransport
               ? [{ label: "Bon transport", onClick: () => downloadFichier(bonTransport.id, bonTransport.nomOriginal ?? "bon-transport") }]
@@ -323,7 +326,7 @@ export default function WorkflowTimeline({ demande }: Props) {
     date: fmtDate(demande.dateReception),
     tags:
       stateFor(6) === "done" && photosReception.length > 0
-        ? [{ label: `Photo réception (${photosReception.length})`, onClick: () => photosReception[0] && openFichier(photosReception[0].id) }]
+        ? [{ label: `Photo réception (${photosReception.length})`, onClick: () => setGalleryKind("reception") }]
         : undefined,
     comment: stateFor(6) !== "future" ? demande.commentaireReception : null,
   });
@@ -347,7 +350,7 @@ export default function WorkflowTimeline({ demande }: Props) {
       date: fmtDate(demande.dateRetour),
       tags:
         stateFor(8) === "done" && photosRetour.length > 0
-          ? [{ label: `Photo retour (${photosRetour.length})`, onClick: () => photosRetour[0] && openFichier(photosRetour[0].id) }]
+          ? [{ label: `Photo retour (${photosRetour.length})`, onClick: () => setGalleryKind("retour") }]
           : undefined,
       comment: stateFor(8) !== "future" ? demande.commentaireRetour : null,
     });
@@ -361,7 +364,29 @@ export default function WorkflowTimeline({ demande }: Props) {
     date: fmtDate(demande.dateCloture),
   });
 
-  return <Section steps={steps} />;
+  const galleryPhotos =
+    galleryKind === "colis" ? photosColis
+    : galleryKind === "reception" ? photosReception
+    : galleryKind === "retour" ? photosRetour
+    : [];
+  const galleryTitle =
+    galleryKind === "colis" ? "Photos colis"
+    : galleryKind === "reception" ? "Photos réception"
+    : galleryKind === "retour" ? "Photos retour"
+    : "";
+
+  return (
+    <>
+      <Section steps={steps} />
+      {galleryKind && galleryPhotos.length > 0 && (
+        <PhotosGalleryModal
+          photos={galleryPhotos}
+          title={galleryTitle}
+          onClose={() => setGalleryKind(null)}
+        />
+      )}
+    </>
+  );
 }
 
 function Section({ steps }: { steps: Step[] }) {

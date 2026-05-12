@@ -26,6 +26,7 @@ import { useAuth } from "@/lib/auth";
 import { usePagination } from "@/hooks/use-pagination";
 import { useSites } from "@/hooks/use-referentiels";
 import { openFichier, downloadFichier } from "@/lib/fichiers";
+import PhotosGalleryModal from "@/components/PhotosGalleryModal";
 import Pagination from "@/components/Pagination";
 
 // ── Icons inline ────────────────────────────────────────────────
@@ -347,6 +348,7 @@ interface ExpandedProps {
 
 function ExpandedRow({ demande }: ExpandedProps) {
   const navigate = useNavigate();
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   const { data: photos = [] } = useQuery<Fichier[]>({
     queryKey: ["fichiers", "DEMANDE_ENVOI", demande.id, "PHOTO", "expanded"],
@@ -428,8 +430,8 @@ function ExpandedRow({ demande }: ExpandedProps) {
               <button
                 type="button"
                 className="obtn sm"
-                onClick={() => photos[0] && openFichier(photos[0].id)}
-                title="Ouvrir les photos colis"
+                onClick={() => setGalleryOpen(true)}
+                title="Ouvrir la galerie photo"
               >
                 <Icon name="paperclip" size={11} />
                 Photo colis ({photosCount})
@@ -456,6 +458,13 @@ function ExpandedRow({ demande }: ExpandedProps) {
           </div>
         </div>
       </div>
+      {galleryOpen && (
+        <PhotosGalleryModal
+          photos={photos}
+          title={`Photos colis · ${demande.numero}`}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
     </td>
   );
 }
