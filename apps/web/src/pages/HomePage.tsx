@@ -3,24 +3,49 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
-type StatsResponse = {
-  materiels: { total: number; data: { etat: string }[] };
-  maquettes: { total: number; data: { etat: string }[] };
-  demandes: { total: number; data: { statut: string }[] };
+type MaterielStats = {
+  total: number;
+  echus: number;
+  prochains: number;
+  enPret: number;
+  hs: number;
+  incomplets: number;
+  byEtat: Record<string, number>;
+};
+type MaquetteStats = {
+  total: number;
+  stock: number;
+  empruntees: number;
+  transit: number;
+  empruntesOuTransit: number;
+  asn: number;
+  hs: number;
+  enReparation: number;
+  byEtat: Record<string, number>;
+};
+type DemandeStats = {
+  total: number;
+  brouillons: number;
+  aValider: number;
+  aTraiter: number;
+  enTransit: number;
+  cloturees: number;
+  refusees: number;
+  byStatut: Record<string, number>;
 };
 
 function useStats() {
-  const materiels = useQuery({
+  const materiels = useQuery<MaterielStats>({
     queryKey: ["materiels", "stats"],
-    queryFn: () => api.get<StatsResponse["materiels"]>("/materiels", { page: 1, pageSize: 200 }),
+    queryFn: () => api.get<MaterielStats>("/materiels/stats"),
   });
-  const maquettes = useQuery({
+  const maquettes = useQuery<MaquetteStats>({
     queryKey: ["maquettes", "stats"],
-    queryFn: () => api.get<StatsResponse["maquettes"]>("/maquettes", { page: 1, pageSize: 200 }),
+    queryFn: () => api.get<MaquetteStats>("/maquettes/stats"),
   });
-  const demandes = useQuery({
+  const demandes = useQuery<DemandeStats>({
     queryKey: ["demandes-envoi", "stats"],
-    queryFn: () => api.get<StatsResponse["demandes"]>("/demandes-envoi", { page: 1, pageSize: 200 }),
+    queryFn: () => api.get<DemandeStats>("/demandes-envoi/stats"),
   });
   return { materiels, maquettes, demandes };
 }
@@ -260,31 +285,46 @@ export default function HomePage() {
   const { user } = useAuth();
   const { materiels, maquettes, demandes } = useStats();
 
-  const matData = materiels.data?.data ?? [];
-  const maqData = maquettes.data?.data ?? [];
-  const demData = demandes.data?.data ?? [];
+  const matStats = materiels.data;
+  const maqStats = maquettes.data;
+  const demStats = demandes.data;
 
-  const matTotal = materiels.data?.total ?? 0;
-  const maqTotal = maquettes.data?.total ?? 0;
-  const demTotal = demandes.data?.total ?? 0;
+  const matTotal = matStats?.total ?? 0;
+  const maqTotal = maqStats?.total ?? 0;
+  const demTotal = demStats?.total ?? 0;
 
-  const countBy = <T,>(arr: T[], field: keyof T, value: string) =>
-    arr.filter((item) => item[field] === value).length;
+  // Matériels : on lit directement le breakdown par état renvoyé par
+  // /materiels/stats. Les valeurs DISPONIBLE / EN_SERVICE / etc. sont
+  // celles du référentiel ETAT_MATERIEL.
+  const matByEtat = matStats?.byEtat ?? {};
+  const matDispo = matByEtat["DISPONIBLE"] ?? 0;
+  const matEnService = matByEtat["EN_SERVICE"] ?? 0;
+  const matPrete = matStats?.enPret ?? matByEtat["PRETE"] ?? 0;
+  const matReparation = matByEtat["EN_REPARATION"] ?? 0;
 
-  const matDispo = countBy(matData, "etat" as keyof typeof matData[0], "DISPONIBLE");
-  const matEnService = countBy(matData, "etat" as keyof typeof matData[0], "EN_SERVICE");
-  const matPrete = countBy(matData, "etat" as keyof typeof matData[0], "PRETE");
-  const matReparation = countBy(matData, "etat" as keyof typeof matData[0], "EN_REPARATION");
+  const maqByEtat = maqStats?.byEtat ?? {};
+  const maqStock = maqStats?.stock ?? 0;
+  const maqEmpruntee = maqStats?.empruntees ?? 0;
+  const maqControle = maqByEtat["EN_CONTROLE"] ?? 0;
+  const maqEnvoyee = maqStats?.transit ?? maqByEtat["ENVOYEE"] ?? 0;
 
-  const maqStock = countBy(maqData, "etat" as keyof typeof maqData[0], "STOCK");
-  const maqEmpruntee = countBy(maqData, "etat" as keyof typeof maqData[0], "EMPRUNTEE");
-  const maqControle = countBy(maqData, "etat" as keyof typeof maqData[0], "EN_CONTROLE");
-  const maqEnvoyee = countBy(maqData, "etat" as keyof typeof maqData[0], "ENVOYEE");
-
-  const demBrouillon = countBy(demData, "statut" as keyof typeof demData[0], "BROUILLON");
-  const demEnvoyee = countBy(demData, "statut" as keyof typeof demData[0], "ENVOYEE");
-  const demTransit = countBy(demData, "statut" as keyof typeof demData[0], "EN_TRANSIT");
-  const demRecue = countBy(demData, "statut" as keyof typeof demData[0], "RECUE");
+  // Demandes : on regroupe les statuts par grandes étapes pour rester
+  // cohérent avec le workflow Phase 1+.
+  const demByStatut = demStats?.byStatut ?? {};
+  const demBrouillon = demStats?.brouillons ?? 0;
+  const demEnvoyee =
+    (demByStatut["SOUMISE"] ?? 0) +
+    (demByStatut["VALIDEE_PARTIELLEMENT"] ?? 0) +
+    (demByStatut["VALIDEE"] ?? 0) +
+    (demByStatut["PRETE_A_EXPEDIER"] ?? 0);
+  const demTransit =
+    (demByStatut["EN_TRANSIT"] ?? 0) + (demByStatut["EN_RETOUR"] ?? 0);
+  const demRecue =
+    (demByStatut["RECUE"] ?? 0) +
+    (demByStatut["LIVREE_TITULAIRE"] ?? 0) +
+    (demByStatut["EN_COURS"] ?? 0) +
+    (demByStatut["RECUE_RETOUR"] ?? 0) +
+    (demByStatut["CLOTUREE"] ?? 0);
 
   const isLoading = materiels.isLoading || maquettes.isLoading || demandes.isLoading;
 

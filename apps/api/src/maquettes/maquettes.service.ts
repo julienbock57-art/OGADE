@@ -134,7 +134,7 @@ export class MaquettesService {
 
   async stats() {
     const where = { deletedAt: null };
-    const [total, stock, empruntees, transit, asn, hs, enReparation] =
+    const [total, stock, empruntees, transit, asn, hs, enReparation, byEtatRows] =
       await Promise.all([
         this.prisma.maquette.count({ where }),
         this.prisma.maquette.count({ where: { ...where, etat: 'STOCK' } }),
@@ -143,7 +143,14 @@ export class MaquettesService {
         this.prisma.maquette.count({ where: { ...where, referenceASN: true } }),
         this.prisma.maquette.count({ where: { ...where, etat: 'REBUT' } }),
         this.prisma.maquette.count({ where: { ...where, etat: 'EN_REPARATION' } }),
+        this.prisma.maquette.groupBy({
+          by: ['etat'],
+          where,
+          _count: { _all: true },
+        }),
       ]);
+    const byEtat: Record<string, number> = {};
+    for (const r of byEtatRows) if (r.etat) byEtat[r.etat] = r._count._all;
     return {
       total,
       stock,
@@ -153,6 +160,7 @@ export class MaquettesService {
       asn,
       hs,
       enReparation,
+      byEtat,
       requalifier: enReparation,
     };
   }
