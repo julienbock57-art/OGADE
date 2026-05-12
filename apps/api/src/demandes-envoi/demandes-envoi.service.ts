@@ -98,7 +98,18 @@ export class DemandesEnvoiService {
           demandeur: { select: AGENT_SELECT },
           _count: { select: { lignes: true } },
           lignes: {
-            select: { id: true, statut: true },
+            select: {
+              id: true,
+              statut: true,
+              materielId: true,
+              maquetteId: true,
+              materiel: {
+                select: { id: true, reference: true, libelle: true, site: true, typeMateriel: true },
+              },
+              maquette: {
+                select: { id: true, reference: true, libelle: true, site: true, typeMaquette: true },
+              },
+            },
           },
         },
       }),
@@ -753,7 +764,20 @@ export class DemandesEnvoiService {
           magasinierEnvoi: { select: AGENT_SELECT },
           magasinierReception: { select: AGENT_SELECT },
           _count: { select: { lignes: true } },
-          lignes: { select: { id: true, statut: true } },
+          lignes: {
+            select: {
+              id: true,
+              statut: true,
+              materielId: true,
+              maquetteId: true,
+              materiel: {
+                select: { id: true, reference: true, libelle: true, site: true, typeMateriel: true },
+              },
+              maquette: {
+                select: { id: true, reference: true, libelle: true, site: true, typeMaquette: true },
+              },
+            },
+          },
         },
       }),
       this.prisma.demandeEnvoi.count({ where }),
