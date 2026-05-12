@@ -237,12 +237,11 @@ export class MaterielsService {
         acteurId: userId,
       });
 
-      // Notification au responsable, sauf si c'est lui qui modifie.
-      const effectiveActorId = actorId ?? userId;
-      if (
-        materiel.responsableId &&
-        materiel.responsableId !== effectiveActorId
-      ) {
+      // Notification au responsable.
+      // On NE filtre PAS l'acteur : si l'utilisateur est lui-même
+      // responsable et qu'il modifie son matériel, il reçoit quand même
+      // la notif (sert de trace dans son flux).
+      if (materiel.responsableId) {
         await this.notifications.create({
           recipientId: materiel.responsableId,
           type: 'MATERIEL_MODIFIE',

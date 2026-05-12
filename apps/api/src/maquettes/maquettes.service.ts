@@ -209,9 +209,10 @@ export class MaquettesService {
       include: MAQUETTE_DETAIL_INCLUDE,
     });
 
-    // Notification au référent, sauf si c'est lui qui modifie.
-    const effectiveActorId = actorId ?? userId;
-    if (maquette.referentId && maquette.referentId !== effectiveActorId) {
+    // Notification au référent (sans filtrer l'acteur — si l'utilisateur
+    // est lui-même référent, il reçoit la notif comme trace).
+    void actorId;
+    if (maquette.referentId) {
       await this.notifications.create({
         recipientId: maquette.referentId,
         type: 'MAQUETTE_MODIFIEE',
