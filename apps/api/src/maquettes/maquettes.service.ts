@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import type {
   CreateMaquetteInput,
   UpdateMaquetteInput,
@@ -53,7 +54,10 @@ const MAQUETTE_DETAIL_INCLUDE = {
 
 @Injectable()
 export class MaquettesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   async findAll(params: {
     page: number;
@@ -189,9 +193,14 @@ export class MaquettesService {
     });
   }
 
-  async update(id: number, data: UpdateMaquetteInput, userId?: number) {
+  async update(
+    id: number,
+    data: UpdateMaquetteInput,
+    userId?: number,
+    actorId?: number,
+  ) {
     await this.findOne(id);
-    return this.prisma.maquette.update({
+    const maquette = await this.prisma.maquette.update({
       where: { id },
       data: {
         ...data,
@@ -199,6 +208,22 @@ export class MaquettesService {
       },
       include: MAQUETTE_DETAIL_INCLUDE,
     });
+
+    // Notification au référent, sauf si c'est lui qui modifie.
+    const effectiveActorId = actorId ?? userId;
+    if (maquette.referentId && maquette.referentId !== effectiveActorId) {
+      await this.notifications.create({
+        recipientId: maquette.referentId,
+        type: 'MAQUETTE_MODIFIEE',
+        title: `Maquette ${maquette.reference} modifiée`,
+        message: `${maquette.libelle} a été modifiée`,
+        link: `/maquettes/${maquette.id}`,
+        entityType: 'Maquette',
+        entityId: maquette.id,
+      });
+    }
+
+    return maquette;
   }
 
   async softDelete(id: number) {

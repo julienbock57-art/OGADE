@@ -43,6 +43,8 @@ model Agent {
   materielsResponsable        Materiel[]          @relation("materiel_responsable")
   defautsDetectes             Defaut[]            @relation("defaut_detecteur")
   rolesAccordes               AgentRole[]         @relation("role_granter")
+  notifications               Notification[]      @relation("notif_recipient")
+  notificationPreferences     NotificationPreference[]
 
   @@map("agents")
 }
@@ -529,4 +531,56 @@ model Fichier {
   @@index([entityType, entityId])
   @@index([demandeEnvoiId])
   @@map("fichiers")
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────────────
+//
+// Notifications in-app uniquement (pour la v1). Chaque utilisateur
+// peut désactiver un type particulier via NotificationPreference.
+//
+// Types prévus (chaîne libre, pas d'enum pour rester flexible) :
+//   DEMANDE_A_VALIDER       (réf. matériel/maquette)
+//   DEMANDE_VALIDEE         (demandeur)
+//   DEMANDE_REFUSEE         (demandeur)
+//   DEMANDE_VAL_PARTIELLE   (demandeur)
+//   DEMANDE_A_TRAITER       (magasinier site origine, statut VALIDEE)
+//   DEMANDE_EXPEDIEE        (demandeur + magasinier réception)
+//   DEMANDE_RECUE           (demandeur)
+//   DEMANDE_CLOTUREE        (demandeur)
+//   ETALONNAGE_PROCHE       (responsable matériel)
+//   ETALONNAGE_ECHU         (responsable matériel)
+//   MATERIEL_MODIFIE        (responsable matériel)
+//   MAQUETTE_MODIFIEE       (référent maquette)
+model Notification {
+  id          Int       @id @default(autoincrement())
+  recipientId Int       @map("recipient_id")
+  type        String
+  title       String
+  message     String?
+  link        String?
+  entityType  String?   @map("entity_type")
+  entityId    Int?      @map("entity_id")
+  payload     Json?
+  readAt      DateTime? @map("read_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  recipient Agent @relation("notif_recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, readAt])
+  @@index([recipientId, createdAt])
+  @@map("notifications")
+}
+
+// Préférence par utilisateur + type. Si pas de ligne → in-app activé par défaut.
+model NotificationPreference {
+  agentId   Int     @map("agent_id")
+  notifType String  @map("notif_type")
+  inApp     Boolean @default(true) @map("in_app")
+  email     Boolean @default(false)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, notifType])
+  @@map("notification_preferences")
 }
