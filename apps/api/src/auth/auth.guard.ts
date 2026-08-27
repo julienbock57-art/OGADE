@@ -2,6 +2,8 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
+  ServiceUnavailableException,
   UnauthorizedException,
   createParamDecorator,
 } from '@nestjs/common';
@@ -21,12 +23,32 @@ export interface RequestUser {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
+  /**
+   * Repli sur l'en-tête `x-user-email`, destiné au développement local afin de
+   * lancer l'application sans fournisseur d'authentification.
+   *
+   * Il accorde un accès complet sur simple présentation d'une adresse e-mail :
+   * il ne doit jamais être actif en production. Le déploiement doit donc
+   * impérativement définir NODE_ENV=production.
+   */
+  private readonly devHeaderAuthEnabled = process.env.NODE_ENV !== 'production';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly reflector: Reflector,
     private readonly msToken: MicrosoftTokenService,
     private readonly localAuth: LocalAuthService,
-  ) {}
+  ) {
+    if (this.devHeaderAuthEnabled && !this.msToken.isConfigured) {
+      this.logger.warn(
+        "MODE DÉVELOPPEMENT — l'en-tête « x-user-email » est accepté comme " +
+          'authentification, sans mot de passe. Définissez NODE_ENV=production ' +
+          'pour désactiver ce repli.',
+      );
+    }
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -61,8 +83,14 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    // Fallback to x-user-email header if no auth configured (dev mode)
-    if (!email && !this.msToken.isConfigured && emailHeader) {
+    // Repli développement uniquement — jamais actif en production.
+    // Cf. devHeaderAuthEnabled.
+    if (
+      !email &&
+      this.devHeaderAuthEnabled &&
+      !this.msToken.isConfigured &&
+      emailHeader
+    ) {
       email = emailHeader.toLowerCase();
     }
 
@@ -91,8 +119,15 @@ export class AuthGuard implements CanActivate {
       } satisfies RequestUser;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
-      request.user = null;
-      return true;
+      // Toute autre erreur (base indisponible, timeout…) ne doit pas laisser
+      // passer la requête : on refuse explicitement plutôt que d'ouvrir
+      // l'accès aux routes dépourvues de @Roles().
+      this.logger.error(
+        `Échec de la vérification d'identité pour « ${email} » : ${err}`,
+      );
+      throw new ServiceUnavailableException(
+        'Service temporairement indisponible. Réessayez dans quelques instants.',
+      );
     }
 
     return true;
