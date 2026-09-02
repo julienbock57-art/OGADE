@@ -1,0 +1,80 @@
+# Unité systemd OGADE — serveur de développement EDF
+#
+# Installation :
+#   sudo cp /opt/ogade/deploy/edf/ogade.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now ogade
+#
+# Journaux :  journalctl -u ogade -f
+
+[Unit]
+Description=OGADE — gestion des actifs END
+Documentation=file:/opt/ogade/deploy/edf/DEPLOIEMENT.md
+After=network-online.target
+Wants=network-online.target
+# Si PostgreSQL est hébergé sur la même machine, décommenter :
+#After=postgresql.service
+#Requires=postgresql.service
+
+# Une configuration invalide (JWT_SECRET manquant en production, base
+# injoignable…) provoque un arrêt immédiat. Sans cette limite, systemd
+# redémarrerait indéfiniment sans que le problème soit résolu.
+# Ces deux clés relèvent de [Unit], non de [Service].
+StartLimitBurst=3
+StartLimitIntervalSec=120
+
+[Service]
+Type=simple
+User=ogade
+Group=ogade
+WorkingDirectory=/opt/ogade
+
+# L'application ne lit aucun fichier .env : toutes les variables doivent
+# transiter par ce fichier.
+EnvironmentFile=/etc/ogade/ogade.env
+
+# Migrations appliquées avant chaque démarrage.
+#
+# Contrairement à la commande de l'image Docker, qui masque les échecs
+# (« || echo ... ») et démarre sur une base potentiellement non migrée, un
+# échec interrompt ici le démarrage : mieux vaut un service arrêté et
+# diagnosticable qu'un service actif écrivant dans un schéma incohérent.
+#
+# Le binaire est appelé par son chemin, sans dépendre de la présence de
+# pnpm dans le PATH de systemd.
+ExecStartPre=/opt/ogade/apps/api/node_modules/.bin/prisma migrate deploy --schema=/opt/ogade/apps/api/prisma/schema.prisma
+
+# Adapter le chemin si Node n'est pas installé dans /usr/bin — le vérifier
+# avec « command -v node ». systemd exige un chemin absolu et n'effectue
+# aucune recherche dans le PATH.
+ExecStart=/usr/bin/node /opt/ogade/apps/api/dist/main.js
+
+Restart=on-failure
+RestartSec=5s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ogade
+
+# ─── Cloisonnement ─────────────────────────────────────────────
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+# pnpm et Prisma écrivent des fichiers temporaires sous le répertoire de
+# l'application ; ProtectSystem=strict le rendrait sinon inaccessible en
+# écriture.
+ReadWritePaths=/opt/ogade
+
+[Install]
+WantedBy=multi-user.target
+
+# ─── Note sur la montée en charge ──────────────────────────────────
+# Ne pas dupliquer ce service ni multiplier les processus : la tâche
+# planifiée des relances d'étalonnage (@nestjs/schedule) s'exécute au sein
+# du processus. Deux instances enverraient les notifications en double, la
+# déduplication ne portant que sur 24 heures.
