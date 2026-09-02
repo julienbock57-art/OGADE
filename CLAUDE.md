@@ -41,7 +41,7 @@ apps/api/src/
 │   └── roles.decorator.ts     # @Roles() role-based access
 ├── demandes-envoi/   # Shipment requests + line items
 ├── entreprises/      # Company reference data
-├── fichiers/         # File metadata (Azure Blob)
+├── fichiers/         # File storage (content in DB as BYTEA)
 ├── maquettes/        # Model/prototype management
 ├── materiels/        # Equipment/instrument management
 ├── prisma/           # PrismaService (global module)
@@ -93,7 +93,7 @@ packages/shared/src/
 | Referentiel | referentiels | type+code (unique), label, position | 17 types (TYPE_END, TYPE_MATERIEL, etc.) |
 | Site | ref_sites | code (unique), label, adresse, ville | |
 | Entreprise | ref_entreprises | code (unique), label, type, siret? | |
-| Fichier | fichiers | blobKey (unique), entityType, entityId | Azure Blob metadata |
+| Fichier | fichiers | blobKey (unique), entityType, entityId, blobData | Content stored in DB (BYTEA) |
 | Evenement | evenements | entityType, entityId, eventType, payload | Audit trail |
 
 ### Migrations
@@ -219,7 +219,7 @@ All wrapped in `RequireAuth` → shows `LoginPage` when auth is configured and u
 **Backend guard** (`auth.guard.ts`):
 1. Check `@Public()` → skip auth
 2. Try Bearer token: local JWT first (HS256, fast), then Microsoft JWKS
-3. Fallback: `x-user-email` header (only when MSAL not configured = dev mode)
+3. Fallback: `x-user-email` header (dev mode only — disabled when NODE_ENV=production or MSAL is configured)
 4. Lookup agent by email → must exist and be `actif: true`
 5. Populate `request.user: RequestUser { agentId, email, nom, prenom, roles }`
 
@@ -244,17 +244,33 @@ JWT_SECRET="<random 32+ char string>"
 ```bash
 PORT=8080                            # Default: 3000
 CORS_ORIGIN="*"                      # Default: http://localhost:5173
-AZURE_STORAGE_ACCOUNT_NAME="..."     # Azure Blob (file uploads)
-AZURE_STORAGE_ACCOUNT_KEY="..."
-AZURE_STORAGE_CONTAINER_NAME="..."
+API_URL="https://..."                # Baked into generated QR codes
+NODE_ENV=production                  # Enables the production guards (see below)
+MAX_UPLOAD_MB=25                     # Upload size cap (default: 25)
+ENABLE_SWAGGER=false                 # Overrides the NODE_ENV-based default
+TZ=Europe/Paris                      # Used by the étalonnage cron
 ```
+
+### Production guards
+
+`NODE_ENV=production` tightens three behaviours:
+
+- `JWT_SECRET` becomes mandatory and is rejected if weak or left at the dev value
+- the `x-user-email` header fallback is disabled
+- Swagger (`/api/docs`) is no longer served
+
+Without it the app runs in dev mode, where the `x-user-email` header alone
+grants full access with no password.
 
 ### Dev only (auto-configured)
 
 ```bash
-DATABASE_URL="file:./ogade.db"       # SQLite
 # No AZURE_AD_* → app uses DEV_USER fallback
+# No JWT_SECRET → dev secret, with a startup warning
 ```
+
+**Note**: PostgreSQL is required — the schema relies on PostgreSQL-only types
+(BYTEA, JSONB, SERIAL) and on Prisma's case-insensitive search.
 
 **Note**: `VITE_*` variables are NOT needed — frontend fetches auth config from `/api/v1/auth/config` at runtime.
 
