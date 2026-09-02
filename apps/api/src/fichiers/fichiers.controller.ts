@@ -11,6 +11,7 @@ import {
   HttpStatus,
   BadRequestException,
   ParseIntPipe,
+  UseFilters,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import { ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FichiersService } from './fichiers.service';
 import { CurrentUser, RequestUser } from '../auth/auth.guard';
+import { UploadExceptionFilter } from './upload-exception.filter';
+import { MAX_UPLOAD_BYTES } from './upload-limits';
 
 @ApiTags('Fichiers')
 @ApiBearerAuth()
@@ -29,7 +32,10 @@ export class FichiersController {
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseFilters(UploadExceptionFilter)
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: MAX_UPLOAD_BYTES } }),
+  )
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Body('entityType') entityType: string,

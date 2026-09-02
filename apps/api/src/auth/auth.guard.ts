@@ -2,6 +2,8 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
+  ServiceUnavailableException,
   UnauthorizedException,
   createParamDecorator,
 } from '@nestjs/common';
@@ -21,12 +23,28 @@ export interface RequestUser {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
+  // En dev on accepte l'en-tête x-user-email, ça permet de lancer l'appli sans
+  // avoir à configurer d'authentification.
+  // Par contre avec ça n'importe qui peut se faire passer pour n'importe qui,
+  // donc surtout jamais en prod. Bien penser à mettre NODE_ENV=production au
+  // moment du déploiement.
+  private readonly devHeaderAuthEnabled = process.env.NODE_ENV !== 'production';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly reflector: Reflector,
     private readonly msToken: MicrosoftTokenService,
     private readonly localAuth: LocalAuthService,
-  ) {}
+  ) {
+    if (this.devHeaderAuthEnabled && !this.msToken.isConfigured) {
+      this.logger.warn(
+        "MODE DEV : l'en-tete x-user-email est accepte comme authentification, " +
+          'sans mot de passe. Mettre NODE_ENV=production pour couper ca.',
+      );
+    }
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -61,8 +79,13 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    // Fallback to x-user-email header if no auth configured (dev mode)
-    if (!email && !this.msToken.isConfigured && emailHeader) {
+    // Repli dev uniquement, voir devHeaderAuthEnabled plus haut.
+    if (
+      !email &&
+      this.devHeaderAuthEnabled &&
+      !this.msToken.isConfigured &&
+      emailHeader
+    ) {
       email = emailHeader.toLowerCase();
     }
 
@@ -91,8 +114,14 @@ export class AuthGuard implements CanActivate {
       } satisfies RequestUser;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
-      request.user = null;
-      return true;
+      // Base injoignable, timeout, etc. : on refuse la requete.
+      // Avant on faisait un "return true" ici, du coup des que la base toussait
+      // toutes les routes sans @Roles() devenaient accessibles sans etre
+      // connecte. Pas terrible.
+      this.logger.error(`Verification d'identite impossible pour ${email} : ${err}`);
+      throw new ServiceUnavailableException(
+        'Service temporairement indisponible. Reessayez dans quelques instants.',
+      );
     }
 
     return true;
