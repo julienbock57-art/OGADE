@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Fabrique l'archive à transférer sur le serveur EDF.
+# Prepare l'archive a envoyer sur le serveur EDF.
 #
-# À exécuter depuis un poste disposant du dépôt Git — le serveur n'y ayant
-# pas accès, le numéro de version et le hachage du commit sont figés ici,
-# dans un fichier lu ensuite par build.sh.
+# A lancer depuis un poste qui a le depot Git. Comme le serveur ne l'a pas, on
+# fige ici le numero de version et le hash du commit dans un petit fichier que
+# build.sh relira ensuite.
 #
-# Usage :  ./deploy/edf/make-release.sh [répertoire_de_sortie]
+# Usage :  bash ./deploy/edf/make-release.sh [dossier_de_sortie]
 
 set -euo pipefail
 
@@ -15,10 +15,10 @@ SORTIE="${1:-$RACINE/dist-release}"
 
 cd "$RACINE"
 
-# ─── Version ───────────────────────────────────────────────────
-# vite.config.ts déduit la version du dernier commit de fusion et le hachage
-# du commit courant. Sans dépôt Git, il retomberait sur « 1.0.0 » et « dev ».
-# On capture donc les deux valeurs maintenant.
+# --- Version ---
+# vite.config.ts va chercher la version dans le dernier commit de merge et le
+# hash du commit courant. Sans depot Git il retombe sur "1.0.0" et "dev", donc
+# on recupere les deux valeurs maintenant, tant qu'on les a.
 NUMERO_PR="0"
 COMMIT="inconnu"
 if git rev-parse --git-dir >/dev/null 2>&1; then
@@ -28,7 +28,7 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
   COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo inconnu)"
 else
-  echo "Avertissement : dépôt Git introuvable, la version affichée sera 1.0.0." >&2
+  echo "Attention : pas de depot Git ici, la version affichee sera 1.0.0." >&2
 fi
 
 HORODATAGE="$(date +%Y%m%d-%H%M%S)"
@@ -36,19 +36,18 @@ NOM="ogade-1.0.${NUMERO_PR}-${HORODATAGE}"
 
 mkdir -p "$SORTIE"
 
-# Ces valeurs seront réexportées par build.sh au moment de la compilation.
+# build.sh reexportera ces valeurs au moment de compiler.
 cat > "$RACINE/deploy/edf/RELEASE_VERSION" <<EOF
 # Généré par make-release.sh — ne pas modifier à la main.
 APP_PR_NUMBER=${NUMERO_PR}
 GITHUB_SHA=${COMMIT}
 EOF
 
-# ─── Archive ───────────────────────────────────────────────────
-# Liste blanche plutôt que liste d'exclusions : le dépôt contient des
-# éléments sans rapport avec l'exécution — notamment l'export PowerApps
-# d'origine, qui pèse à lui seul plus de 200 Mo. N'embarquer que le
-# nécessaire évite d'alourdir le transfert et de diffuser des documents
-# internes sur le serveur.
+# --- Archive ---
+# On liste ce qu'on prend, plutot que ce qu'on exclut. Le depot contient des
+# trucs qui n'ont rien a faire la : notamment l'export PowerApps d'origine, qui
+# pese a lui tout seul plus de 200 Mo. En ne prenant que le necessaire on evite
+# d'alourdir le transfert et de balader des documents internes sur le serveur.
 CONTENU=(
   package.json
   pnpm-lock.yaml
@@ -61,7 +60,7 @@ CONTENU=(
 
 for element in "${CONTENU[@]}"; do
   if [ ! -e "$RACINE/$element" ]; then
-    echo "ERREUR : élément requis introuvable — $element" >&2
+    echo "ERREUR : il manque $element" >&2
     exit 1
   fi
 done
@@ -85,7 +84,7 @@ Archive prête : ${SORTIE}/${NOM}.tar.gz  (${TAILLE})
   version  : 1.0.${NUMERO_PR}
   commit   : ${COMMIT}
 
-Transfert puis installation :
+Ensuite, transfert et installation :
   scp ${SORTIE}/${NOM}.tar.gz utilisateur@serveur-edf:/tmp/
   ssh utilisateur@serveur-edf
   sudo tar -xzf /tmp/${NOM}.tar.gz -C /opt
@@ -94,5 +93,5 @@ Transfert puis installation :
   sudo chmod +x /opt/ogade/deploy/edf/*.sh
   sudo -u ogade bash /opt/ogade/deploy/edf/build.sh
 
-Détail complet : deploy/edf/DEPLOIEMENT.md
+Le detail complet est dans deploy/edf/DEPLOIEMENT.md
 EOF

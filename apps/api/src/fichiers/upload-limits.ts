@@ -1,16 +1,12 @@
-/**
- * Taille maximale acceptée pour un fichier téléversé.
- *
- * Multer bufferise l'intégralité du fichier en mémoire, puis celui-ci est
- * stocké dans une colonne BYTEA : sans borne, un seul envoi peut saturer le
- * tas Node comme la base. La valeur par défaut est volontairement large afin
- * de couvrir photos et documents courants ; MAX_UPLOAD_MB permet de
- * l'ajuster.
- *
- * Le proxy inverse doit être configuré en cohérence (client_max_body_size
- * pour nginx), faute de quoi il rejettera la requête avant l'application,
- * avec un message bien moins explicite.
- */
+// Taille max d'un fichier qu'on accepte à l'upload.
+//
+// Multer garde tout le fichier en mémoire avant qu'on l'écrive en base (colonne
+// BYTEA), donc sans limite un seul gros envoi peut faire tomber le process.
+// On met large par défaut pour ne géner personne (photos, PDF), et
+// MAX_UPLOAD_MB permet d'ajuster si besoin.
+//
+// Penser à mettre client_max_body_size au moins aussi haut côté nginx, sinon
+// c'est nginx qui refuse avant nous, avec un message beaucoup moins parlant.
 const DEFAULT_MAX_UPLOAD_MB = 25;
 
 export const MAX_UPLOAD_MB = ((): number => {

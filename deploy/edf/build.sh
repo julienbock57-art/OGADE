@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# Compile OGADE sur le serveur.
+# Compile OGADE directement sur le serveur.
 #
-# À exécuter sous l'utilisateur applicatif, depuis la racine du dépôt :
+# A lancer avec l'utilisateur de l'appli :
 #   sudo -u ogade bash /opt/ogade/deploy/edf/build.sh
 #
-# Nécessite un accès au registre npm (direct ou via miroir d'entreprise).
-# Ne démarre pas le service et n'applique aucune migration : ces deux
-# opérations relèvent de systemd.
+# Il faut un acces au registre npm (direct ou via le miroir de la boite).
+# Le script ne demarre pas le service et ne fait pas les migrations, c'est
+# systemd qui s'en occupe.
 
 set -euo pipefail
 
@@ -17,7 +17,7 @@ cd "$RACINE"
 echo "=== Compilation OGADE ==="
 echo "Répertoire : $RACINE"
 
-# ─── Prérequis ──────────────────────────────────────────────────
+# --- On verifie que tout est la ---
 if ! command -v node >/dev/null 2>&1; then
   echo "ERREUR : node est introuvable dans le PATH." >&2
   exit 1
@@ -38,15 +38,15 @@ if ! command -v pnpm >/dev/null 2>&1; then
 fi
 echo "pnpm       : $(pnpm --version)"
 
-# Le moteur de requêtes Prisma est lié à OpenSSL.
+# Le moteur Prisma a besoin d'OpenSSL.
 if ! command -v openssl >/dev/null 2>&1; then
   echo "Avertissement : openssl est introuvable. Le moteur Prisma peut échouer." >&2
   echo "                Installez-le avec : sudo apt-get install -y openssl" >&2
 fi
 
-# ─── Version affichée dans l'interface ────────────────────────────────
-# Le serveur n'ayant pas de dépôt Git, ces valeurs proviennent du fichier
-# écrit par make-release.sh au moment de la fabrication de l'archive.
+# --- Version affichee dans l'interface ---
+# Le serveur n'a pas de depot Git, donc ces valeurs viennent du fichier ecrit
+# par make-release.sh au moment de la fabrication de l'archive.
 if [ -f "$RACINE/deploy/edf/RELEASE_VERSION" ]; then
   # shellcheck disable=SC1091
   set -a; . "$RACINE/deploy/edf/RELEASE_VERSION"; set +a
@@ -55,29 +55,28 @@ else
   echo "Version    : indéterminée — l'interface affichera 1.0.0 / dev"
 fi
 
-# ─── Dépendances ────────────────────────────────────────────────
-# Installation complète, y compris les dépendances de développement : la
-# compilation requiert nest-cli, TypeScript et Vite, et la CLI Prisma sert
-# ensuite aux migrations au démarrage du service.
+# --- Dependances ---
+# On installe tout, y compris les devDependencies : il faut nest-cli, TypeScript
+# et Vite pour compiler, et la CLI Prisma servira ensuite aux migrations a
+# chaque demarrage du service.
 echo
 echo "--- Installation des dépendances ---"
 pnpm install --frozen-lockfile
 
-# ─── Client Prisma ─────────────────────────────────────────────
-# À générer avant la compilation : les services TypeScript s'appuient sur
-# les types produits ici.
+# --- Client Prisma ---
+# A generer avant de compiler, sinon TypeScript n'a pas les types et ca casse.
 echo
 echo "--- Génération du client Prisma ---"
 pnpm run db:generate
 
-# ─── Compilation ───────────────────────────────────────────────
-# Ordre imposé : shared -> web -> api. L'API importe des valeurs (schémas
-# Zod), et pas seulement des types, depuis @ogade/shared.
+# --- Compilation ---
+# L'ordre compte : shared, puis web, puis api. L'API importe de vraies valeurs
+# depuis @ogade/shared (les schemas Zod), pas seulement des types.
 echo
 echo "--- Compilation (shared, web, api) ---"
 pnpm run build
 
-# ─── Contrôles ─────────────────────────────────────────────────
+# --- On verifie que la compilation a bien tout produit ---
 echo
 echo "--- Vérifications ---"
 ERREURS=0
@@ -106,9 +105,8 @@ cat <<EOF
 
 === Compilation réussie ===
 
-L'interface se trouve dans apps/web/dist et sera servie par l'API : si ce
-répertoire venait à manquer, le service démarrerait malgré tout mais
-n'afficherait aucune page.
+L'interface est dans apps/web/dist, c'est l'API qui la sert. Si ce dossier
+disparait, le service demarre quand meme mais n'affiche plus aucune page.
 
 Suite :
   sudo systemctl restart ogade

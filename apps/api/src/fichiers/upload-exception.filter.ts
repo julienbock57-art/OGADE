@@ -8,17 +8,14 @@ import {
 import type { Response } from 'express';
 import { MAX_UPLOAD_MB } from './upload-limits';
 
-/**
- * Remplace le message de dépassement de taille par un libellé explicite.
- *
- * @nestjs/platform-express convertit déjà l'erreur Multer en
- * PayloadTooLargeException, mais avec le message figé « File too large » :
- * ni traduit, ni porteur de la limite applicable. Le client affiche ce
- * message tel quel (cf. apps/web/src/lib/api.ts, méthode `upload`).
- *
- * Seul ce type d'exception est intercepté ; les autres suivent leur
- * traitement habituel.
- */
+// Remplace le message d'erreur quand le fichier envoyé est trop gros.
+//
+// NestJS transforme déjà l'erreur de Multer en PayloadTooLargeException, sauf
+// qu'il met "File too large" : c'est en anglais et ça ne dit pas la limite.
+// Le front réaffiche ce message tel quel (voir apps/web/src/lib/api.ts, la
+// méthode upload), donc autant qu'il soit clair.
+//
+// On n'attrape que ce cas là, tout le reste passe normalement.
 @Catch(PayloadTooLargeException)
 export class UploadExceptionFilter implements ExceptionFilter {
   catch(_exception: PayloadTooLargeException, host: ArgumentsHost): void {

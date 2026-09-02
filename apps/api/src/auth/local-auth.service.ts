@@ -4,14 +4,12 @@ import * as bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 12;
 
-/**
- * Secret de repli pour le développement local. Sa valeur est publique
- * (elle figure dans le dépôt) : l'utiliser en production reviendrait à
- * permettre à quiconque de forger un jeton pour n'importe quel compte.
- */
+// Secret de secours pour bosser en local. Il est en clair dans le dépôt, donc
+// si on s'en sert en prod n'importe qui peut se fabriquer un token valide pour
+// le compte qu'il veut.
 const DEV_SECRET = 'ogade-dev-secret-change-in-production';
 
-/** Longueur minimale exigée en production (cf. `openssl rand -base64 48`). */
+// Taille mini du secret en prod. Pour en générer un : openssl rand -base64 48
 const MIN_SECRET_LENGTH = 32;
 
 @Injectable()
@@ -23,20 +21,17 @@ export class LocalAuthService {
     this.secret = new TextEncoder().encode(LocalAuthService.resolveSecret(this.logger));
   }
 
-  /**
-   * Détermine le secret de signature. En production, une configuration
-   * absente ou faible interrompt le démarrage plutôt que de laisser
-   * l'application tourner avec des jetons forgeables.
-   */
+  // Récupère le secret qui sert à signer les tokens.
+  // En prod, si le secret manque ou s'il est trop faible on préfère planter au
+  // démarrage plutôt que de tourner avec des tokens que tout le monde peut refaire.
   private static resolveSecret(logger: Logger): string {
     const raw = process.env.JWT_SECRET?.trim();
 
     if (process.env.NODE_ENV !== 'production') {
       if (!raw) {
         logger.warn(
-          'JWT_SECRET non défini — utilisation du secret de développement. ' +
-            'Cette valeur est publique et doit impérativement être remplacée ' +
-            'en production.',
+          'JWT_SECRET non defini, on utilise le secret de dev. Cette valeur est ' +
+            'publique, il faut absolument la remplacer en prod.',
         );
         return DEV_SECRET;
       }

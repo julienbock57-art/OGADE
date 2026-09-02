@@ -33,11 +33,10 @@ async function bootstrap() {
     }),
   );
 
-  // La documentation Swagger décrit toute la surface de l'API sans
-  // authentification. Elle reste donc active hors production — utile en
-  // développement comme en recette — et se désactive en production.
-  // ENABLE_SWAGGER (« true » / « false ») force explicitement l'un ou
-  // l'autre comportement.
+  // Swagger liste toute l'API et n'est pas protégé par l'auth.
+  // On le laisse donc actif en dev et en recette (c'est bien pratique) et on le
+  // coupe en prod. ENABLE_SWAGGER=true ou false permet de forcer dans un sens
+  // ou dans l'autre si besoin.
   const swaggerEnabled = process.env.ENABLE_SWAGGER
     ? process.env.ENABLE_SWAGGER === 'true'
     : !isProduction;
@@ -65,24 +64,23 @@ async function bootstrap() {
   const port = process.env.PORT || process.env.API_PORT || 3000;
   await app.listen(port, '0.0.0.0');
 
-  // Récapitulatif de configuration : rend visible, dès le démarrage, le
-  // mode réellement appliqué et les écarts susceptibles de passer
-  // inaperçus.
-  logger.log(`OGADE démarré — port ${port}`);
+  // Petit récap au démarrage. Comme ça on voit tout de suite dans quel mode on
+  // tourne, et on se fait pas avoir par une variable oubliée.
+  logger.log(`OGADE demarre sur le port ${port}`);
   logger.log(`Mode : ${isProduction ? 'production' : 'développement'}`);
   logger.log(`Documentation API : ${swaggerEnabled ? '/api/docs' : 'désactivée'}`);
   if (!webBuildPresent) {
     logger.warn(
-      `Interface web introuvable (${webDistPath}) — seule l'API répondra. ` +
-        'Lancez « pnpm run build » avant de démarrer.',
+      `Interface web introuvable (${webDistPath}), seule l'API va repondre. ` +
+        'Il faut lancer "pnpm run build" avant de demarrer.',
     );
   }
 }
 
 bootstrap().catch((err: unknown) => {
-  // Sans ce filet, une erreur de configuration (JWT_SECRET manquant en
-  // production, base injoignable…) ne remonte que sous forme de rejet de
-  // promesse non traité, difficile à lire dans les journaux du service.
+  // Sans ça, une erreur de config (JWT_SECRET oublié en prod, base injoignable,
+  // etc.) sort en "unhandled promise rejection" avec une grosse stack illisible
+  // dans les logs. Là au moins on a un message clair.
   const message = err instanceof Error ? err.message : String(err);
   Logger.error(`Démarrage impossible : ${message}`, 'Bootstrap');
   process.exit(1);

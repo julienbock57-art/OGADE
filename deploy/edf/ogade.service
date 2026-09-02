@@ -1,25 +1,25 @@
-# Unité systemd OGADE — serveur de développement EDF
+# Service systemd pour OGADE, serveur de dev EDF
 #
-# Installation :
+# Pour l'installer :
 #   sudo cp /opt/ogade/deploy/edf/ogade.service /etc/systemd/system/
 #   sudo systemctl daemon-reload
 #   sudo systemctl enable --now ogade
 #
-# Journaux :  journalctl -u ogade -f
+# Pour voir les logs :  journalctl -u ogade -f
 
 [Unit]
-Description=OGADE — gestion des actifs END
+Description=OGADE - gestion des actifs END
 Documentation=file:/opt/ogade/deploy/edf/DEPLOIEMENT.md
 After=network-online.target
 Wants=network-online.target
-# Si PostgreSQL est hébergé sur la même machine, décommenter :
+# Si PostgreSQL tourne sur la meme machine, decommenter ces deux lignes :
 #After=postgresql.service
 #Requires=postgresql.service
 
-# Une configuration invalide (JWT_SECRET manquant en production, base
-# injoignable…) provoque un arrêt immédiat. Sans cette limite, systemd
-# redémarrerait indéfiniment sans que le problème soit résolu.
-# Ces deux clés relèvent de [Unit], non de [Service].
+# Si la config est mauvaise (JWT_SECRET manquant en prod, base injoignable...)
+# l'appli s'arrete tout de suite. Sans cette limite systemd la relancerait en
+# boucle pour rien.
+# Attention, ces deux cles vont dans [Unit] et pas dans [Service].
 StartLimitBurst=3
 StartLimitIntervalSec=120
 
@@ -29,24 +29,22 @@ User=ogade
 Group=ogade
 WorkingDirectory=/opt/ogade
 
-# L'application ne lit aucun fichier .env : toutes les variables doivent
-# transiter par ce fichier.
+# L'appli ne lit aucun fichier .env, donc toutes les variables passent par ici.
 EnvironmentFile=/etc/ogade/ogade.env
 
-# Migrations appliquées avant chaque démarrage.
+# On applique les migrations avant chaque demarrage.
 #
-# Contrairement à la commande de l'image Docker, qui masque les échecs
-# (« || echo ... ») et démarre sur une base potentiellement non migrée, un
-# échec interrompt ici le démarrage : mieux vaut un service arrêté et
-# diagnosticable qu'un service actif écrivant dans un schéma incohérent.
+# A la difference de la commande de l'image Docker, qui masque les erreurs avec
+# un "|| echo ..." et demarre quand meme sur une base pas forcement a jour, ici
+# un echec bloque le demarrage. Mieux vaut un service arrete ou on comprend le
+# probleme qu'un service qui tourne et ecrit dans un schema bancal.
 #
-# Le binaire est appelé par son chemin, sans dépendre de la présence de
-# pnpm dans le PATH de systemd.
+# On appelle le binaire par son chemin, comme ca pas besoin d'avoir pnpm dans le
+# PATH de systemd.
 ExecStartPre=/opt/ogade/apps/api/node_modules/.bin/prisma migrate deploy --schema=/opt/ogade/apps/api/prisma/schema.prisma
 
-# Adapter le chemin si Node n'est pas installé dans /usr/bin — le vérifier
-# avec « command -v node ». systemd exige un chemin absolu et n'effectue
-# aucune recherche dans le PATH.
+# Si Node n'est pas dans /usr/bin, adapter le chemin (le verifier avec
+# "command -v node"). systemd veut un chemin absolu, il ne cherche pas dans le PATH.
 ExecStart=/usr/bin/node /opt/ogade/apps/api/dist/main.js
 
 Restart=on-failure
@@ -56,7 +54,7 @@ StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=ogade
 
-# ─── Cloisonnement ─────────────────────────────────────────────
+# --- Cloisonnement ---
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
@@ -65,16 +63,15 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
-# pnpm et Prisma écrivent des fichiers temporaires sous le répertoire de
-# l'application ; ProtectSystem=strict le rendrait sinon inaccessible en
-# écriture.
+# pnpm et Prisma ecrivent des fichiers temporaires dans le dossier de l'appli,
+# et ProtectSystem=strict le passerait en lecture seule sans cette ligne.
 ReadWritePaths=/opt/ogade
 
 [Install]
 WantedBy=multi-user.target
 
-# ─── Note sur la montée en charge ──────────────────────────────────
-# Ne pas dupliquer ce service ni multiplier les processus : la tâche
-# planifiée des relances d'étalonnage (@nestjs/schedule) s'exécute au sein
-# du processus. Deux instances enverraient les notifications en double, la
-# déduplication ne portant que sur 24 heures.
+# --- A savoir si un jour on veut scaler ---
+# Ne pas dupliquer ce service et ne pas lancer plusieurs process : la tache
+# planifiee des relances d'etalonnage (@nestjs/schedule) tourne dans le process.
+# Avec deux instances les notifications partiraient en double, la deduplication
+# ne couvrant que 24h.

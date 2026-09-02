@@ -25,14 +25,11 @@ export interface RequestUser {
 export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
 
-  /**
-   * Repli sur l'en-tête `x-user-email`, destiné au développement local afin de
-   * lancer l'application sans fournisseur d'authentification.
-   *
-   * Il accorde un accès complet sur simple présentation d'une adresse e-mail :
-   * il ne doit jamais être actif en production. Le déploiement doit donc
-   * impérativement définir NODE_ENV=production.
-   */
+  // En dev on accepte l'en-tête x-user-email, ça permet de lancer l'appli sans
+  // avoir à configurer d'authentification.
+  // Par contre avec ça n'importe qui peut se faire passer pour n'importe qui,
+  // donc surtout jamais en prod. Bien penser à mettre NODE_ENV=production au
+  // moment du déploiement.
   private readonly devHeaderAuthEnabled = process.env.NODE_ENV !== 'production';
 
   constructor(
@@ -43,9 +40,8 @@ export class AuthGuard implements CanActivate {
   ) {
     if (this.devHeaderAuthEnabled && !this.msToken.isConfigured) {
       this.logger.warn(
-        "MODE DÉVELOPPEMENT — l'en-tête « x-user-email » est accepté comme " +
-          'authentification, sans mot de passe. Définissez NODE_ENV=production ' +
-          'pour désactiver ce repli.',
+        "MODE DEV : l'en-tete x-user-email est accepte comme authentification, " +
+          'sans mot de passe. Mettre NODE_ENV=production pour couper ca.',
       );
     }
   }
@@ -83,8 +79,7 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    // Repli développement uniquement — jamais actif en production.
-    // Cf. devHeaderAuthEnabled.
+    // Repli dev uniquement, voir devHeaderAuthEnabled plus haut.
     if (
       !email &&
       this.devHeaderAuthEnabled &&
@@ -119,14 +114,13 @@ export class AuthGuard implements CanActivate {
       } satisfies RequestUser;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
-      // Toute autre erreur (base indisponible, timeout…) ne doit pas laisser
-      // passer la requête : on refuse explicitement plutôt que d'ouvrir
-      // l'accès aux routes dépourvues de @Roles().
-      this.logger.error(
-        `Échec de la vérification d'identité pour « ${email} » : ${err}`,
-      );
+      // Base injoignable, timeout, etc. : on refuse la requete.
+      // Avant on faisait un "return true" ici, du coup des que la base toussait
+      // toutes les routes sans @Roles() devenaient accessibles sans etre
+      // connecte. Pas terrible.
+      this.logger.error(`Verification d'identite impossible pour ${email} : ${err}`);
       throw new ServiceUnavailableException(
-        'Service temporairement indisponible. Réessayez dans quelques instants.',
+        'Service temporairement indisponible. Reessayez dans quelques instants.',
       );
     }
 
