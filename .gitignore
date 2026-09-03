@@ -7,6 +7,10 @@ dist/
 build/
 *.tsbuildinfo
 
+# Sorties de deploy/edf/make-release.sh
+dist-release/
+deploy/edf/RELEASE_VERSION
+
 # Environment
 .env
 .env.local
